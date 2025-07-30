@@ -1,0 +1,55 @@
+{
+  "name": "tourtales_backend",
+  "version": "1.0.0",
+  "description": "REST API para el desarrollo de la aplicación TourTales",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node servidor-local.js",
+    "dev": "node --watch servidor-local.js",
+    "html": "servor ./web 8080 --reload --browse",
+    "lint": "eslint . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TourTales/BackEnd.git"
+  },
+  "keywords": [
+    "API REST",
+    "TourTales",
+    "turismo"
+  ],
+  "author": "ARCYNTRAR",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TourTales/BackEnd/issues"
+  },
+  "homepage": "https://github.com/TourTales/BackEnd#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "2.8.5",
+    "dotenv": "16.3.1",
+    "express": "4.18.2",
+    "jsonwebtoken": "9.0.2",
+    "mysql2": "3.6.5",
+    "node-mailjet": "^6.0.5",
+    "nodemailer": "^6.9.7",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.54.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "servor": "4.0.2",
+    "standard": "17.1.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "./node_modules/standard/eslintrc.json"
+    ]
+  }
+}
