@@ -6,7 +6,7 @@ export const ResultsRouter = (Modelos) => {
   const resultsController = new ResultsController(Modelos)
 
   ResultsRouter.get('/', resultsController.obtenerTodosLosResultadosOrdenadosPorGP)
-  ResultsRouter.get('/obtenerResultadoGP', resultsController.obtenerResultadoPorGPPorId)
+  ResultsRouter.get('/obtenerResultadoGP/:id', resultsController.obtenerResultadoPorGPPorId)
   ResultsRouter.post('/crearResultado', resultsController.registrarResultado)
   ResultsRouter.post('/cambiarPiloto', resultsController.cambiarPiloto)
   ResultsRouter.post('/cambiarPosicionInicial', resultsController.cambiarPosicionInicial)

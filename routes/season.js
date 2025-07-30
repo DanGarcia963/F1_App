@@ -6,7 +6,7 @@ export const SeasonRouter = (Modelos) => {
   const seasonController = new SeasonController(Modelos)
 
   SeasonRouter.get('/', seasonController.obtenerTodasLasTemporadas)
-  SeasonRouter.post('/obtenerTemporada', seasonController.obtenerTemporadaPorId)
+  SeasonRouter.get('/obtenerTemporada/:id', seasonController.obtenerTemporadaPorId)
   SeasonRouter.post('/crearTemporada', seasonController.registrarTemporada)
   SeasonRouter.post('/cambiarAnio', seasonController.cambiarAnio)
   

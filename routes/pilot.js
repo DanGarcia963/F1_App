@@ -6,7 +6,7 @@ export const PilotoRouter = (Modelos) => {
   const pilotoController = new PilotoController(Modelos)
 
   PilotoRouter.get('/', pilotoController.obtenerTodosLosPilotos)
-  PilotoRouter.post('/obtenerPiloto', pilotoController.obtenerPilotoPorId)
+  PilotoRouter.get('/obtenerPiloto/:id', pilotoController.obtenerPilotoPorId)
   PilotoRouter.post('/cambiarNumero', pilotoController.cambiarNumero)
   PilotoRouter.post('/crearPiloto', pilotoController.registrarPiloto)
   

@@ -6,7 +6,7 @@ export const TeamSeasonRouter = (Modelos) => {
   const teamSeasonController = new TeamSeasonController(Modelos)
 
   TeamSeasonRouter.get('/', teamSeasonController.obtenerTodosLosEquiposPorTemporadas)
-  TeamSeasonRouter.get('/obtenerEquiposPorTemporada', teamSeasonController.obtenerEquiposPorTemporadaPorId)
+  TeamSeasonRouter.get('/obtenerEquiposPorTemporada/:id', teamSeasonController.obtenerEquiposPorTemporadaPorId)
   TeamSeasonRouter.post('/crearEquipoTemporada', teamSeasonController.crearEquipoTemporada)
   TeamSeasonRouter.post('/editarTemporada', teamSeasonController.editarTemporada)
   TeamSeasonRouter.post('/editarEquipo', teamSeasonController.editarEquipo)

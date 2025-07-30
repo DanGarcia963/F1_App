@@ -6,7 +6,7 @@ export const GPRouter = (Modelos) => {
   const gpController = new GPController(Modelos)
 
   GPRouter.get('/', gpController.obtenerTodosLosGP)
-  GPRouter.get('/obtenerGP', gpController.obtenerGPPorId)
+  GPRouter.get('/obtenerGP/:id', gpController.obtenerGPPorId)
   GPRouter.post('/crearGP', gpController.registrarGP)
   GPRouter.post('/cambiarNombre', gpController.cambiarNombre)
   GPRouter.post('/cambiarFecha', gpController.cambiarFecha)

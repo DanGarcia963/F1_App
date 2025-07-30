@@ -6,7 +6,7 @@ export const PilotSeasonRouter = (Modelos) => {
   const pilotSeasonController = new PilotSeasonController(Modelos)
 
   PilotSeasonRouter.get('/', pilotSeasonController.obtenerTodosLosPilotosPorTemporadas)
-  PilotSeasonRouter.get('/obtenerPilotosPorTemporada', pilotSeasonController.obtenerPilotosPorTemporadaPorId)
+  PilotSeasonRouter.get('/obtenerPilotosPorTemporada/:id', pilotSeasonController.obtenerPilotosPorTemporadaPorId)
   PilotSeasonRouter.post('/crearPilotoTemporada', pilotSeasonController.crearPilotoTemporada)
   PilotSeasonRouter.post('/editarTemporada', pilotSeasonController.editarTemporada)
   PilotSeasonRouter.post('/editarPiloto', pilotSeasonController.editarPiloto)
