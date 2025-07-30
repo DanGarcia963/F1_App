@@ -1,0 +1,24 @@
+POST http://localhost:1234/api/temporada/crearTemporada
+Content-Type: application/json
+
+{ 
+    "anio": 2026
+}
+
+### 
+POST http://localhost:1234/api/temporada/cambiarAnio
+Content-Type: application/json
+
+{
+    "id_Temporada": 1,
+    "anio": 2025
+}
+
+### 
+GET http://localhost:1234/api/temporada/
+
+### 
+GET http://localhost:1234/api/temporada/obtenerTemporada/2
+
+### 
+GET http://localhost:1234/api/temporada/obtenerTemporadaAnio/2026

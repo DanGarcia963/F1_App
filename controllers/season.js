@@ -13,7 +13,16 @@ export class SeasonController {
 
         const temporada = await this.seasonModel.obtenerTemporadaPorId(id)
 
-        if (temporada) return res.json(piloto)
+        if (temporada) return res.json(temporada)
+            res.status(404).json({ message: 'temporada no encontrada' })
+    }
+        
+    obtenerTemporadaPorAnio = async (req, res) => {
+        const { anio } = req.params
+
+        const temporada = await this.seasonModel.obtenerTemporadaPorAnio(anio)
+
+        if (temporada) return res.json(temporada)
             res.status(404).json({ message: 'temporada no encontrada' })
     }
 
