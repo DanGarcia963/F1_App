@@ -22,6 +22,11 @@
         res.send(nuevoResultado)
     } 
 
+    cambiarPiloto = async (req, res) => {
+        const resultado = await this.resultsModel.cambiarPiloto({ entrada: req.body })
+        res.status(200).json({ message: `${resultado}` })
+    }
+
     cambiarPosicionInicial = async (req, res) => {
         const resultado = await this.resultsModel.cambiarPosicionInicial({ entrada: req.body })
         res.status(200).json({ message: `${resultado}` })

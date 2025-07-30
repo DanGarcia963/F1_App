@@ -1,0 +1,27 @@
+POST http://localhost:1234/api/piloto/crearPiloto
+Content-Type: application/json
+
+{ 
+    "Nombre": "Esteban",
+    "Apellido": "Gutierrez",
+    "Nacionalidad": "Mexico",
+    "Fecha_Nacimiento": "1991-08-05",
+    "Fecha_Debut": 2013,
+    "numero" : 12,
+    "codigo_fia": "GUT"
+}
+
+### Cambiar numero de piloto
+POST http://localhost:1234/api/piloto/cambiarNumero
+Content-Type: application/json
+
+{
+    "codigo_fia": "PER",
+    "numero": 11
+}
+
+### Obtener todos los pilotos
+GET http://localhost:1234/api/piloto/
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/piloto/obtenerPiloto/BEA
