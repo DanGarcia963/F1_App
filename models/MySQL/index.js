@@ -5,7 +5,7 @@ import { PilotModel } from './pilot.js'
 //import { ResultsModel } from './results.js'
 import { SeasonModel } from './season.js'
 //import { TeamModel } from './team.js'
-//import { TeamSeasonModel } from './teamSeason.js'
+import { TeamSeasonModel } from './teamSeason.js'
 
 export const Modelos = {
   //CircuitModel,
@@ -13,7 +13,7 @@ export const Modelos = {
   PilotModel,
   //PilotSeasonModel,
   //ResultsModel,
-  SeasonModel
+  SeasonModel,
   //TeamModel,
-  //TeamSeasonModel
+  TeamSeasonModel
 }

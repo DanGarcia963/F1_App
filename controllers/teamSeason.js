@@ -17,6 +17,13 @@ export class TeamSeasonController {
             res.status(404).json({ message: 'equipos por temporada no encontrados' })
     }
 
+    obtenerEquiposPorIDYPorTemporadaPorId = async (req, res) => {
+        const equiposTemporada = await this.teamSeasonModel.obtenerEquiposPorIDYPorTemporadaPorId({entrada: req.body})
+
+        if (equiposTemporada) return res.json(equiposTemporada)
+            res.status(404).json({ message: 'equipos por temporada no encontrados' })
+    }
+
     crearEquipoTemporada = async (req, res) => {
         const nuevoEquipoTemporada = await this.teamSeasonModel.crearEquipoTemporada({ entrada: req.body })
         res.send(nuevoEquipoTemporada)

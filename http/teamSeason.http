@@ -1,0 +1,43 @@
+### 
+GET http://localhost:1234/api/equipoTemporada/
+
+### 
+GET http://localhost:1234/api/equipoTemporada/obtenerEquiposPorTemporada/1
+
+### 
+GET http://localhost:1234/api/equipoTemporada/obtenerEquiposPorIDYPorTemporada
+Content-Type:  application/json
+
+{
+    "temporada_id":1,
+    "equipo_id":10
+}
+
+###
+POST http://localhost:1234/api/equipoTemporada/crearEquipoTemporada
+Content-Type: application/json
+
+{ 
+    "equipo_id": 2,
+    "temporada_id": 2
+}
+
+### 
+POST http://localhost:1234/api/equipoTemporada/editarTemporada
+Content-Type: application/json
+
+{
+    "equipo_id": 4,
+    "temporada_id": 1,
+    "id_Equipo_Temporada":4
+}
+
+### 
+POST http://localhost:1234/api/equipoTemporada/editarEquipo
+Content-Type: application/json
+
+{
+    "equipo_id": 4,
+    "temporada_id": 1,
+    "id_Equipo_Temporada":4
+}
