@@ -17,6 +17,15 @@ export class TeamController {
             res.status(404).json({ message: 'equipo no encontrado' })
     }
 
+    obtenerEquipoPorNombre = async (req, res) => {
+        const { nombre } = req.params
+
+        const equipo = await this.teamModel.obtenerEquipoPorNombre(nombre)
+
+        if (equipo) return res.json(equipo)
+            res.status(404).json({ message: 'equipo no encontrado' })
+    }
+
     registrarEquipo = async (req, res) => {
         const nuevoEquipo = await this.teamModel.registrarEquipo({ entrada: req.body })
         res.send(nuevoEquipo)

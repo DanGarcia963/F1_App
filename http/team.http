@@ -1,0 +1,35 @@
+POST http://localhost:1234/api/equipo/crearEquipo
+Content-Type: application/json
+
+{ 
+    "nombre": "Cadillac Formula 1 Team",
+    "Motor" : "Ferrari",
+    "pais": "USA"
+}
+
+### Cambiar numero de piloto
+POST http://localhost:1234/api/equipo/cambiarNombre
+Content-Type: application/json
+
+{
+    "id_Equipo": 11,
+    "nombre": "Cadillac Formula 1 Team"
+}
+
+### Cambiar numero de piloto
+POST http://localhost:1234/api/equipo/cambiarMotor
+Content-Type: application/json
+
+{
+    "id_Equipo": 11,
+    "Motor": "Ferrari 066/12"
+}
+
+### Obtener todos los pilotos
+GET http://localhost:1234/api/equipo/
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/equipo/obtenerEquipo/1
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/equipo/obtenerEquipo/McLaren

@@ -7,6 +7,7 @@ export const TeamRouter = (Modelos) => {
 
   TeamRouter.get('/', teamController.obtenerTodosLosEquipos)
   TeamRouter.get('/obtenerEquipo/:id', teamController.obtenerEquipoPorId)
+    TeamRouter.get('/obtenerEquipoNombre/:nombre', teamController.obtenerEquipoPorNombre)
   TeamRouter.post('/crearEquipo', teamController.registrarEquipo)
   TeamRouter.post('/cambiarNombre', teamController.cambiarNombre)
   TeamRouter.post('/cambiarMotor', teamController.cambiarMotor)
