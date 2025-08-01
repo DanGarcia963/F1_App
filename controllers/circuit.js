@@ -16,6 +16,15 @@
         if (circuito) return res.json(circuito)
             res.status(404).json({ message: 'circuito no encontrado' })
     }
+        
+    obtenerCircuitoPorNombre = async (req, res) => {
+        const { nombre } = req.params
+
+        const circuito = await this.circuitModel.obtenerCircuitoPorNombre(nombre)
+
+        if (circuito) return res.json(circuito)
+            res.status(404).json({ message: 'circuito no encontrado' })
+    }
 
     registrarCircuito = async (req, res) => {
         const nuevoCircuito = await this.circuitModel.registrarCircuito({ entrada: req.body })

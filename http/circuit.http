@@ -1,0 +1,52 @@
+POST http://localhost:1234/api/circuito/crearCircuito
+Content-Type: application/json
+
+{ 
+    "nombre": "Sepang International Circuit",
+    "ciudad": "Sepang",
+    "pais": "Malaysia",
+    "longitud_km": 5.543,
+    "curvas": 15
+}
+
+### Cambiar numero de piloto
+POST http://localhost:1234/api/circuito/cambiarNombre
+Content-Type: application/json
+
+{
+    "codigo_fia": "PER",
+    "numero": 11
+}
+
+### Cambiar numero de piloto
+POST http://localhost:1234/api/circuito/cambiarCiudad
+Content-Type: application/json
+
+{
+    "codigo_fia": "PER",
+    "numero": 11
+}
+
+### Cambiar numero de piloto
+POST http://localhost:1234/api/circuito/cambiarCurvas
+Content-Type: application/json
+
+{
+    "codigo_fia": "PER",
+    "numero": 11
+}
+
+### Cambiar numero de piloto
+POST http://localhost:1234/api/circuito/cambiarLongitud
+Content-Type: application/json
+
+{
+    "codigo_fia": "PER",
+    "numero": 11
+}
+
+### Obtener todos los pilotos
+GET http://localhost:1234/api/circuito/
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/piloto/obtenerPiloto/BEA

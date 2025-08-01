@@ -7,6 +7,7 @@ export const CircuitRouter = (Modelos) => {
 
   CircuitRouter.get('/', circuitController.obtenerTodosLosCircuitos)
   CircuitRouter.get('/obtenerCircuito/:id', circuitController.obtenerCircuitoPorId)
+    CircuitRouter.get('/obtenerCircuitoNombre/:id', circuitController.obtenerCircuitoPorNombre)
   CircuitRouter.post('/crearCircuito', circuitController.registrarCircuito)
   CircuitRouter.post('/cambiarNombre', circuitController.cambiarNombre)
   CircuitRouter.post('/cambiarCiudad', circuitController.cambiarCiudad)
