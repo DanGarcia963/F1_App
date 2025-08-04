@@ -16,8 +16,8 @@ POST http://localhost:1234/api/piloto/cambiarNumero
 Content-Type: application/json
 
 {
-    "codigo_fia": "PER",
-    "numero": 11
+    "codigo_fia": "VER",
+    "numero": 33
 }
 
 ### Obtener todos los pilotos

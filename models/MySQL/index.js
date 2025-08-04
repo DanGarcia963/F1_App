@@ -1,7 +1,7 @@
 import { CircuitModel } from './circuit.js'
 //import { GPModel } from './grandPrix.js'
 import { PilotModel } from './pilot.js'
-//import { PilotSeasonModel } from './pilotSeason.js'
+import { PilotSeasonModel } from './pilotSeason.js'
 //import { ResultsModel } from './results.js'
 import { SeasonModel } from './season.js'
 import { TeamModel } from './team.js'
@@ -11,7 +11,7 @@ export const Modelos = {
   CircuitModel,
   //GPModel,
   PilotModel,
-  //PilotSeasonModel,
+  PilotSeasonModel,
   //ResultsModel,
   SeasonModel,
   TeamModel,

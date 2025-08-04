@@ -14,8 +14,8 @@ POST http://localhost:1234/api/circuito/cambiarNombre
 Content-Type: application/json
 
 {
-    "codigo_fia": "PER",
-    "numero": 11
+    "id_Circuito": 25,
+    "nombre": "Circuito Internacional de Sepang"
 }
 
 ### Cambiar numero de piloto
@@ -23,8 +23,8 @@ POST http://localhost:1234/api/circuito/cambiarCiudad
 Content-Type: application/json
 
 {
-    "codigo_fia": "PER",
-    "numero": 11
+    "id_Circuito": 25,
+    "ciudad": "Sepang"
 }
 
 ### Cambiar numero de piloto
@@ -32,8 +32,8 @@ POST http://localhost:1234/api/circuito/cambiarCurvas
 Content-Type: application/json
 
 {
-    "codigo_fia": "PER",
-    "numero": 11
+    "id_Circuito": 25,
+    "curvas": 15
 }
 
 ### Cambiar numero de piloto
@@ -41,12 +41,12 @@ POST http://localhost:1234/api/circuito/cambiarLongitud
 Content-Type: application/json
 
 {
-    "codigo_fia": "PER",
-    "numero": 11
+    "id_Circuito": 25,
+    "longitud_km": 5.543
 }
 
 ### Obtener todos los pilotos
 GET http://localhost:1234/api/circuito/
 
 ### Obtener la información de un piloto
-GET http://localhost:1234/api/piloto/obtenerPiloto/BEA
+GET http://localhost:1234/api/circuito/obtenerCircuito/25

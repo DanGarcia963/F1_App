@@ -1,0 +1,49 @@
+### Obtener todos los pilotos por temporadas
+GET http://localhost:1234/api/pilotoTemporada/
+
+### Obtener todos los pilotos de una temporada
+GET http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporada/4
+
+###
+GET http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporadaYEquipo
+Content-Type: application/json
+
+{ 
+    "idTemporada": 1,
+    "idPiloto": 22
+}
+
+###
+GET http://localhost:1234/api/pilotoTemporada/duplaPilotos
+Content-Type: application/json
+
+{ 
+    "idTemporada": 1,
+    "idEquipo": 1
+}
+
+### Crear piloto temporada
+POST http://localhost:1234/api/pilotoTemporada/crearPilotoTemporada
+Content-Type: application/json
+
+{
+    "piloto_id": 22,
+    "equipo_id": 11,
+    "temporada_id":4,
+    "numero": 11
+}
+
+### Editar piloto
+POST http://localhost:1234/api/pilotoTemporada/editarPiloto
+Content-Type: application/json
+
+{
+    "piloto_id": 1,
+    "equipo_id":3,
+    "temporada_id":1,
+    "numero": 1,
+    "id_Piloto_Temporada": 5
+}
+
+
+
