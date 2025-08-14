@@ -1,0 +1,40 @@
+POST http://localhost:1234/api/granPremio/crearTemporada
+Content-Type: application/json
+
+{ 
+    "anio": 2026
+}
+
+###
+POST http://localhost:1234/api/granPremio/registrarGP
+Content-Type: application/json
+
+{ 
+    "nombre_oficial": "Azerbaiyan GP",
+    "fecha": "2024-09-15",
+    "circuito_id": 17,
+    "temporada_id": 2,
+    "vueltas_totales": 51,
+    "pole_position_piloto_id" : 9,
+    "vuelta_rapida_piloto_id": 2
+}
+
+### 
+GET http://localhost:1234/api/granPremio/obtenerGPTemporada/2023
+
+
+### 
+GET http://localhost:1234/api/granPremio/obtenerWDCPorAnio/2023
+
+### 
+GET http://localhost:1234/api/granPremio/obtenerWCCPorAnio/2023
+
+### 
+GET http://localhost:1234/api/granPremio/obtenerTemporadaAnio/2026
+
+### 
+GET http://localhost:1234/api/granPremio/
+
+###
+GET http://localhost:1234/api/granPremio/obtenerGP/1
+    

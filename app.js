@@ -40,11 +40,11 @@ export const crearApp = (Modelos) => {
   // Rutas del sitio web estático
   app.use(express.static(__dirname + '/public'))
   // Pruebas de backend
-  app.get('/recuperarContrasena', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/cambiar_contraseña.html'))
-  app.get('/', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/login_ES.html'))
-  app.get('/LogInAdmin', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/Admin/login_Admin.html'))
-  app.get('/registrar', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/registro_turista_ES.html'))
-  app.get('/registrarAdmin', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/Admin/registro_Admin.html'))
+  app.get('/piloto', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/piloto.html'))
+  app.get('/', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/main.html'))
+  app.get('/seasons', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/seasons.html'))
+  app.get('/season', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/season.html'))
+  app.get('/granPremio', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/gran_Premio.html'))
   app.get('/admin', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/admin/admin.html'))
   app.get('/inicio', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/inicio.html'))
   app.get('/experience', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/Experience.html'))

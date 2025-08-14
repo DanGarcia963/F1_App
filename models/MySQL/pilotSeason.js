@@ -27,9 +27,8 @@ export class PilotSeasonModel {
 
     static async obtenerPilotosPorTemporadaPorId (idTemporada) {
         const [pilotosTemporada] = await connectionMySQL.query(`SELECT 
-            e.nombre, 
-            CONCAT(p.nombre, " ", p.apellido) AS "nombre_completo", 
-            t.anio 
+            p.id_Piloto,
+            CONCAT(p.nombre, " ", p.apellido) AS "nombre_completo"
             FROM pilotos_temporada pt
             JOIN equipo e
             ON e.id_Equipo = pt.equipo_id

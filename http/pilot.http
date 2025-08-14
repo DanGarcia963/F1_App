@@ -24,4 +24,16 @@ Content-Type: application/json
 GET http://localhost:1234/api/piloto/
 
 ### Obtener la información de un piloto
-GET http://localhost:1234/api/piloto/obtenerPiloto/BEA
+GET http://localhost:1234/api/piloto/obtenerPiloto/22
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/piloto/obtenerInfoPiloto/22
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/piloto/obtenerVictoriasPiloto/22
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/piloto/obtenerPodiosPiloto/22
+
+### Obtener la información de un piloto
+GET http://localhost:1234/api/piloto/obtenerTrayectoriaPiloto/22

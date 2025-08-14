@@ -2,7 +2,7 @@ POST http://localhost:1234/api/temporada/crearTemporada
 Content-Type: application/json
 
 { 
-    "anio": 2026
+    "anio": 2011
 }
 
 ### 

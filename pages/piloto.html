@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Información del Piloto</title>
+  <link href="styles/style.css" rel="stylesheet">
+  <style>
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .card-img { background-size: cover; background-position: center; }
+      #gridVictories{
+    max-height: 300px;
+  }
+  #gridPodios, #gridTrayectoria{
+        max-height: 250px;
+  }
+    .scrollbar-hide {
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    /* Mostrar scrollbar solo al hacer hover */
+    .hover\\:scrollbar-default:hover {
+      scrollbar-width: auto; /* Firefox */
+    }
+
+    .hover\\:scrollbar-default:hover::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+    }
+
+    .hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-neutral-950 text-white min-h-screen flex flex-col items-center p-6">
+
+  <!-- Botón Volver -->
+  <div class="w-full mb-4">
+    <a href="/" class="inline-block bg-neutral-800 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 transition">
+      ⬅ Volver
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-rows-3 lg:grid-cols-5 xl:grid-rows-3 xl:grid-cols-7 2xl:grid-rows-4 2xl:grid-cols-9 rounded-lg overflow-hidden shadow-lg relative">
+  
+    <!-- Contenedor principal -->
+  <section id="gridPiloto"class="bg-neutral-900 col-span-1 lg:row-span-2 lg:col-span-3 xl:col-span-2 xl:col-span-4 2xl:row-span-2 2xl:col-span-5 border border-neutral-700 rounded-xl shadow-lg w-full  p-6  gap-6">    
+    <!-- Foto del piloto -->
+    <div class="flex-shrink-0 flex flex-col items-center">
+      <span id="fotoPiloto"></span>
+      <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
+      <p id="equipoPiloto" class="text-neutral-400"></p>
+    </div>
+    <!-- Datos del piloto -->
+    <div class="flex-1">
+      <h2 class="text-2xl font-semibold mb-4 border-b border-neutral-700 pb-2">Detalles</h2>
+      <ul class="space-y-2">
+        <li><span class="font-semibold">Nacionalidad:</span> <span id="nacionalidadPiloto"></span></li>
+        <li><span class="font-semibold">Fecha de nacimiento:</span> <span id="fechaNacimiento"></span></li>
+        <li><span class="font-semibold">Número:</span> <span id="numeroPiloto"></span></li>
+        <li><span class="font-semibold">Puntos totales:</span> <span id="puntosTotales"></span></li>
+        <li><span class="font-semibold">Victorias:</span> <span id="victoriasPiloto"></span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="bg-neutral-900 col-span-1 lg:row-span-3 lg:col-span-2 xl:row-span-3 xl:col-span-3 2xl:row-span-4 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg w-full p-6 gap-6">
+    <div id="infoGridVictorias" class="grid grid-cols-1 gap-6 p-6 items-start">
+      <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+        <div class="p-4 flex flex-row items-center gap-4">
+          <div class="flex flex-col">
+            <p class="text-2xl max-w-full text-neutral-200 font-semibold">Victorias</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="gridVictories" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+    </div>
+  </section>
+
+  <section class="bg-neutral-900 col-span-1 lg:row-span-1 lg:col-span-3 xl:row-span-1 xl:col-span-4 2xl:row-span-2 2xl:col-span-5 border border-neutral-700 rounded-xl shadow-lg w-full  p-6  gap-6">    
+    <div id="infoGridTrayectoria" class="grid grid-cols-1 gap-6 p-6 items-start">
+      <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+        <div class="p-4 flex flex-row items-center gap-4">
+          <div class="flex flex-col">
+            <p class="text-2xl max-w-full text-neutral-200 font-semibold">Trayectoria</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="gridTrayectoria" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+    </div>
+  </section>
+
+  <section class="col-span-1 lg:row-span-1 lg:col-span-3 xl:row-span-1 xl:col-span-4 2xl:row-span-2 2xl:col-span-4 border border-neutral-700 rounded-lg shadow-lg overflow-hidden p-6 gap-6 bg-neutral-900">    
+    <div id="infoGridPodios" class="grid grid-cols-1 gap-6 p-6 items-start">
+      <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+        <div class="p-4 flex flex-row items-center gap-4">
+          <div class="flex flex-col">
+            <p class="text-2xl max-w-full text-neutral-200 font-semibold">Podios</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="gridPodios" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+    </div>
+  </section>
+
+</div>
+  <!-- Script para cargar datos -->
+  <script>
+
+    async function obtenerImagenWikipedia(nombre) {
+      const query = encodeURIComponent(nombre);
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=100&origin=*`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+        return page.thumbnail ? page.thumbnail.source : null;
+      } catch (err) {
+        console.error('Error obteniendo imagen de', nombre, err);
+        return null;
+      }
+    }
+
+    // Obtiene el id del piloto desde la URL
+    const params = new URLSearchParams(window.location.search);
+    const idPiloto = params.get("id");
+console.log(idPiloto)
+
+    async function cargarVictoriasPiloto(){
+      try{
+        const VictoriasPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerVictoriasPiloto/${idPiloto}`).then(r=>r.json());
+        const container =document.getElementById('gridVictories')
+        container.innerHTML='';
+        for(let i=0; i<VictoriasPiloto.length;i++){
+        const victory = VictoriasPiloto[i];
+        const imgCURL = await obtenerImagenWikipedia(victory.nombre_Circuito)
+        const card = document.createElement('div');
+
+        const fecha = new Date(victory.fecha);
+        const day = String(fecha.getDate()).padStart(2, '0');
+        const month = fecha.toLocaleString('es-ES', { month: 'short' });
+        const year = fecha.getFullYear();
+        const newDate = `${day}/${month}/${year}`;
+
+        card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+        card.innerHTML =`                
+                <div class="p-4 flex flex-col items-center text-center">
+                <h3 class="text-lg font-bold text-white">${victory.nombre_oficial} ${year}</h3>
+                ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${victory.nombre_Circuito}" class="w-20 h-18 mb-2 border bg-white">` : ''}
+                <p class="text-sm text-neutral-400">${newDate}</p>
+                </div>
+                `;
+                container.appendChild(card)
+      };
+    }      
+    catch (err) {
+        console.error('Error cargando victorias', err);
+    }
+    }
+
+        async function cargarPodiosPiloto(){
+      try{
+        const PodiosPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerPodiosPiloto/${idPiloto}`).then(r=>r.json());
+        const container =document.getElementById('gridPodios')
+        container.innerHTML='';
+        for(let i=0; i<PodiosPiloto.length;i++){
+        const podios = PodiosPiloto[i];
+        const imgCURL = await obtenerImagenWikipedia(podios.nombre_Circuito)
+        const card = document.createElement('div');
+
+        const fecha = new Date(podios.Fecha);
+        const day = String(fecha.getDate()).padStart(2, '0');
+        const month = fecha.toLocaleString('es-ES', { month: 'short' });
+        const year = fecha.getFullYear();
+        const newDate = `${day}/${month}/${year}`;
+
+        card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+        card.innerHTML =`                
+                <div class="p-4 flex flex-col items-center text-center">
+                <h3 class="text-lg font-bold text-white">${podios.Nombre_GP} ${year}</h3>
+                ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${podios.nombre_Circuito}" class="w-20 h-18 mb-2 border bg-white">` : ''}
+                <p class="text-sm text-neutral-400">${newDate}</p>
+                </div>
+                `;
+                container.appendChild(card)
+      };
+    }      
+    catch (err) {
+        console.error('Error cargando podios', err);
+    }
+    }
+
+    async function cargarTrayectoria(){
+      try{
+        const TrayectoriaPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerTrayectoriaPiloto/${idPiloto}`).then(r=>r.json());
+        const container =document.getElementById('gridTrayectoria')
+        container.innerHTML='';
+        for(let i=0; i<TrayectoriaPiloto.length;i++){
+          const trayectoria = TrayectoriaPiloto[i];
+          const cardTrayectory = document.createElement('div');
+
+          cardTrayectory.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+          cardTrayectory.innerHTML=`
+            <div class="p-4 flex flex-col items-center text-center">
+
+            <h3 class="text-lg font-bold text-white">${trayectoria.Equipo}</h3>
+            <p class="text-sm text-neutral-400">Temporadas: ${trayectoria.temporadas}</p>
+            <p class="text-sm text-neutral-400">No. Victorias: ${trayectoria.victorias}</p>
+            <p class="text-sm text-neutral-400">No. Poles: ${trayectoria.poles}</p>
+            <p class="text-sm text-neutral-400">No. Podios: ${trayectoria.Podios}</p>
+
+            </div>
+          `;
+          container.appendChild(cardTrayectory)
+        }
+      }catch (err) {
+        console.error('Error cargando trayectoria', err);
+    }
+    }
+
+    async function cargarDatosPiloto() {
+      try {
+        // Ejemplo de llamada a tu backend para obtener info
+        
+        const infoPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerPiloto/${idPiloto}`).then(r => r.json());
+        const statsPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerInfoPiloto/${idPiloto}`).then(r=> r.json());
+        var acumPuntos=0
+        var acumPodios=0
+        var acumVictories=0
+        var acumPoles=0
+          for (let i = 0; i < statsPiloto.length; i++) {
+                    const piloto = statsPiloto[i];
+                    acumPuntos += Number(piloto.puntos_totales);
+                    acumPodios += Number(piloto.Podios);
+                    acumVictories += Number(piloto.victorias);
+                    acumPoles += Number(piloto.poles);
+          }
+        const fecha = new Date(infoPiloto.fecha_nacimiento);
+        const day = String(fecha.getDate()).padStart(2, '0');
+        const month = fecha.toLocaleString('es-ES', { month: 'short' });
+        const year = fecha.getFullYear();
+
+        const newDate = `${day}/${month}/${year}`;
+        const imgPUrl = await obtenerImagenWikipedia(infoPiloto.nombre_completo);
+        document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoPiloto.nombre_completo}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">`
+        document.getElementById("nombrePiloto").textContent = infoPiloto.nombre_completo;
+        document.getElementById("equipoPiloto").textContent = infoPiloto.equipo;
+        document.getElementById("nacionalidadPiloto").textContent = infoPiloto.nacionalidad;
+        document.getElementById("fechaNacimiento").textContent = newDate;
+        document.getElementById("numeroPiloto").textContent = infoPiloto.identificador;
+        document.getElementById("puntosTotales").textContent = acumPuntos;
+        document.getElementById("victoriasPiloto").textContent = acumVictories;
+      } catch (error) {
+        console.error("Error cargando datos del piloto:", error);
+      }
+    }
+    cargarPodiosPiloto();
+    cargarTrayectoria();
+    cargarVictoriasPiloto();
+    cargarDatosPiloto();
+  </script>
+
+</body>
+</html>

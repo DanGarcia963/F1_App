@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resultados - Gran Premio</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="styles/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+
+  <!-- Header simple -->
+  <header class="bg-black/60 glass border-b border-gray-800 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="flex items-center gap-2">
+          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold">F1</div>
+          <span class="font-semibold">F1 APP — Resultados GP</span>
+        </a>
+      </div>
+      <div id="gpTitle" class="text-sm text-gray-300"></div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-6">
+    <!-- Contenedor de resultados (se muestra si hay datos) -->
+    <section id="gridResultados" class="hidden bg-neutral-900 border border-neutral-700 rounded-lg p-4 shadow">
+      <h2 class="text-xl font-semibold mb-4">Resultados del Gran Premio</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-400">
+              <th class="p-2">Pos</th>
+              <th class="p-2">Piloto</th>
+              <th class="p-2">Equipo</th>
+              <th class="p-2">Clasif.</th>
+              <th class="p-2">Vueltas completadas</th>
+              <th class="p-2">Puntos</th>
+            </tr>
+          </thead>
+          <tbody id="resultadosBody" class="divide-y divide-neutral-800"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Contenedor vacío (si no hay resultados) -->
+    <section id="noResultados" class="hidden bg-neutral-900 border border-neutral-700 rounded-lg p-6 shadow mt-6">
+      <h2 class="text-xl font-semibold mb-4">No se encontraron resultados para este Gran Premio</h2>
+      <p class="text-sm text-gray-300 mb-4">Puedes agregar manualmente los resultados para este GP.</p>
+      <div>
+        <button id="btnAbrirForm" class="px-4 py-2 bg-red-600 rounded">Agregar resultados</button>
+      </div>
+    </section>
+
+    <!-- Modal / Panel formulario -->
+    <div id="modalForm" class="fixed inset-0 hidden items-center justify-center bg-black/60 z-50 p-4">
+      <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
+        <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+          <h3 class="text-lg font-semibold">Agregar resultados - Gran Premio <span id="gpIdInModal"></span></h3>
+          <div class="flex gap-2">
+            <button id="btnCancelar" class="px-3 py-1 bg-neutral-800 rounded">Cancelar</button>
+            <button id="btnGuardar" class="px-3 py-1 bg-red-600 rounded">Guardar resultados</button>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <p class="text-sm text-gray-300 mb-4">Selecciona el piloto para cada posición (1 → 25 pts). Asegúrate de no repetir pilotos.</p>
+
+          <form id="formResultados" class="space-y-4">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="text-left text-gray-400">
+                    <th class="p-2 w-12">Pos</th>
+                    <th class="p-2">Piloto</th>
+                    <th class="p-2 w-36">Pos. Clasif.</th>
+                    <th class="p-2 w-40">Vueltas completadas</th>
+                    <th class="p-2 w-28">Puntos</th>
+                  </tr>
+                </thead>
+                <tbody id="formRows" class="divide-y divide-neutral-800"></tbody>
+              </table>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensajes / feedback -->
+    <div id="msg" class="fixed bottom-6 right-6 hidden p-3 rounded shadow-lg"></div>
+  </main>
+
+<script>
+(async function () {
+  // Obtener id_GP desde URL
+  const params = new URLSearchParams(window.location.search);
+  const idGP = params.get('id');
+  const gpTitle = document.getElementById('gpTitle');
+  const gpIdInModal = document.getElementById('gpIdInModal');
+
+  if (!idGP) {
+    gpTitle.textContent = 'GP no especificado. Añade ?id=... en la URL';
+  } else {
+    gpTitle.textContent = `GP ID: ${idGP}`;
+  }
+
+  // Endpoints que puedes ajustar
+  const GPPoint = await fetch(`http://localhost:1234/api/granPremio/obtenerGP/${idGP}`).then(r => r.json());
+  console.log(GPPoint[0].id_Temporada)
+  const idSeason = GPPoint[0].id_Temporada
+  const anio = GPPoint[0].anio
+  const nombreGP = GPPoint[0].Nombre_GP
+  gpTitle.textContent = `Gran Premio: ${nombreGP} ${anio}`
+  
+            // GET -> devuelve array de resultados
+  const endpointAllPilotos = `/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`;                               // fallback
+  const endpointGuardar = `/api/resultados/crearResultado/`;      // POST -> guarda resultados (ajusta)
+
+  // Puntos según posición (1..20)
+  const puntosPorPos = [25,18,15,12,10,8,6,4,2,1,0,0,0,0,0,0,0,0,0,0];
+
+  const resultadosSection = document.getElementById('gridResultados');
+  const noResultadosSection = document.getElementById('noResultados');
+  const resultadosBody = document.getElementById('resultadosBody');
+
+  // Modal y botones
+  const modal = document.getElementById('modalForm');
+  const btnAbrir = document.getElementById('btnAbrirForm');
+  const btnCancelar = document.getElementById('btnCancelar');
+  const btnGuardar = document.getElementById('btnGuardar');
+  const formRows = document.getElementById('formRows');
+  const msg = document.getElementById('msg');
+
+  function mostrarMsg(text, tipo='info') {
+    msg.textContent = text;
+    msg.className = 'fixed bottom-6 right-6 p-3 rounded shadow-lg';
+    if (tipo==='ok') msg.classList.add('bg-green-600'); else if (tipo==='err') msg.classList.add('bg-red-600'); else msg.classList.add('bg-neutral-800');
+    msg.classList.remove('hidden');
+    setTimeout(()=> msg.classList.add('hidden'), 3000);
+  }
+
+  // 1) Intentar obtener resultados
+  let resultados;
+  try {
+    const r = await fetch(`http://localhost:1234/api/resultados/obtenerResultadoGP/${idGP}`);
+    if (!r.ok) throw new Error('No OK');
+    resultados = await r.json();
+  } catch (e) {
+    // Si falla la petición, consideramos como no hay resultados
+    resultados = null;
+  }
+
+  if (Array.isArray(resultados) && resultados.length > 0) {
+    // Mostrar tabla de resultados
+    resultadosSection.classList.remove('hidden');
+    noResultadosSection.classList.add('hidden');
+    console.log(resultados)
+    // Rellenar tabla
+    resultadosBody.innerHTML = '';
+    resultados.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2 align-top">${row.posicion_final}</td>
+          <td class="p-2 align-top">${row.nombre_piloto || row.piloto_nombre || row.piloto || '—'}</td>
+          <td class="p-2 align-top">${row.equipo || '—'}</td>
+          <td class="p-2 align-top">${row.posicion_clasificacion ?? '—'}</td>
+          <td class="p-2 align-top">${row.vueltas_completadas ?? '—'}</td>
+          <td class="p-2 align-top">${row.puntos || row.puntos_obtenidos || 0}</td>
+        `;
+        resultadosBody.appendChild(tr);
+      });
+  } else {
+    // No hay resultados -> mostrar botón para abrir formulario
+    resultadosSection.classList.add('hidden');
+    noResultadosSection.classList.remove('hidden');
+
+    // Prepara lista de pilotos para selects
+    let pilotosList = [];
+      // fallback a endpoint general de pilotos
+      try {
+        const resp2 = await fetch(endpointAllPilotos);
+        pilotosList = await resp2.json();
+      } catch (e2) {
+        pilotosList = [];
+      }
+    
+
+    // btn abrir
+    btnAbrir?.addEventListener('click', () => {
+      openForm(pilotosList);
+    });
+  }
+
+  // Función para abrir formulario y crear 20 filas
+  function openForm(pilotos) {
+    formRows.innerHTML = ''; // limpiar
+    // Si no hay pilotos, muestra mensaje y no permitir continuar
+    if (!Array.isArray(pilotos) || pilotos.length === 0) {
+      mostrarMsg('No hay pilotos disponibles para seleccionar.', 'err');
+      return;
+    }
+
+    for (let pos = 1; pos <= 20; pos++) {
+      const tr = document.createElement('tr');
+      // construir select options
+      const options = pilotos.map(p => {
+        // adaptable: nombres y ids pueden variar según tu API
+        const id = p.id_Piloto ?? p.id ?? p.id_piloto ?? p.idPiloto;
+        const name = p.nombre_completo ?? p.nombre ?? p.name ?? `${p.Nombre ?? ''} ${p.Apellido ?? ''}`.trim();
+        return `<option value="${id}">${name}</option>`;
+      }).join('');
+
+      tr.innerHTML = `
+        <td class="p-2 align-top font-semibold">${pos}</td>
+        <td class="p-2">
+          <select class="w-full bg-neutral-800 p-2 rounded select-piloto" required>
+            <option value="">-- seleccionar piloto --</option>
+            ${options}
+          </select>
+        </td>
+        <td class="p-2">
+          <input type="number" min="1" class="w-full bg-neutral-800 p-2 rounded input-clasif" placeholder="Pos. clasif.">
+        </td>
+        <td class="p-2">
+          <input type="number" min="0" class="w-full bg-neutral-800 p-2 rounded input-vueltas" placeholder="Vueltas completadas">
+        </td>
+        <td class="p-2">
+          <input type="number" class="w-full bg-neutral-700 p-2 rounded input-puntos" value="${puntosPorPos[pos-1]}">
+        </td>
+      `;
+      formRows.appendChild(tr);
+    }
+
+    // mostrar modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    // eventos
+    btnCancelar?.addEventListener('click', closeModal);
+    btnGuardar?.addEventListener('click', onSave);
+  }
+
+  async function fetchGuardarResultadoGP(resultadoGP){
+    try {
+      const res = await fetch(endpointGuardar, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(resultadoGP)
+      });
+      if (!res.ok) throw new Error('Error en el guardado');
+      const data = await res.json();
+      //
+
+      // opcional: recargar la página para mostrar resultados recién guardados
+      //
+    } catch (err) {
+      console.error(err);
+      mostrarMsg('Error guardando resultados', 'err');
+    }
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  // Validación y envío
+  async function onSave(e) {
+    e.preventDefault();
+
+    // Recoger filas
+    const rows = Array.from(formRows.querySelectorAll('tr'));
+    const payload = [];
+    const selectedPilotos = new Set();
+    let ok = true;
+    let firstInvalid = null;
+
+    rows.forEach((row, idx) => {
+      const position_final = idx + 1;
+      const select = row.querySelector('.select-piloto');
+      const clasif = row.querySelector('.input-clasif');
+      const vueltas = row.querySelector('.input-vueltas');
+      const puntosInput = row.querySelector('.input-puntos');
+
+      const pilotoId = select?.value?.trim();
+      const posicion_clasificacion = clasif?.value ? Number(clasif.value) : null;
+      const vueltas_completadas = vueltas?.value ? Number(vueltas.value) : null;
+      const puntos = puntosInput ? Number(puntosInput.value) : 0;
+
+      // Si no seleccionó piloto, lo tratamos como posición vacía: no agregamos al payload
+      if (!pilotoId) {
+        // skip empty rows (posiciones sin piloto)
+        return;
+      }
+
+      // verificar repetidos
+      if (selectedPilotos.has(pilotoId)) {
+        ok = false;
+        if (!firstInvalid) firstInvalid = `Piloto repetido en la posición ${position_final}`;
+      } else {
+        selectedPilotos.add(pilotoId);
+      }
+
+      // agregar al payload
+      payload.push({
+        piloto_id: pilotoId,
+        grand_prix_id:idGP,
+        posicion_final:position_final,
+        posicion_inicio:posicion_clasificacion,
+        vueltas_completadas,
+        puntos_obtenidos:puntos
+      });
+    });
+
+    if (!ok) {
+      mostrarMsg(firstInvalid || 'Hay errores en el formulario', 'err');
+      return;
+    }
+
+    if (payload.length === 0) {
+      mostrarMsg('No hay resultados seleccionados para guardar.', 'err');
+      return;
+    }
+
+    // confirmación simple
+    if (!confirm(`Se guardarán ${payload.length} resultados para el GP ${idGP}. ¿Continuar?`)) return;
+
+      payload.forEach(async (resultadosGP)=>{
+        console.log(resultadosGP)
+    await fetchGuardarResultadoGP(resultadosGP);
+          mostrarMsg('Resultados guardados correctamente', 'ok');
+          closeModal();
+          setTimeout(()=> location.reload(), 800);
+  })
+         
+
+  }
+
+})();
+</script>
+
+</body>
+</html>
+

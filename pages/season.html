@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F1 APP — Plantilla con Campeonato</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="styles/style.css" rel="stylesheet">
+  <style>
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .card-img { background-size: cover; background-position: center; }
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+}
+  #gridWDC, #gridWCC, #gridGPs {
+    max-height: 540px;
+  }
+
+  #gridDriverSeason{
+    max-width:  100%;
+    overflow-x: scroll;
+
+  }
+
+.scrollbar-hide::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Mostrar scrollbar solo al hacer hover */
+.hover\\:scrollbar-default:hover {
+  scrollbar-width: auto; /* Firefox */
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+  <!-- NAV -->
+  <header class="sticky top-0 z-40 bg-black/60 glass border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <a href="#" class="flex items-center gap-2">
+          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold"></div>
+          <span class="font-semibold text-lg">F1 APP — Mock</span>
+        </a>
+        <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
+          <a class="px-3 py-2 hover:text-white" href="/">Inicio</a>
+          <a class="px-3 py-2 hover:text-white" href="#">Equipos</a>
+          <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
+          <a class="px-3 py-2 hover:text-white" href="#">Calendario</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input class="hidden sm:inline-block bg-gray-800 text-sm px-3 py-2 rounded" placeholder="Buscar pilotos, carreras..." />
+        <button class="px-4 py-2 bg-red-600 rounded text-sm font-medium">Suscribirse</button>
+      </div>
+    </div>
+  </header>
+
+
+
+  <!-- HERO -->
+  <main class="min-w-md max-w-full mx-auto px-4 py-8">
+
+    <div class="max-w-screen-xl mx-auto px-4 mb-6 overflow-x-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+                  <div id="driverAddBtnCard" class="flex-none w-20 h-28 bg-green-700/10 border border-green-600 rounded-lg shadow-lg p-3 flex items-center justify-center cursor-pointer">
+          <button id="openAddPilotosBtn" class="flex items-center gap-2 text-sm text-white px-3 py-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+            Agregar Piloto
+          </button>
+        </div>
+      <div class="flex gap-4 py-2">
+
+        <div id="gridDriverSeason" class="flex-shrink-0 bg-gray-800 rounded-lg shadow-lg p-3 overflow-x-auto flex">
+        <!-- Aquí tu contenido dinámico -->
+        </div>
+      </div>
+    </div>
+    <a id="mi-boton" class="hidden inline-block sm:inline-block md:none" href="#WDCSection">WDC</a>
+    <a id="mi-Boton2" class="hidden inline-block sm:inline-block md:none " href="#GPSection">Grandes Premios</a>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
+      
+      <!-- World Constructors Championship -->
+      <section class="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-2 2xl:col-span-2  rounded-lg overflow-hidden shadow-lg relative">
+        <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Constructors Championship</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridWCC" class="grid grid-cols-1 sm:grid-cols- md:grid-cols- lg:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+      </section>
+
+      <!-- Grand Prix Section -->
+      <section id="GPSection"class="col-span-1 md:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-5 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
+        <div class="relative">
+          <div class="bg-gray-800 rounded-lg p-4 shadow">
+            <h2 class="text-2xl font-bold">Grandes Premios <span id="anio"></span></h2>
+            <div id="gridGPs" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+            </div>
+            <div id="btnAgregarGP" class="p-6">
+                <button id="abrirFormGP" class="px-4 py-2 bg-green-600 rounded text-sm font-medium">Agregar GP</button>
+            </div>
+            <!-- Formulario oculto -->
+            <div id="formAgregarGP" class="hidden bg-neutral-900 border border-neutral-700 p-6 rounded-xl mt-4">
+                <h3 class="text-lg font-bold mb-4">Nuevo Gran Premio</h3>
+                <form id="gpForm" class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-sm mb-1">Nombre del GP</label>
+                        <select name="NombreGP" id="selectGP" class="w-full bg-gray-800 px-3 py-2 rounded" required>
+                        <option value="">Cargando...</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Fecha</label>
+                    <input id="date" type="date" name="fecha" class="w-full bg-gray-800 px-3 py-2 rounded" required>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Circuito</label>
+                    <select name="circuito" id="selectCircuito" class="w-full bg-gray-800 px-3 py-2 rounded" required>
+                        <option value="">Cargando...</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Vueltas Totales</label>
+                    <input id="Laps" type="number" name="vueltas" min="1" class="w-full bg-gray-800 px-3 py-2 rounded" required>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Piloto Pole Position</label>
+                    <select name="polePosition" id="selectPolePosition" class="w-full bg-gray-800 px-3 py-2 rounded">
+                        <option value="">Cargando...</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Piloto Vuelta Rápida</label>
+                    <select name="vueltaRapida" id="selectVueltaRapida" class="w-full bg-gray-800 px-3 py-2 rounded">
+                        <option value="">Cargando...</option>
+                    </select>
+                    </div>
+                    <div class="flex gap-2">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 rounded">Guardar</button>
+                    <button type="button" id="cancelarFormGP" class="px-4 py-2 bg-gray-600 rounded">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+          </div>
+        </div>
+        <div class="p-5">
+          <h2 class="text-2xl font-bold">Grandes Premios</h2>
+          <p class="mt-2 text-gray-300">Revive las mejores maniobras, el podio y los momentos clave.</p>
+        </div>
+      </section>
+
+      <!-- World Drivers Championship Section -->
+      <section id="WDCSection"class="md:col-span-3  lg:col-span-2 xl:col-span-2 2xl:col-span-2 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
+        <!-- Campeonato -->
+        <div id="infoGridWDC" class="grid grid-cols-1 gap-6 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Drivers Championship</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridWDC" class="grid grid-cols-1 xl:grid-cols-2 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+      </section>
+    </div>
+            <!-- Modal: Agregar pilotos a temporada -->
+    <div id="modalAddPilotos" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+      <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
+        <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+          <h3 class="text-lg font-semibold">Agregar pilotos a la temporada <span id="modalSeasonId" class="font-bold"></span></h3>
+          <div class="flex gap-2">
+            <button id="btnCloseAddPilotos" class="px-3 py-1 bg-neutral-800 rounded">Cancelar</button>
+            <button id="btnSavePilotosSeason" class="px-3 py-1 bg-red-600 rounded">Guardar</button>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <p class="text-sm text-gray-300 mb-4">Agrega uno o varios pilotos a la temporada. Pulsa "+ Agregar fila" para añadir más filas.</p>
+
+          <div class="mb-4 flex gap-2">
+            <button id="btnAddRow" type="button" class="px-3 py-2 bg-green-600 rounded text-sm">+ Agregar fila</button>
+            <button id="btnClearRows" type="button" class="px-3 py-2 bg-neutral-700 rounded text-sm">Limpiar filas</button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-400">
+                  <th class="p-2 w-12">#</th>
+                  <th class="p-2">Piloto</th>
+                  <th class="p-2">Equipo</th>
+                  <th class="p-2 w-32">Número</th>
+                  <th class="p-2 w-20">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="pilotosSeasonRows" class="divide-y divide-neutral-800"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-sm text-gray-400">
+      <p>Plantilla inspirada en F1 TV — Mockup sin fines comerciales.</p>
+    </footer>
+  </main>
+
+  <script>
+        //parametros que trae la url para trabajar con ellos
+        const params = new URLSearchParams(window.location.search);
+        const idSeason = params.get("id");
+        const Anio = params.get("anio");
+        console.log(idSeason)
+        console.log(Anio)
+
+        //Formulario agregar gran premio a la temporada
+        const btnAbrirFormGP = document.getElementById("abrirFormGP");
+        const formContainerGP = document.getElementById("formAgregarGP");
+        const btnCancelarFormGP = document.getElementById("cancelarFormGP");
+        
+
+        // endpoints (ajusta si tu API tiene rutas distintas)
+        const endpointAllPilotos = '/api/piloto/'; // devuelve array de pilotos { id_Piloto, nombre_completo }
+        const endpointAllEquipos = '/api/equipo/'; // devuelve array de equipos { id_Equipo, nombre }
+
+        //Formulario agregar piloto temporada
+        const modal = document.getElementById('modalAddPilotos');
+        const btnClose = document.getElementById('btnCloseAddPilotos');
+        const btnSave = document.getElementById('btnSavePilotosSeason');
+        const btnAddRow = document.getElementById('btnAddRow');
+        const btnClearRows = document.getElementById('btnClearRows');
+        const rowsTbody = document.getElementById('pilotosSeasonRows');
+        const modalSeasonId = document.getElementById('modalSeasonId');
+        const openAddPilotosBtn = document.getElementById('openAddPilotosBtn');
+        // caches de listas
+        let pilotosList = [];
+        let equiposList = [];
+
+        // temporada id desde URL (ya lo tienes en idSeason)
+        // si no existe, intenta leer del DOM o parámetro
+        const idSeasonLocal = (typeof idSeason !== 'undefined' && idSeason) ? idSeason : (new URLSearchParams(window.location.search)).get('id');
+
+        // inicial: escribe temporada en modal
+        if(modalSeasonId) modalSeasonId.textContent = Anio ?? '—';
+
+        //abrir formulario agregar gran premio
+        btnAbrirFormGP.addEventListener("click", () => {
+            formContainerGP.classList.remove("hidden");
+            cargarSelectsFormulario();
+        });
+        //cerrar formulario agregar gran premio
+        btnCancelarFormGP.addEventListener("click", () => {
+            formContainerGP.classList.add("hidden");
+        });
+
+        async function openAddPilotosModal(){
+          try {
+            if (!pilotosList.length) {
+              const resp = await fetch(endpointAllPilotos);
+              pilotosList = await resp.json();
+            }
+            if (!equiposList.length) {
+              const resp2 = await fetch(endpointAllEquipos);
+              equiposList = await resp2.json();
+            }
+          } 
+          catch (err) {
+            console.error('Error cargando pilotos/equipos', err);
+            alert('No se pudieron cargar pilotos o equipos. Revisa la conexión.');
+            return;
+          }
+          // limpiar filas y abrir con 1 fila por defecto
+          rowsTbody.innerHTML = '';
+          addRow(); // agrega una fila inicial
+            // opcional: mover al body si no lo hiciste en HTML
+          if (modal.parentElement !== document.body) document.body.appendChild(modal);
+          modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        function closeModalAddPilotos() {
+          modal.classList.add('hidden'); modal.classList.remove('flex');
+        }
+
+        // rellenar select pilotos
+        function mkPilotoOptions() {
+          return pilotosList.map(p => {
+            const id = p.id_Piloto ?? p.id ?? p.id_piloto;
+            const name = p.nombre_completo ?? `${p.Nombre ?? ''} ${p.Apellido ?? ''}`.trim();
+            return `<option value="${id}">${escapeHtml(name)}</option>`;
+          }).join('');
+        }
+        // rellenar select equipos
+        function mkEquipoOptions() {
+          return equiposList.map(e => {
+            const id = e.id_Equipo ?? e.id;
+            const name = e.nombre ?? e.team ?? 'Equipo';
+            return `<option value="${id}">${escapeHtml(name)}</option>`;
+          }).join('');
+        }
+        // helper para escapar texto en HTML
+        function escapeHtml(str) {
+          if (!str && str !== 0) return '';
+          return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+        }
+
+        // agrega una fila al tbody. opcional: data prellenado
+        let filaCount = 0;
+        function addRow(data = {}) {
+          filaCount++;
+          const tr = document.createElement('tr');
+          tr.dataset.row = filaCount;
+
+          // valores por defecto
+          const pilotoVal = data.piloto_id ?? '';
+          const equipoVal = data.equipo_id ?? '';
+          const numeroVal = data.numero ?? '';
+
+          tr.innerHTML = `
+            <td class="p-2 align-top font-semibold">${filaCount}</td>
+            <td class="p-2">
+              <select class="w-full bg-neutral-800 p-2 rounded select-piloto-season" required>
+                <option value="">-- seleccionar piloto --</option>
+                ${mkPilotoOptions()}
+              </select>
+            </td>
+            <td class="p-2">
+              <select class="w-full bg-neutral-800 p-2 rounded select-equipo-season" required>
+                <option value="">-- seleccionar equipo --</option>
+                ${mkEquipoOptions()}
+              </select>
+            </td>
+            <td class="p-2">
+              <input type="number" min="1" class="w-full bg-neutral-800 p-2 rounded input-numero-season" placeholder="Número" value="${numeroVal}">
+            </td>
+            <td class="p-2">
+              <button type="button" class="btn-remove-row px-2 py-1 bg-neutral-700 rounded text-sm">Eliminar</button>
+            </td>
+          `;
+
+          // si vienen valores, seleccionarlos
+          rowsTbody.appendChild(tr);
+          if (pilotoVal) tr.querySelector('.select-piloto-season').value = pilotoVal;
+          if (equipoVal) tr.querySelector('.select-equipo-season').value = equipoVal;
+          if (numeroVal) tr.querySelector('.input-numero-season').value = numeroVal;
+
+          // handler remove
+          tr.querySelector('.btn-remove-row').addEventListener('click', () => {
+            tr.remove();
+            // reenumerar filas
+            Array.from(rowsTbody.querySelectorAll('tr')).forEach((r, idx) => {
+              r.querySelector('td:first-child').textContent = idx + 1;
+            });
+          });
+        }
+
+          // limpiar filas
+        function clearRows() {
+          rowsTbody.innerHTML = '';
+          filaCount = 0;
+        }
+          // recolectar datos y validar
+        function collectRows() {
+          const rows = Array.from(rowsTbody.querySelectorAll('tr'));
+          const payload = [];
+          const pilotosSeleccionados = new Set();
+          for (let i = 0; i < rows.length; i++) {
+            const r = rows[i];
+            const pilotoId = r.querySelector('.select-piloto-season')?.value;
+            const equipoId = r.querySelector('.select-equipo-season')?.value;
+            const numero = r.querySelector('.input-numero-season')?.value;
+
+            if (!pilotoId || !equipoId || !numero) {
+              // fila inválida -> rechazar
+              return { ok: false, msg: `Fila ${i+1}: completa piloto, equipo y número.` };
+            }
+
+            if (pilotosSeleccionados.has(pilotoId)) {
+              return { ok: false, msg: `Piloto duplicado en la fila ${i+1}.` };
+            }
+            pilotosSeleccionados.add(pilotoId);
+
+            payload.push({
+              piloto_id: Number(pilotoId),
+              equipo_id: Number(equipoId),
+              temporada_id: Number(idSeasonLocal),
+              numero: Number(numero)
+            });
+          }
+
+          if (payload.length === 0) return { ok: false, msg: 'No hay filas para guardar.' };
+          return { ok: true, payload };
+        }
+
+          // enviar payload al backend (batch)
+        async function savePilotosSeason(payload) {
+          try {
+            // endpoint: AJUSTA si tu API espera otra ruta
+            const res = await fetch(`/api/pilotoTemporada/crearPilotoTemporada`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload )
+            });
+            if (!res.ok) {
+              const txt = await res.text();
+              throw new Error(txt || 'Error en servidor');
+            }
+            return await res.json();
+          } catch (err) {
+            console.error('Error guardando pilotos temporada', err);
+            throw err;
+          }
+        }
+
+        openAddPilotosBtn.addEventListener('click', openAddPilotosModal);
+        btnClose.addEventListener('click', closeModalAddPilotos);
+        btnAddRow.addEventListener('click', () => addRow());
+        btnClearRows.addEventListener('click', () => clearRows());
+
+        btnSave.addEventListener('click', async () => {
+          const { ok, payload, msg } = collectRows();
+          if (!ok) {
+            alert(msg);
+            return;
+          }
+          if (!confirm(`Se agregarán ${payload.length} pilotos a la temporada ${Anio}. ¿Continuar?`)) return;
+          try {
+            payload.forEach(async(pilotoTemporada)=>{
+              console.log(pilotoTemporada)
+           await savePilotosSeason(pilotoTemporada);
+           
+            alert('Pilotos agregados correctamente');
+            closeModalAddPilotos();
+            // refrescar strip y WDC/WCC
+            
+            })
+            await cargarPilotosTemporada(); // tu función ya definida arriba
+ 
+          } catch (err) {
+            alert('Error guardando pilotos. Revisa la consola.');
+          }
+        });
+
+    async function cargarSelectsFormulario() {
+        try {
+        // Circuitos
+        const circuitos = await fetch("http://localhost:1234/api/circuito/").then(r => r.json());
+        const GPs = await fetch(`http://localhost:1234/api/granPremio/`).then(r => r.json());
+        const selCircuito = document.getElementById("selectCircuito");
+        const selGPs = document.getElementById("selectGP")
+        selCircuito.innerHTML = circuitos.map(c => `<option value="${c.id_Circuito}">${c.nombre}, ${c.pais}</option>`).join("");
+        selGPs.innerHTML = GPs.map(g => `<option value="${g.nombre_oficial}">${g.nombre_oficial}</option>`).join("");
+        // Pilotos
+        const pilotos = await fetch(`http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r => r.json());
+        const selVR = document.getElementById("selectVueltaRapida");
+        const selPP = document.getElementById("selectPolePosition");
+        selVR.innerHTML = pilotos.map(p => `<option value="${p.id_Piloto}">${p.nombre_completo}</option>`).join("");
+        selPP.innerHTML = pilotos.map(p => `<option value="${p.id_Piloto}">${p.nombre_completo}</option>`).join("");
+        } catch (err) {
+        console.error("Error cargando datos del formulario", err);
+        }
+    }
+
+    document.getElementById("gpForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        
+        const nombre_GP = document.querySelector('select[name="NombreGP"]').value;
+        const fecha = document.getElementById('date').value;
+        const circuito = document.getElementById('selectCircuito').value; // ya es valor
+        const totalLaps = document.getElementById('Laps').value;
+        const polePosition = document.querySelector('select[name="polePosition"]').value;
+        const vueltaRapida = document.querySelector('select[name="vueltaRapida"]').value;
+
+        console.log(nombre_GP, fecha, circuito,idSeason, totalLaps, polePosition, vueltaRapida);
+
+        try {
+        const res = await fetch("http://localhost:1234/api/granPremio/registrarGP", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nombre_oficial: nombre_GP,
+                fecha: fecha,
+                circuito_id: circuito,
+                temporada_id: idSeason,
+                vueltas_totales: totalLaps,
+                pole_position_piloto_id: polePosition,
+                vuelta_rapida_piloto_id: vueltaRapida
+            })
+        });
+        if (res.ok) {
+            alert("Gran Premio agregado con éxito");
+            formContainerGP.classList.add("hidden");
+            cargarGPS(); // refrescar lista
+        } else {
+            alert("Error al agregar el Gran Premio");
+        }
+        } catch (err) {
+        console.error("Error enviando formulario", err);
+        }
+    });
+
+    async function obtenerImagenWikipedia(nombre) {
+      const query = encodeURIComponent(nombre);
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=100&origin=*`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+        return page.thumbnail ? page.thumbnail.source : null;
+      } catch (err) {
+        console.error('Error obteniendo imagen de', nombre, err);
+        return null;
+      }
+    }
+    
+    async function cargarGPS(){
+    try{const GPs = await fetch(`http://localhost:1234/api/granPremio/obtenerGPTemporada/${Anio}`).then(r=> r.json());
+      const container = document.getElementById('gridGPs');
+        container.innerHTML = '';
+          for (let i = 0; i < GPs.length; i++) {
+          const gp = GPs[i];
+        const imgCUrl = await obtenerImagenWikipedia(gp.Nombre_Circuito);
+        const imgPUrl = await obtenerImagenWikipedia(gp.Pais);
+         const card = document.createElement('div');
+
+        const fecha = new Date(gp.fecha);
+        const day = String(fecha.getDate()).padStart(2, '0');
+        const month = fecha.toLocaleString('es-ES', { month: 'short' });
+        const year = fecha.getFullYear();
+
+        const newDate = `${day}/${month}/${year}`;
+
+        card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+        card.innerHTML = `
+                <div class="p-4 flex flex-col items-center text-center">
+                ${imgPUrl ? `<img src="${imgPUrl}" alt="Bandera ${gp.Pais}" class="w-12 h-8 mb-2 border">` : ''}
+                <h3 class="text-lg font-bold text-white">${gp.Nombre_GP}</h3>
+                <p class="text-sm text-neutral-400">${newDate}</p>
+                <p class="text-sm text-neutral-500">${gp.Nombre_Circuito}</p>
+                </div>
+
+                <div class="max-h-0 overflow-hidden transition-[max-height] duration-500 px-4 text-center items-center text-sm text-neutral-300 group-hover:max-h-96">
+                <h3 class="text-xl font-bold text-red-500 mb-2">${gp.Nombre_GP}</h3>
+                <p class="mb-1">Fecha: ${newDate}</p>
+                <p class="mb-1">Circuito: ${gp.Nombre_Circuito}</p>
+                ${imgCUrl ? `<img src="${imgCUrl}" alt="${gp.Nombre_Circuito}" class="w-12 h-8 mb-2 bg-white border>` : ''}
+                <p class="mb-1">Vuelta Rapida: ${gp.Vuelta_Rapida}</p>
+                <p class="mb-1">Pole Position: ${gp.Pole_Position}</p>
+                <p>Ganador: ${gp.Ganador}</p>
+                </div>
+
+        
+        `;
+        card.dataset.IdGP = gp.id_GP
+        card.addEventListener('click', () => {
+        window.location.href = `/granPremio?id=${gp.id_GP}`; // ejemplo de redirección con query
+        });
+          container.appendChild(card);          
+        };
+      }
+      catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+
+    async function cargarPilotosTemporada(){
+      try{
+        const pilotosSeason = await fetch(`http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r=>r.json());
+        const DriverSeason = document.getElementById('gridDriverSeason');
+        DriverSeason.innerHTML = '';
+          for (let i = 0; i < pilotosSeason.length; i++) {
+            const p = pilotosSeason[i];
+            const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+            const cardDriver = document.createElement('div');
+
+            cardDriver.className =`group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-x-auto shadow-lg gap-5 p-5 border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+            cardDriver.innerHTML = `
+              <div id="idPiloto" class="p-4 flex flex-row items-center gap-3 p-3">
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-12 h-14 rounded-full mb-2 border">` : ''}
+                <div class="flex flex-col gap-3 p-3">
+                  <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.nombre_completo}</p>
+                </div>
+              </div>
+              `;
+            DriverSeason.appendChild(cardDriver)
+          };
+      }catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+
+    // Simulación: reemplazar fetch con tus endpoints reales
+    async function cargarCampeonatos() {
+      try {
+        const pilotos = await fetch(`http://localhost:1234/api/granPremio/obtenerWDCPorAnio/${Anio}`).then(r => r.json());
+        const constructores = await fetch(`http://localhost:1234/api/granPremio/obtenerWCCPorAnio/${Anio}`).then(r => r.json());
+
+        const WDC = document.getElementById('gridWDC');
+        WDC.innerHTML = '';
+          for (let i = 0; i < pilotos.length; i++) {
+          const p = pilotos[i];
+        const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+        const cardDriver = document.createElement('div');
+
+        cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardDriver.innerHTML = `
+                <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
+                <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-12 h-14 rounded-full mb-2 border">` : ''}
+                <div class="flex flex-col">
+                <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.Piloto}</p>
+                <p class="text-sm mx-2 text-neutral-400">Puntos: ${p.puntos_totales}</p>
+                </div>
+                </div>
+        `;
+        cardDriver.dataset.IdPiloto = p.id_Piloto
+        cardDriver.addEventListener('click', () => {
+        window.location.href = `/piloto?id=${p.id_Piloto}`; // ejemplo de redirección con query
+        });
+        WDC.appendChild(cardDriver)
+
+        };
+
+        const WCC = document.getElementById('gridWCC');
+        WCC.innerHTML = '';
+          for (let i = 0; i < constructores.length; i++) {
+          const c = constructores[i];
+        const imgUrl = await obtenerImagenWikipedia(c.equipo);
+        const cardTeam = document.createElement('div');
+        
+        cardTeam.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardTeam.innerHTML = `
+                <div class="p-4 flex flex-row items-center gap-4">
+                <p class="text-sm text-neutral-400 w-6 text-center">${i+1}</p>
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 rounded-full mb-2 border">` : ''}
+                <div class="flex flex-col">
+                <p class="text-sm mx-8 text-neutral-200 font-semibold">${c.equipo}</p>
+                <p class="text-sm mx-8 text-neutral-400">${c.puntos_totales}</p>
+                </div>
+                </div>
+        `;
+        WCC.appendChild(cardTeam)
+        };
+      } catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+    cargarPilotosTemporada();
+    cargarGPS();
+    cargarCampeonatos();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temporadas F1 — Plantilla</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .card-img { background-size: cover; background-position: center; }
+    .scrollbar-hide {
+      scrollbar-width: none; /* Firefox */
+    }
+    #gridSeasons {
+      max-height: 540px;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    /* Mostrar scrollbar solo al hacer hover */
+    .hover\\:scrollbar-default:hover {
+      scrollbar-width: auto; /* Firefox */
+    }
+
+    .hover\\:scrollbar-default:hover::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+    }
+
+    .hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+    
+  <!-- NAV -->
+  <header class="sticky top-0 z-40 bg-black/60 glass border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="flex items-center gap-2">
+          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold">F1</div>
+          <span class="font-semibold text-lg">F1 APP — Temporadas</span>
+        </a>
+        <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
+          <a class="px-3 py-2 hover:text-white" href="/">Inicio</a>
+          <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
+          <a class="px-3 py-2 hover:text-white" href="#buscar">Buscar</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input id="searchInput" class="hidden sm:inline-block bg-gray-800 text-sm px-3 py-2 rounded" placeholder="Buscar temporada (ej. 2024)" />
+        <button id="btnNuevoFiltro" class="px-4 py-2 bg-red-600 rounded text-sm font-medium">Filtrar</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT - SOLUCIÓN APLICADA -->
+  <main class="w-full max-w-full px-4 py-8 mx-auto">
+    <div class="w-full rounded-lg overflow-hidden shadow-lg relative">
+      <section class="w-full border border-neutral-700 rounded-lg shadow-lg overflow-hidden p-6 gap-6 bg-neutral-900">    
+        <div id="infoGridTemporadas" class="grid grid-cols-1 gap-6 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Temporadas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridSeasons" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-6 p-6 items-start overflow-y-auto max-h-[1000px] scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default w-full">
+
+        </div>
+      </section>
+    </div>
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-sm text-gray-400">
+      <p>Plantilla de temporadas — integra tus datos desde la API y adapta los campos necesarios.</p>
+    </footer>
+  </main>
+
+  <script>
+    async function cargarTemporadas(){
+      try{
+        
+        const temporadas = await fetch(`http://localhost:1234/api/temporada/`).then(r=>r.json());
+        const containerSeasons =document.getElementById('gridSeasons')
+        containerSeasons.innerHTML='';
+        for(let i=0; i<temporadas.length;i++){
+            console.log(temporadas[i])
+          const season = temporadas[i];
+          const cardSeason = document.createElement('div');
+          const pilotos = await fetch(`http://localhost:1234/api/granPremio/obtenerWDCPorAnio/${season.anio}`).then(r => r.json());
+          if (pilotos.length > 0) {
+            const campeon = pilotos[0]; // Tomamos el primero
+            cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+            cardSeason.innerHTML = `
+                <div class="p-4 flex flex-col items-center text-center">
+                <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
+                <p class="text-sm text-neutral-400">Campeón: ${campeon.nombre_completo}</p>
+                </div>
+            `;
+            } else {
+            cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+            cardSeason.innerHTML = `
+                <div class="p-4 flex flex-col items-center text-center">
+                <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
+                <p class="text-sm text-neutral-400">Campeón: Desconocido</p>
+                </div>
+            `;
+            }
+        cardSeason.dataset.IdSeason = season.id_Temporada
+
+        cardSeason.dataset.Anio = season.anio
+        cardSeason.addEventListener('click', () => {
+        const url = `/season?id=${season.id_Temporada}&anio=${season.anio}`; // ejemplo de redirección con query
+        console.log("Redirigiendo a:", url);
+        window.location.href = url
+        });     
+          containerSeasons.appendChild(cardSeason)
+        }
+      }catch (err) {
+        console.error('Error cargando trayectoria', err);
+    }
+    }
+
+    cargarTemporadas();
+
+
+  </script>
+</body>
+</html>

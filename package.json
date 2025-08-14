@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/TourTales/BackEnd#readme",
   "dependencies": {
+    "@tailwindcss/cli": "^4.1.11",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "2.8.5",
@@ -36,6 +37,7 @@
     "mysql2": "3.6.5",
     "node-mailjet": "^6.0.5",
     "nodemailer": "^6.9.7",
+    "tailwindcss": "^4.1.11",
     "zod": "3.22.4"
   },
   "devDependencies": {

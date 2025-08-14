@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F1 APP — Plantilla con Campeonato</title>
+  <link href="styles/style.css" rel="stylesheet">
+  <style>
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .card-img { background-size: cover; background-position: center; }
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+}
+  #gridWDC, #gridWCC, #gridGPs {
+    max-height: 540px;
+  }
+
+.scrollbar-hide::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Mostrar scrollbar solo al hacer hover */
+.hover\\:scrollbar-default:hover {
+  scrollbar-width: auto; /* Firefox */
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+  <!-- NAV -->
+  <header class="sticky top-0 z-40 bg-black/60 glass border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <a href="#" class="flex items-center gap-2">
+          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold"></div>
+          <span class="font-semibold text-lg">F1 APP — Mock</span>
+        </a>
+        <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
+          <a class="px-3 py-2 hover:text-white" href="#">Inicio</a>
+          <a class="px-3 py-2 hover:text-white" href="#">Equipos</a>
+          <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
+          <a class="px-3 py-2 hover:text-white" href="#">Calendario</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input class="hidden sm:inline-block bg-gray-800 text-sm px-3 py-2 rounded" placeholder="Buscar pilotos, carreras..." />
+        <button class="px-4 py-2 bg-red-600 rounded text-sm font-medium">Suscribirse</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main class="min-w-md max-w-full mx-auto px-4 py-8">
+    <a id="mi-boton" class="hidden inline-block sm:inline-block md:none" href="#WDCSection">WDC</a>
+    <a id="mi-Boton2" class="hidden inline-block sm:inline-block md:none " href="#GPSection">Grandes Premios</a>
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
+      
+      <!-- World Constructors Championship -->
+      <section class="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-2 2xl:col-span-2  rounded-lg overflow-hidden shadow-lg relative">
+        <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Constructors Championship</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridWCC" class="grid grid-cols-1 sm:grid-cols- md:grid-cols- lg:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+      </section>
+
+      <!-- Grand Prix Section -->
+      <section id="GPSection"class="col-span-1 md:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-5 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
+        <div class="relative">
+          <div class="bg-gray-800 rounded-lg p-4 shadow">
+            <h2 class="text-2xl font-bold">Grandes Premios <span id="anio"></span></h2>
+            <div id="gridGPs" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+            </div>
+          </div>
+        </div>
+        <div class="p-5">
+          <h2 class="text-2xl font-bold">Grandes Premios</h2>
+          <p class="mt-2 text-gray-300">Revive las mejores maniobras, el podio y los momentos clave.</p>
+        </div>
+      </section>
+
+      <!-- World Drivers Championship Section -->
+      <section id="WDCSection"class="md:col-span-3  lg:col-span-2 xl:col-span-2 2xl:col-span-2 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
+        <!-- Campeonato -->
+        <div id="infoGridWDC" class="grid grid-cols-1 gap-6 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Drivers Championship</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridWDC" class="grid grid-cols-1 xl:grid-cols-2 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-sm text-gray-400">
+      <p>Plantilla inspirada en F1 TV — Mockup sin fines comerciales.</p>
+    </footer>
+  </main>
+
+  <script>
+    async function obtenerImagenWikipedia(nombre) {
+      const query = encodeURIComponent(nombre);
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=100&origin=*`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+        return page.thumbnail ? page.thumbnail.source : null;
+      } catch (err) {
+        console.error('Error obteniendo imagen de', nombre, err);
+        return null;
+      }
+    }
+
+    var today = new Date()
+    var CurrentYear = today.getFullYear()
+    const season = document.getElementById('anio')
+    season.textContent = CurrentYear
+    console.log(CurrentYear)
+
+
+    async function cargarGPS(){
+    try{const GPs = await fetch(`http://localhost:1234/api/granPremio/obtenerGPTemporada/${CurrentYear}`).then(r=> r.json());
+      const container = document.getElementById('gridGPs');
+        container.innerHTML = '';
+          for (let i = 0; i < GPs.length; i++) {
+          const gp = GPs[i];
+        const imgCUrl = await obtenerImagenWikipedia(gp.Nombre_Circuito);
+        const imgPUrl = await obtenerImagenWikipedia(gp.Pais);
+         const card = document.createElement('div');
+
+        const fecha = new Date(gp.fecha);
+        const day = String(fecha.getDate()).padStart(2, '0');
+        const month = fecha.toLocaleString('es-ES', { month: 'short' });
+        const year = fecha.getFullYear();
+
+        const newDate = `${day}/${month}/${year}`;
+
+        card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+        card.innerHTML = `
+                <div class="p-4 flex flex-col items-center text-center">
+                ${imgPUrl ? `<img src="${imgPUrl}" alt="Bandera ${gp.Pais}" class="w-12 h-8 mb-2 border">` : ''}
+                <h3 class="text-lg font-bold text-white">${gp.Nombre_GP}</h3>
+                <p class="text-sm text-neutral-400">${newDate}</p>
+                <p class="text-sm text-neutral-500">${gp.Nombre_Circuito}</p>
+                </div>
+
+                <div class="max-h-0 overflow-hidden transition-[max-height] duration-500 px-4 text-center items-center text-sm text-neutral-300 group-hover:max-h-96">
+                <h3 class="text-xl font-bold text-red-500 mb-2">${gp.Nombre_GP}</h3>
+                <p class="mb-1">Fecha: ${newDate}</p>
+                <p class="mb-1">Circuito: ${gp.Nombre_Circuito}</p>
+                ${imgCUrl ? `<img src="${imgCUrl}" alt="${gp.Nombre_Circuito}" class="w-12 h-8 mb-2 bg-white border>` : ''}
+                <p class="mb-1">Vuelta Rapida: ${gp.Vuelta_Rapida}</p>
+                <p class="mb-1">Pole Position: ${gp.Pole_Position}</p>
+                <p>Ganador: ${gp.Ganador}</p>
+                </div>
+
+        
+        `;
+        card.dataset.IdGP = gp.id_GP
+        card.addEventListener('click', () => {
+        window.location.href = `/granPremio?id=${gp.id_GP}`; // ejemplo de redirección con query
+        });
+          container.appendChild(card);          
+        };
+      }
+      catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+    // Simulación: reemplazar fetch con tus endpoints reales
+    async function cargarCampeonatos() {
+      try {
+        const pilotos = await fetch(`http://localhost:1234/api/granPremio/obtenerWDCPorAnio/${CurrentYear}`).then(r => r.json());
+        const constructores = await fetch(`http://localhost:1234/api/granPremio/obtenerWCCPorAnio/${CurrentYear}`).then(r => r.json());
+
+        const WDC = document.getElementById('gridWDC');
+        WDC.innerHTML = '';
+          for (let i = 0; i < pilotos.length; i++) {
+          const p = pilotos[i];
+        const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+        const cardDriver = document.createElement('div');
+
+        cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardDriver.innerHTML = `
+                <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
+                <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-12 h-14 rounded-full mb-2 border">` : ''}
+                <div class="flex flex-col">
+                <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.Piloto}</p>
+                <p class="text-sm mx-2 text-neutral-400">Puntos: ${p.puntos_totales}</p>
+                </div>
+                </div>
+        `;
+        cardDriver.dataset.IdPiloto = p.id_Piloto
+        cardDriver.addEventListener('click', () => {
+        window.location.href = `/piloto?id=${p.id_Piloto}`; // ejemplo de redirección con query
+        });
+        WDC.appendChild(cardDriver)
+
+        };
+
+        const WCC = document.getElementById('gridWCC');
+        WCC.innerHTML = '';
+          for (let i = 0; i < constructores.length; i++) {
+          const c = constructores[i];
+        const imgUrl = await obtenerImagenWikipedia(c.equipo);
+        const cardTeam = document.createElement('div');
+        
+        cardTeam.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardTeam.innerHTML = `
+                <div class="p-4 flex flex-row items-center gap-4">
+                <p class="text-sm text-neutral-400 w-6 text-center">${i+1}</p>
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 rounded-full mb-2 border">` : ''}
+                <div class="flex flex-col">
+                <p class="text-sm mx-8 text-neutral-200 font-semibold">${c.equipo}</p>
+                <p class="text-sm mx-8 text-neutral-400">${c.puntos_totales}</p>
+                </div>
+                </div>
+        `;
+        WCC.appendChild(cardTeam)
+        };
+      } catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+    cargarGPS();
+    cargarCampeonatos();
+  </script>
+</body>
+</html>
+

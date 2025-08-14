@@ -2,7 +2,7 @@ import { connectionMySQL } from '../../helpers/connectionMySQL.js'
 
 export class SeasonModel {
     static async obtenerTodasLasTemporadas () {
-      const [temporadas] = await connectionMySQL.query('SELECT * FROM temporada;')
+      const [temporadas] = await connectionMySQL.query('SELECT * FROM temporada ORDER BY anio DESC;')
   
       return temporadas
     }
