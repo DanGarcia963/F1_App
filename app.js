@@ -45,7 +45,7 @@ export const crearApp = (Modelos) => {
   app.get('/seasons', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/seasons.html'))
   app.get('/season', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/season.html'))
   app.get('/granPremio', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/gran_Premio.html'))
-  app.get('/admin', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/admin/admin.html'))
+  app.get('/pilotos', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/pilotos.html'))
   app.get('/inicio', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/inicio.html'))
   app.get('/experience', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/Experience.html'))
   app.get('/inicioAdmin', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/inicioAdmin.html'))

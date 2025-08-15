@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F1 APP — Plantilla con Campeonato</title>
+    <link href="styles/style.css" rel="stylesheet">
+   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .card-img { background-size: cover; background-position: center; }
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+}
+  #gridPilotos {
+    max-height: 470px;
+  }
+
+.scrollbar-hide::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Mostrar scrollbar solo al hacer hover */
+.hover\\:scrollbar-default:hover {
+  scrollbar-width: auto; /* Firefox */
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 antialiased">
+  <!-- NAV -->
+  <header class="sticky top-0 z-40 bg-black/60 glass border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <a href="#" class="flex items-center gap-2">
+          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold"></div>
+          <span class="font-semibold text-lg">F1 APP — Mock</span>
+        </a>
+        <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
+          <a class="px-3 py-2 hover:text-white" href="/">Inicio</a>
+          <a class="px-3 py-2 hover:text-white" href="#">Equipos</a>
+          <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
+          <a class="px-3 py-2 hover:text-white" href="/pilotos">Pilotos</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input class="hidden sm:inline-block bg-gray-800 text-sm px-3 py-2 rounded" placeholder="Buscar pilotos, carreras..." />
+        <button class="px-4 py-2 bg-red-600 rounded text-sm font-medium">Suscribirse</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+ <main class="w-full max-w-full px-4 py-8 mx-auto">
+    <div class="w-full rounded-lg overflow-hidden shadow-lg relative">
+      <section class="w-full border border-neutral-700 rounded-lg shadow-lg overflow-hidden p-6 gap-6 bg-neutral-900">    
+        <div id="infoGridTemporadas" class="grid grid-cols-1 gap-6 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+                <div id="driverAddBtnCard" class="flex-none w-20 h-28 bg-green-700/10 border border-green-600 rounded-lg shadow-lg p-3 flex items-center justify-center cursor-pointer">
+                    <button id="openAddPilotosBtn" class="flex items-center gap-2 text-sm text-white px-3 py-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        Agregar Piloto
+                    </button>
+                </div>
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Pilotos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="gridPilotos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default w-full">
+
+        </div>
+      </section>
+    </div>
+                <!-- Modal: Agregar pilotos a temporada -->
+    <div id="modalAddPilotos" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+      <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
+        <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+          <h3 class="text-lg font-semibold">Agregar pilotos a la temporada <span id="modalSeasonId" class="font-bold"></span></h3>
+          <div class="flex gap-2">
+            <button id="btnCloseAddPilotos" class="px-3 py-1 bg-neutral-800 rounded">Cancelar</button>
+            <button id="btnSavePilotosSeason" class="px-3 py-1 bg-red-600 rounded">Guardar</button>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <p class="text-sm text-gray-300 mb-4">Agrega uno o varios pilotos a la temporada. Pulsa "+ Agregar fila" para añadir más filas.</p>
+
+          <div class="mb-4 flex gap-2">
+            <button id="btnAddRow" type="button" class="px-3 py-2 bg-green-600 rounded text-sm">+ Agregar fila</button>
+            <button id="btnClearRows" type="button" class="px-3 py-2 bg-neutral-700 rounded text-sm">Limpiar filas</button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-400">
+                  <th class="p-2 w-12">#</th>
+                  <th class="p-2">Nombre</th>
+                  <th class="p-2">Apellido</th>
+                  <th class="p-2 w-32">Nacionalidad</th>
+                  <th class="p-2 w-20">Fecha de nacimiento</th>
+                  <th class="p-2 w-20">Año debut</th>
+                  <th class="p-2 w-20">Numero</th>
+                  <th class="p-2 w-20">Codigo FIA</th>
+                </tr>
+              </thead>
+              <tbody id="pilotosSeasonRows" class="divide-y divide-neutral-800"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-sm text-gray-400">
+      <p>Plantilla de temporadas — integra tus datos desde la API y adapta los campos necesarios.</p>
+    </footer>
+  </main>
+
+  <script>
+
+    // endpoints (ajusta si tu API tiene rutas distintas)
+    const endpointAllPilotos = '/api/piloto/'; // devuelve array de pilotos { id_Piloto, nombre_completo }
+
+    //Formulario agregar piloto temporada
+    const modal = document.getElementById('modalAddPilotos');
+    const btnClose = document.getElementById('btnCloseAddPilotos');
+    const btnSave = document.getElementById('btnSavePilotosSeason');
+    const btnAddRow = document.getElementById('btnAddRow');
+    const btnClearRows = document.getElementById('btnClearRows');
+    const rowsTbody = document.getElementById('pilotosSeasonRows');
+    const modalSeasonId = document.getElementById('modalSeasonId');
+    const openAddPilotosBtn = document.getElementById('openAddPilotosBtn');
+
+    let pilotosList = [];
+
+    async function openAddPilotosModal(){
+        try {
+            if (!pilotosList.length) {
+                const resp = await fetch(endpointAllPilotos);
+                pilotosList = await resp.json();
+            }
+        } 
+        catch (err) {
+            console.error('Error cargando pilotos', err);
+            alert('No se pudieron cargar pilotos. Revisa la conexión.');
+            return;
+        }
+        // limpiar filas y abrir con 1 fila por defecto
+        rowsTbody.innerHTML = '';
+        addRow(); // agrega una fila inicial
+        // opcional: mover al body si no lo hiciste en HTML
+        if (modal.parentElement !== document.body) document.body.appendChild(modal);
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+    }
+
+    function closeModalAddPilotos() {
+        modal.classList.add('hidden'); modal.classList.remove('flex');
+    }
+
+            // agrega una fila al tbody. opcional: data prellenado
+        let filaCount = 0;
+        function addRow(data = {}) {
+          filaCount++;
+          const tr = document.createElement('tr');
+          tr.dataset.row = filaCount;
+
+          // valores por defecto
+          const nombreVal = data.piloto_nombre ?? '';
+          const apellidoVal = data.piloto_apellido ?? '';
+          const nacionalidadVal = data.piloto_nacionalidad ?? '';
+          const birthVal = data.piloto_birth ?? '';
+          const debutVal = data.piloto_debut ?? '';
+          const numeroVal = data.numero ?? '';
+          const codigoVal = data.codigo ?? '';
+
+          tr.innerHTML = `
+            <td class="p-2 align-top font-semibold">${filaCount}</td>
+            <td class="p-2">
+                <input type="text" class="w-full bg-neutral-800 p-2 rounded input-nombre" placeholder="Nombre" value="${nombreVal}">
+            </td>
+            <td class="p-2">
+                <input type="text" class="w-full bg-neutral-800 p-2 rounded input-apellido" placeholder="Apellido" value="${apellidoVal}">
+            </td>
+            <td class="p-2">
+                <input type="text" class="w-full bg-neutral-800 p-2 rounded input-nacionalidad" placeholder="Nacionalidad" value="${nacionalidadVal}">
+            </td>
+            <td class="p-2">
+                <input type="date" class="w-full bg-neutral-800 p-2 rounded input-birthdate" placeholder="Birthdate" value="${birthVal}">
+            </td>
+            <td class="p-2">
+              <input type="number" min="1950" class="w-full bg-neutral-800 p-2 rounded input-debut" placeholder="Debut Year" value="${debutVal}">
+            </td>
+            <td class="p-2">
+              <input type="number" min="1" max="99" class="w-full bg-neutral-800 p-2 rounded input-numero-season" placeholder="Número" value="${numeroVal}">
+            </td>
+            <td class="p-2">
+                <input type="text" class="w-full bg-neutral-800 p-2 rounded input-codigo-FIA" placeholder="Codigo FIA" value="${codigoVal}">
+            </td>
+            <td class="p-2">
+              <button type="button" class="btn-remove-row px-2 py-1 bg-neutral-700 rounded text-sm">Eliminar</button>
+            </td>
+          `;
+
+          // si vienen valores, seleccionarlos
+          rowsTbody.appendChild(tr);
+          if (nombreVal) tr.querySelector('.input-nombre').value = nombreVal;
+          if (apellidoVal) tr.querySelector('.input-apellido').value = apellidoVal;
+          if (nacionalidadVal) tr.querySelector('.input-nacionalidad').value = nacionalidadVal;
+          if (birthVal) tr.querySelector('.input-birthdate').value = birthVal;
+          if (debutVal) tr.querySelector('.input-debut').value = debutVal;
+          if (numeroVal) tr.querySelector('.input-numero-season').value = numeroVal;
+          if (codigoVal) tr.querySelector('.input-codigo-FIA').value = codigoVal;
+
+          // handler remove
+          tr.querySelector('.btn-remove-row').addEventListener('click', () => {
+            tr.remove();
+            // reenumerar filas
+            Array.from(rowsTbody.querySelectorAll('tr')).forEach((r, idx) => {
+              r.querySelector('td:first-child').textContent = idx + 1;
+            });
+          });
+        }
+
+        // limpiar filas
+        function clearRows() {
+          rowsTbody.innerHTML = '';
+          filaCount = 0;
+        }
+
+                  // recolectar datos y validar
+        function collectRows() {
+          const rows = Array.from(rowsTbody.querySelectorAll('tr'));
+          const payload = [];
+          const pilotosSeleccionados = new Set();
+          for (let i = 0; i < rows.length; i++) {
+            const r = rows[i];
+            const nombre = r.querySelector('.input-nombre')?.value;
+            const apellido = r.querySelector('.input-apellido')?.value;
+            const nacionalidad = r.querySelector('.input-nacionalidad')?.value;
+            const birthdate = r.querySelector('.input-birthdate')?.value;
+            const debut = r.querySelector('.input-debut')?.value;
+            const numero = r.querySelector('.input-numero-season')?.value;
+            const codigo = r.querySelector('.input-codigo-FIA')?.value;
+
+            if (!nombre || !apellido || !nacionalidad || !birthdate || !debut || !numero|| !codigo) {
+              // fila inválida -> rechazar
+              return { ok: false, msg: `Fila ${i+1}: completa nombre, apellido, nacionalidad, birthdate, año debut, numero y codigo de la FIA.` };
+            }
+
+            if (pilotosSeleccionados.has(codigo, numero)) {
+              return { ok: false, msg: `Piloto duplicado en la fila ${i+1}.` };
+            }
+            pilotosSeleccionados.add(codigo, numero);
+
+            payload.push({
+              Nombre: nombre,
+              Apellido: apellido,
+              Nacionalidad: nacionalidad,
+              Fecha_Nacimiento: birthdate,
+              Fecha_Debut: debut,
+              numero: Number(numero),
+              codigo_fia:codigo
+            });
+          }
+
+          if (payload.length === 0) return { ok: false, msg: 'No hay filas para guardar.' };
+          return { ok: true, payload };
+        }
+
+                  // enviar payload al backend (batch)
+        async function savePilotos(payload) {
+          try {
+            // endpoint: AJUSTA si tu API espera otra ruta
+            const res = await fetch(`/api/piloto/crearPiloto`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload )
+            });
+            if (!res.ok) {
+              const txt = await res.text();
+              throw new Error(txt || 'Error en servidor');
+            }
+            return await res.json();
+          } catch (err) {
+            console.error('Error guardando piloto', err);
+            throw err;
+          }
+        }
+
+        openAddPilotosBtn.addEventListener('click', openAddPilotosModal);
+        btnClose.addEventListener('click', closeModalAddPilotos);
+        btnAddRow.addEventListener('click', () => addRow());
+        btnClearRows.addEventListener('click', () => clearRows());
+
+        btnSave.addEventListener('click', async () => {
+          const { ok, payload, msg } = collectRows();
+          if (!ok) {
+            alert(msg);
+            return;
+          }
+          if (!confirm(`Se agregarán ${payload.length} pilotos. ¿Continuar?`)) return;
+          try {
+            payload.forEach(async(piloto)=>{
+              console.log(piloto)
+                await savePilotos(piloto);
+           
+            alert('Pilotos agregados correctamente');
+            closeModalAddPilotos();
+            // refrescar strip y WDC/WCC
+            
+            })
+            await cargarPilotos(); // tu función ya definida arriba
+ 
+          } catch (err) {
+            alert('Error guardando pilotos. Revisa la consola.');
+          }
+        });
+
+    async function obtenerImagenWikipedia(nombre) {
+      const query = encodeURIComponent(nombre);
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=100&origin=*`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+        return page.thumbnail ? page.thumbnail.source : null;
+      } catch (err) {
+        console.error('Error obteniendo imagen de', nombre, err);
+        return null;
+      }
+    }
+
+
+    // Simulación: reemplazar fetch con tus endpoints reales
+    async function cargarPilotos() {
+      try {
+        const pilotos = await fetch(endpointAllPilotos).then(r => r.json());
+
+        const gridpilotos = document.getElementById('gridPilotos');
+        gridpilotos.innerHTML = '';
+          for (let i = 0; i < pilotos.length; i++) {
+          const p = pilotos[i];
+        const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+        const cardDriver = document.createElement('div');
+
+        cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardDriver.innerHTML = `
+                <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
+                <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-12 h-14 rounded-full mb-2 border">` : ''}
+                <div class="flex flex-col">
+                <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.nombre_completo}</p>
+                <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.identificador}</p>
+                </div>
+                </div>
+        `;
+        cardDriver.dataset.IdPiloto = p.id_Piloto
+        cardDriver.addEventListener('click', () => {
+        window.location.href = `/piloto?id=${p.id_Piloto}`; // ejemplo de redirección con query
+        });
+        gridpilotos.appendChild(cardDriver)
+
+        };
+      } catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+    cargarPilotos();
+  </script>
+</body>
+</html>

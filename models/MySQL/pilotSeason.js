@@ -84,10 +84,7 @@ export class PilotSeasonModel {
         if (pilotoTemporadaExiste !== false) {
             return 'Ya existe un piloto esta temporada en ese equipo'
         }
-        const TemporadaEquipoDuplaExiste = await this.obtenerDuplaPilotos(idTemporada, idEquipo)
-        if(TemporadaEquipoDuplaExiste.length >= 2){
-            return 'Esta escuderia ya tiene su dupla de pilotos'
-        }
+
     
         try {
             await connectionMySQL.query('insert into pilotos_temporada (piloto_id, equipo_id, temporada_id, numero) values(?, ?, ?, ?);', [idPiloto, idEquipo, idTemporada, numero])
