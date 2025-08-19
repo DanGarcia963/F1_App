@@ -3,19 +3,26 @@
  export class ResultsModel {
       static async obtenerResultadoPorGPPorId (idGP) {
         const [GPsTemporada] = await connectionMySQL.query(`
-        SELECT 
-        CONCAT(p.Nombre, ' ', p.Apellido) AS nombre_piloto,
-        rgp.posicion_final,
-        rgp.posicion_inicio AS posicion_clasificacion,
-        rgp.puntos_obtenidos,
-        rgp.vueltas_completadas
+        SELECT
+            CONCAT(p.Nombre, ' ', p.Apellido) AS nombre_piloto,
+            e.nombre AS equipo,
+            rgp.posicion_final,
+            rgp.posicion_inicio,
+            rgp.puntos_obtenidos,
+            rgp.vueltas_completadas,
+            gp.tipo_carrera
         FROM resultados rgp
         JOIN piloto p 
-        ON p.id_Piloto = rgp.piloto_id
+            ON p.id_Piloto = rgp.piloto_id
         JOIN grandes_premios gp
-        ON gp.id_GP = rgp.grand_prix_id
-        WHERE rgp.grand_prix_id = ?
-        AND gp.Estado_GP = 'V'
+            ON gp.id_GP = rgp.grand_prix_id
+        JOIN pilotos_temporada pt 
+            ON pt.piloto_id = p.id_Piloto
+          AND pt.temporada_id = gp.temporada_id 
+        JOIN equipo e
+            ON e.id_Equipo = pt.equipo_id
+        WHERE gp.id_GP = ?
+          AND gp.Estado_GP = 'V'
         ORDER BY rgp.posicion_final ASC;`, [idGP])
         if (GPsTemporada.length === 0) return false 
         return GPsTemporada

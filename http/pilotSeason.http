@@ -9,7 +9,7 @@ GET http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporadaYEquipo
 Content-Type: application/json
 
 { 
-    "idTemporada": 1,
+    "idTemporada": 2,
     "idPiloto": 22
 }
 

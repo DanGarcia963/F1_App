@@ -119,48 +119,6 @@
             <div id="btnAgregarGP" class="p-6">
                 <button id="abrirFormGP" class="px-4 py-2 bg-green-600 rounded text-sm font-medium">Agregar GP</button>
             </div>
-            <!-- Formulario oculto -->
-            <div id="formAgregarGP" class="hidden bg-neutral-900 border border-neutral-700 p-6 rounded-xl mt-4">
-                <h3 class="text-lg font-bold mb-4">Nuevo Gran Premio</h3>
-                <form id="gpForm" class="grid grid-cols-1 gap-4">
-                    <div>
-                        <label class="block text-sm mb-1">Nombre del GP</label>
-                        <select name="NombreGP" id="selectGP" class="w-full bg-gray-800 px-3 py-2 rounded" required>
-                        <option value="">Cargando...</option>
-                    </select>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Fecha</label>
-                    <input id="date" type="date" name="fecha" class="w-full bg-gray-800 px-3 py-2 rounded" required>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Circuito</label>
-                    <select name="circuito" id="selectCircuito" class="w-full bg-gray-800 px-3 py-2 rounded" required>
-                        <option value="">Cargando...</option>
-                    </select>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Vueltas Totales</label>
-                    <input id="Laps" type="number" name="vueltas" min="1" class="w-full bg-gray-800 px-3 py-2 rounded" required>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Piloto Pole Position</label>
-                    <select name="polePosition" id="selectPolePosition" class="w-full bg-gray-800 px-3 py-2 rounded">
-                        <option value="">Cargando...</option>
-                    </select>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Piloto Vuelta Rápida</label>
-                    <select name="vueltaRapida" id="selectVueltaRapida" class="w-full bg-gray-800 px-3 py-2 rounded">
-                        <option value="">Cargando...</option>
-                    </select>
-                    </div>
-                    <div class="flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 rounded">Guardar</button>
-                    <button type="button" id="cancelarFormGP" class="px-4 py-2 bg-gray-600 rounded">Cancelar</button>
-                    </div>
-                </form>
-            </div>
           </div>
         </div>
         <div class="p-5">
@@ -185,6 +143,64 @@
         </div>
       </section>
     </div>
+
+                <!-- Formulario oculto -->
+            <div id="formAgregarGP" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+              <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
+                <h3 class="text-lg font-bold mb-4">Nuevo Gran Premio</h3>
+                <form id="gpForm" class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-sm mb-1">Nombre del GP</label>
+                        <input list="NombreGP" id="GP" name="grandPrix" placeholder="Escribe o selecciona" class="w-full bg-neutral-800 p-2 rounded" required>
+                        <datalist id="NombreGP"></datalist>
+                        <!--<select name="NombreGP" id="selectGP" class="w-full bg-gray-800 px-3 py-2 rounded" required>
+                        <option value="">Cargando...</option>-->
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Fecha</label>
+                    <input id="date" type="date" name="fecha" class="w-full bg-neutral-800 p-2 rounded" required>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Circuito</label>
+                    <select name="circuito" id="selectCircuito" class="w-full bg-neutral-800 p-2 rounded" required>
+                        <option value="">Cargando...</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Formato de carrera</label>
+                    <select name="formatoCarrera" id="selectFormatoCarrera" class="w-full bg-neutral-800 p-2 rounded" required>
+                        <option value="" selected>Selecciona una opcion de formato de carrera</option>
+                        <option value="GP">Gran Premio (GP)</option>
+                        <option value="SP">Sprint (SP)</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Vueltas Totales</label>
+                    <input id="Laps" type="number" name="vueltas" min="1" max="300" class="w-full bg-neutral-800 p-2 rounded">
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Piloto Pole Position</label>
+                    <select name="polePosition" id="selectPolePosition" class="w-full bg-neutral-800 p-2 rounded">
+                        <option value="">Cargando...</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label class="block text-sm mb-1">Piloto Vuelta Rápida</label>
+                    <select name="vueltaRapida" id="selectVueltaRapida" class="w-full bg-neutral-800 p-2 rounded">
+                        <option value="">Cargando...</option>
+                    </select>
+                    </div>
+                    <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+                      <div class="flex gap-2">
+                        <button type="submit" class="px-3 py-1 bg-neutral-800 rounded">Guardar</button>
+                        <button type="button" id="cancelarFormGP" class="px-3 py-1 bg-red-600 rounded">Cancelar</button>
+                      </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+
             <!-- Modal: Agregar pilotos a temporada -->
     <div id="modalAddPilotos" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
       <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
@@ -468,15 +484,23 @@
         const circuitos = await fetch("http://localhost:1234/api/circuito/").then(r => r.json());
         const GPs = await fetch(`http://localhost:1234/api/granPremio/`).then(r => r.json());
         const selCircuito = document.getElementById("selectCircuito");
-        const selGPs = document.getElementById("selectGP")
-        selCircuito.innerHTML = circuitos.map(c => `<option value="${c.id_Circuito}">${c.nombre}, ${c.pais}</option>`).join("");
-        selGPs.innerHTML = GPs.map(g => `<option value="${g.nombre_oficial}">${g.nombre_oficial}</option>`).join("");
+        const selGPs = document.getElementById("NombreGP")
+        selCircuito.innerHTML = `<option value="" selected>Seleccione un circuito</option>`;
+        selCircuito.innerHTML += circuitos.map(c => `<option value="${c.id_Circuito}">${c.nombre}, ${c.pais}</option>`).join("");
+        selGPs.innerHTML ="";
+        GPs.forEach(granPremio => {
+            const option = document.createElement("option");
+            option.value = granPremio.nombre_oficial;
+            selGPs.appendChild(option)
+        });
         // Pilotos
         const pilotos = await fetch(`http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r => r.json());
         const selVR = document.getElementById("selectVueltaRapida");
         const selPP = document.getElementById("selectPolePosition");
-        selVR.innerHTML = pilotos.map(p => `<option value="${p.id_Piloto}">${p.nombre_completo}</option>`).join("");
-        selPP.innerHTML = pilotos.map(p => `<option value="${p.id_Piloto}">${p.nombre_completo}</option>`).join("");
+        selVR.innerHTML = `<option value="">Seleccione el piloto que hizo la Vuelta Rapida</option>`;
+        selVR.innerHTML += pilotos.map(p => `<option value="${p.id_Piloto}">${p.nombre_completo}</option>`).join("");
+        selPP.innerHTML = `<option value="">Seleccione el piloto que hizo la Pole Position</option>`;
+        selPP.innerHTML += pilotos.map(p => `<option value="${p.id_Piloto}">${p.nombre_completo}</option>`).join("");
         } catch (err) {
         console.error("Error cargando datos del formulario", err);
         }
@@ -486,14 +510,15 @@
         e.preventDefault();
         
         
-        const nombre_GP = document.querySelector('select[name="NombreGP"]').value;
+        const nombre_GP = document.getElementById("GP").value;
         const fecha = document.getElementById('date').value;
         const circuito = document.getElementById('selectCircuito').value; // ya es valor
         const totalLaps = document.getElementById('Laps').value;
-        const polePosition = document.querySelector('select[name="polePosition"]').value;
-        const vueltaRapida = document.querySelector('select[name="vueltaRapida"]').value;
+        const polePosition = document.getElementById('selectPolePosition').value;
+        const vueltaRapida = document.getElementById('selectVueltaRapida').value;
+        const formatoCarrera = document.getElementById('selectFormatoCarrera').value;
 
-        console.log(nombre_GP, fecha, circuito,idSeason, totalLaps, polePosition, vueltaRapida);
+        console.log(nombre_GP, fecha, circuito,idSeason, totalLaps, polePosition, vueltaRapida, formatoCarrera);
 
         try {
         const res = await fetch("http://localhost:1234/api/granPremio/registrarGP", {
@@ -504,14 +529,16 @@
                 fecha: fecha,
                 circuito_id: circuito,
                 temporada_id: idSeason,
-                vueltas_totales: totalLaps,
-                pole_position_piloto_id: polePosition,
-                vuelta_rapida_piloto_id: vueltaRapida
+                vueltas_totales: totalLaps || null,
+                pole_position_piloto_id: polePosition || null,
+                vuelta_rapida_piloto_id: vueltaRapida || null,
+                tipo_carrera: formatoCarrera
             })
         });
         if (res.ok) {
             alert("Gran Premio agregado con éxito");
             formContainerGP.classList.add("hidden");
+            document.getElementById("gpForm").reset();
             cargarGPS(); // refrescar lista
         } else {
             alert("Error al agregar el Gran Premio");
@@ -523,7 +550,7 @@
 
     async function obtenerImagenWikipedia(nombre) {
       const query = encodeURIComponent(nombre);
-      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=100&origin=*`;
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=1000&origin=*`;
       try {
         const res = await fetch(url);
         const data = await res.json();

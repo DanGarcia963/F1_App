@@ -123,7 +123,7 @@
 
     async function obtenerImagenWikipedia(nombre) {
       const query = encodeURIComponent(nombre);
-      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=100&origin=*`;
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=1000&origin=*`;
       try {
         const res = await fetch(url);
         const data = await res.json();

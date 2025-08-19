@@ -117,11 +117,20 @@
   const endpointGuardar = `/api/resultados/crearResultado/`;      // POST -> guarda resultados (ajusta)
 
   // Puntos según posición (1..20)
-  const puntosPorPos = [25,18,15,12,10,8,6,4,2,1,0,0,0,0,0,0,0,0,0,0];
-
+  
+  const puntosPorPosGP = [25,18,15,12,10,8,6,4,2,1,0,0,0,0,0,0,0,0,0,0];
+  const puntosPorPosSP = [8,7,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0];
+  let puntosPorPos;
   const resultadosSection = document.getElementById('gridResultados');
   const noResultadosSection = document.getElementById('noResultados');
   const resultadosBody = document.getElementById('resultadosBody');
+  console.log(GPPoint[0].tipo_carrera === 'GP')
+  if(GPPoint[0].tipo_carrera == 'GP'){
+    puntosPorPos = [...puntosPorPosGP];
+  }
+  else if(GPPoint[0].tipo_carrera =='SP'){
+    puntosPorPos = [...puntosPorPosSP];
+  }
 
   // Modal y botones
   const modal = document.getElementById('modalForm');
@@ -163,8 +172,8 @@
           <td class="p-2 align-top">${row.posicion_final}</td>
           <td class="p-2 align-top">${row.nombre_piloto || row.piloto_nombre || row.piloto || '—'}</td>
           <td class="p-2 align-top">${row.equipo || '—'}</td>
-          <td class="p-2 align-top">${row.posicion_clasificacion ?? '—'}</td>
-          <td class="p-2 align-top">${row.vueltas_completadas ?? '—'}</td>
+          <td class="p-2 align-top">${row.posicion_inicio || '—'}</td>
+          <td class="p-2 align-top">${row.vueltas_completadas || '—'}</td>
           <td class="p-2 align-top">${row.puntos || row.puntos_obtenidos || 0}</td>
         `;
         resultadosBody.appendChild(tr);
@@ -210,6 +219,7 @@
         return `<option value="${id}">${name}</option>`;
       }).join('');
 
+      
       tr.innerHTML = `
         <td class="p-2 align-top font-semibold">${pos}</td>
         <td class="p-2">

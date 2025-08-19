@@ -23,8 +23,8 @@
             c.pais AS Pais,
             gp.fecha,
             IFNULL(g.codigo_fia, 'Aún no se disputa') AS Ganador,
-            pp.codigo_fia AS Pole_Position,
-            vr.codigo_fia AS Vuelta_Rapida
+            IFNULL(pp.codigo_fia, 'Aún no se disputa') AS Pole_Position,
+            IFNULL(vr.codigo_fia, 'Aún no se disputa') AS Vuelta_Rapida
         FROM grandes_premios gp
         LEFT JOIN piloto pp
             ON pp.id_Piloto = gp.pole_position_piloto_id
@@ -53,7 +53,8 @@
             pp.id_Piloto,
             pp.codigo_fia AS Pole_Position,
             vr.id_Piloto,
-            vr.codigo_fia AS Vuelta_Rapida
+            vr.codigo_fia AS Vuelta_Rapida,
+            gp.tipo_carrera
             FROM
             grandes_premios gp
             LEFT JOIN piloto pp
@@ -119,15 +120,15 @@
 
 static async registrarGP({ entrada }) {
   const {
-    nombre_oficial:nombreGP, fecha, circuito_id:circuito,temporada_id:temporada, vueltas_totales:vueltas, pole_position_piloto_id:polePosition, vuelta_rapida_piloto_id:vueltaRapida
+    nombre_oficial:nombreGP, fecha, circuito_id:circuito,temporada_id:temporada, vueltas_totales:vueltas, pole_position_piloto_id:polePosition, vuelta_rapida_piloto_id:vueltaRapida, tipo_carrera: formatoCarrera
   } = entrada;
 
   try {
     await connectionMySQL.query(
       `INSERT INTO grandes_premios
-      (nombre_oficial, fecha, circuito_id, temporada_id, vueltas_totales, pole_position_piloto_id, vuelta_rapida_piloto_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [nombreGP, fecha, circuito, temporada, vueltas, polePosition, vueltaRapida]
+      (nombre_oficial, fecha, circuito_id, temporada_id, vueltas_totales, pole_position_piloto_id, vuelta_rapida_piloto_id, tipo_carrera)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [nombreGP, fecha, circuito, temporada, vueltas, polePosition, vueltaRapida,formatoCarrera]
     );
 
     // Si quieres devolver el GP recién insertado

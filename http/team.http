@@ -33,3 +33,12 @@ GET http://localhost:1234/api/equipo/obtenerEquipo/1
 
 ### Obtener la información de un piloto
 GET http://localhost:1234/api/equipo/obtenerEquipo/McLaren
+
+###obtener monoplaza actual
+POST http://localhost:1234/api/equipo/obtenerMonoplazaActual
+Content-Type: application/json
+
+{
+    "anio": 2025,
+    "idEquipo": 2
+}

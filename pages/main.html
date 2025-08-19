@@ -51,7 +51,7 @@
         </a>
         <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
           <a class="px-3 py-2 hover:text-white" href="/">Inicio</a>
-          <a class="px-3 py-2 hover:text-white" href="#">Equipos</a>
+          <a class="px-3 py-2 hover:text-white" href="/teams">Equipos</a>
           <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
           <a class="px-3 py-2 hover:text-white" href="/pilotos">Pilotos</a>
         </nav>
@@ -71,7 +71,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
       
       <!-- World Constructors Championship -->
-      <section class="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-2 2xl:col-span-2  rounded-lg overflow-hidden shadow-lg relative">
+      <section class="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-2 2xl:col-span-2 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
         <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
             <div class="p-4 flex flex-row items-center gap-4">
@@ -126,7 +126,7 @@
   <script>
     async function obtenerImagenWikipedia(nombre) {
       const query = encodeURIComponent(nombre);
-      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=100&origin=*`;
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=1000&origin=*`;
       try {
         const res = await fetch(url);
         const data = await res.json();

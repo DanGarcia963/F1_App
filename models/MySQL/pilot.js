@@ -34,7 +34,7 @@ export class PilotModel {
           AND pt.piloto_id = p.id_Piloto
       JOIN equipo e
           ON e.id_Equipo = pt.equipo_id
-      WHERE p.id_Piloto = ?
+      WHERE p.id_Piloto = ? AND gp.tipo_carrera = 'GP'
       GROUP BY p.id_Piloto, e.nombre
       ORDER BY puntos_totales DESC;`, [idPiloto])
         if (piloto.length === 0) return false
@@ -62,8 +62,8 @@ export class PilotModel {
                 ON e.id_Equipo = pt.equipo_id
             JOIN circuito c
                 ON c.id_Circuito = gp.circuito_id
-            WHERE p.id_Piloto = ? AND rgp.posicion_final = 1
-            ORDER BY gp.fecha ASC;
+            WHERE p.id_Piloto = ? AND rgp.posicion_final = 1 AND gp.tipo_carrera = 'GP'
+            ORDER BY gp.fecha DESC;
             `, [idPiloto])
             if(victorias.length === 0) return false 
             
@@ -90,8 +90,8 @@ export class PilotModel {
                 ON e.id_Equipo = pt.equipo_id
             JOIN circuito c
                 ON c.id_Circuito = gp.circuito_id
-            WHERE p.id_Piloto = ? AND (rgp.posicion_final = 1 OR rgp.posicion_final=2 OR rgp.posicion_final=3)
-            ORDER BY gp.fecha ASC;
+            WHERE p.id_Piloto = ? AND (rgp.posicion_final = 1 OR rgp.posicion_final=2 OR rgp.posicion_final=3) AND gp.tipo_carrera = 'GP'
+            ORDER BY gp.fecha DESC;
             `, [idPiloto])
             if(podios.length === 0) return false 
             
@@ -119,7 +119,7 @@ export class PilotModel {
                     AND pt.piloto_id = p.id_Piloto
                 JOIN equipo e
                     ON e.id_Equipo = pt.equipo_id
-                WHERE p.id_Piloto = ?
+                WHERE p.id_Piloto = ? AND gp.tipo_carrera = 'GP'
                 GROUP BY p.id_Piloto, e.nombre, pt.numero
                 ORDER BY puntos_totales DESC;
             `, [idPiloto])
