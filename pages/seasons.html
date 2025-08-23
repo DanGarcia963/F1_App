@@ -93,14 +93,14 @@
     async function cargarTemporadas(){
       try{
         
-        const temporadas = await fetch(`http://localhost:1234/api/temporada/`).then(r=>r.json());
+        const temporadas = await fetch(`/api/temporada/`).then(r=>r.json());
         const containerSeasons =document.getElementById('gridSeasons')
         containerSeasons.innerHTML='';
         for(let i=0; i<temporadas.length;i++){
             console.log(temporadas[i])
           const season = temporadas[i];
           const cardSeason = document.createElement('div');
-          const pilotos = await fetch(`http://localhost:1234/api/granPremio/obtenerWDCPorAnio/${season.anio}`).then(r => r.json());
+          const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${season.anio}`).then(r => r.json());
           if (pilotos.length > 0) {
             const campeon = pilotos[0]; // Tomamos el primero
             cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';

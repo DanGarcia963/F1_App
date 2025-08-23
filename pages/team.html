@@ -227,7 +227,7 @@ console.log(idEquipo)
 
     async function cargarVictoriasPiloto(){
       try{
-        const VictoriasEquipo = await fetch(`http://localhost:1234/api/equipo/obtenerVictoriasEquipo/${idEquipo}`).then(r=>r.json());
+        const VictoriasEquipo = await fetch(`/api/equipo/obtenerVictoriasEquipo/${idEquipo}`).then(r=>r.json());
         const container =document.getElementById('gridVictories')
         container.innerHTML='';
         for(let i=0; i<VictoriasEquipo.length;i++){
@@ -259,7 +259,7 @@ console.log(idEquipo)
 
         async function cargarDuplasPiloto(){
       try{
-        const duplasPilotos = await fetch(`http://localhost:1234/api/equipo/obtenerDuplasEquipo/${idEquipo}`).then(r=>r.json());
+        const duplasPilotos = await fetch(`/api/equipo/obtenerDuplasEquipo/${idEquipo}`).then(r=>r.json());
         const container =document.getElementById('gridDuplas')
         container.innerHTML='';
         for(let i=0; i<duplasPilotos.length;i++){
@@ -363,20 +363,11 @@ console.log(idEquipo)
         <p class="text-neutral-400">podios: ${dupla.podios}</p>`;
         contDupla.appendChild(cardDriver)
       }
-      //const VictoriasPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerVictoriasPiloto/${idPiloto}`).then(r=>r.json());
-      /*
-      contDupla.innerHTML =     
-    `<div class="flex-shrink-0 flex flex-col items-center">
-      <span id="fotoPiloto"></span>
-      <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
-      <p id="equipoPiloto" class="text-neutral-400"></p>
-    </div>`*/
-
     }
 
       async function obtenerStatsDuplaEquipo(anio){
     try{
-      const res = await fetch(`http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear`, {
+      const res = await fetch(`/api/equipo/obtenerStatsDuplaEquipoYear`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -399,7 +390,7 @@ console.log(idEquipo)
 
   async function obtenerMonoplazasEquipo(){
     try{
-      const res = await fetch(`http://localhost:1234/api/equipo/obtenerMonoplazaActual`, {
+      const res = await fetch(`/api/equipo/obtenerMonoplazaActual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -425,8 +416,8 @@ console.log(idEquipo)
         const today = new Date()
         const CurrentYear = today.getFullYear()
         console.log(CurrentYear)
-        const infoEquipo = await fetch(`http://localhost:1234/api/equipo/obtenerEquipo/${idEquipo}`).then(r => r.json());
-        const statsEquipo = await fetch(`http://localhost:1234/api/equipo/obtenerInfoEquipo/${idEquipo}`).then(r=> r.json());
+        const infoEquipo = await fetch(`/api/equipo/obtenerEquipo/${idEquipo}`).then(r => r.json());
+        const statsEquipo = await fetch(`/api/equipo/obtenerInfoEquipo/${idEquipo}`).then(r=> r.json());
         var acumPuntos=0
         var acumPodios=0
         var acumVictories=0

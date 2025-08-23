@@ -217,8 +217,8 @@
   }
 
   // Endpoints que puedes ajustar
-  const GPPoint = await fetch(`http://localhost:1234/api/granPremio/obtenerGP/${idGP}`).then(r => r.json());
-  console.log(GPPoint[0].id_Temporada)
+  const GPPoint = await fetch(`/api/granPremio/obtenerGP/${idGP}`).then(r => r.json());
+  console.log(GPPoint[0])
   const idSeason = GPPoint[0].id_Temporada
   const anio = GPPoint[0].anio
   const nombreGP = GPPoint[0].Nombre_GP
@@ -238,7 +238,11 @@
   const resultadosBody = document.getElementById('resultadosBody');
   console.log(GPPoint[0].tipo_carrera === 'GP')
   if(GPPoint[0].tipo_carrera == 'GP'){
-    puntosPorPos = [...puntosPorPosGP10_Act];
+    if(anio >= 2010){
+      puntosPorPos = [...puntosPorPosGP10_Act];
+    } else {
+      puntosPorPos = [...puntosPorPosGP03_09];
+    }
   }
   else if(GPPoint[0].tipo_carrera =='SP'){
     puntosPorPos = [...puntosPorPosSP];
@@ -266,7 +270,7 @@
   // 1) Intentar obtener resultados
   let resultados;
   try {
-    const r = await fetch(`http://localhost:1234/api/resultados/obtenerResultadoGP/${idGP}`);
+    const r = await fetch(`/api/resultados/obtenerResultadoGP/${idGP}`);
     if (!r.ok) throw new Error('No OK');
     resultados = await r.json();
   } catch (e) {
@@ -664,7 +668,7 @@ console.log()
 
     async function fetchEditarGP(datosGP){
     try {
-      const res = await fetch(`http://localhost:1234/api/granPremio/editarGP`, {
+      const res = await fetch(`/api/granPremio/editarGP`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosGP)
@@ -725,7 +729,7 @@ console.log()
 
       async function cargarLastWinners() {
       try {
-          const Winners = await fetch(`http://localhost:1234/api/granPremio/obtenerLastWinners/${nombreGP}`).then(r => r.json());
+          const Winners = await fetch(`/api/granPremio/obtenerLastWinners/${nombreGP}`).then(r => r.json());
           console.log(Winners)
 
         const lastWinner = document.getElementById('gridLastWinner');

@@ -494,8 +494,8 @@
     async function cargarSelectsFormulario() {
         try {
         // Circuitos
-        const circuitos = await fetch("http://localhost:1234/api/circuito/").then(r => r.json());
-        const GPs = await fetch(`http://localhost:1234/api/granPremio/`).then(r => r.json());
+        const circuitos = await fetch("/api/circuito/").then(r => r.json());
+        const GPs = await fetch(`/api/granPremio/`).then(r => r.json());
         const selCircuito = document.getElementById("selectCircuito");
         const selGPs = document.getElementById("NombreGP")
         selCircuito.innerHTML = `<option value="" selected>Seleccione un circuito</option>`;
@@ -507,7 +507,7 @@
             selGPs.appendChild(option)
         });
         // Pilotos
-        const pilotos = await fetch(`http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r => r.json());
+        const pilotos = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r => r.json());
         const selVR = document.getElementById("selectVueltaRapida");
         const selPP = document.getElementById("selectPolePosition");
         selVR.innerHTML = `<option value="">Seleccione el piloto que hizo la Vuelta Rapida</option>`;
@@ -528,13 +528,15 @@
         const circuito = document.getElementById('selectCircuito').value; // ya es valor
         const totalLaps = document.getElementById('Laps').value;
         const polePosition = document.getElementById('selectPolePosition').value;
+        const tiempoPole = document.getElementById('tiempoPole').value;
+        const tiempoVR = document.getElementById('tiempoVR').value;
         const vueltaRapida = document.getElementById('selectVueltaRapida').value;
         const formatoCarrera = document.getElementById('selectFormatoCarrera').value;
 
-        console.log(nombre_GP, fecha, circuito,idSeason, totalLaps, polePosition, vueltaRapida, formatoCarrera);
+        console.log(nombre_GP, fecha, circuito,idSeason, totalLaps, polePosition,tiempoPole, vueltaRapida, tiempoVR,formatoCarrera);
 
         try {
-        const res = await fetch("http://localhost:1234/api/granPremio/registrarGP", {
+        const res = await fetch("/api/granPremio/registrarGP", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -544,7 +546,9 @@
                 temporada_id: idSeason,
                 vueltas_totales: totalLaps || null,
                 pole_position_piloto_id: polePosition || null,
+                tiempo_pole: tiempoPole || null,
                 vuelta_rapida_piloto_id: vueltaRapida || null,
+                tiempo_vuelta_rapida: tiempoVR || null,
                 tipo_carrera: formatoCarrera
             })
         });
@@ -577,7 +581,7 @@
     }
     
     async function cargarGPS(){
-    try{const GPs = await fetch(`http://localhost:1234/api/granPremio/obtenerGPTemporada/${Anio}`).then(r=> r.json());
+    try{const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${Anio}`).then(r=> r.json());
       const container = document.getElementById('gridGPs');
         container.innerHTML = '';
           for (let i = 0; i < GPs.length; i++) {
@@ -628,7 +632,7 @@
 
     async function cargarPilotosTemporada(){
       try{
-        const pilotosSeason = await fetch(`http://localhost:1234/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r=>r.json());
+        const pilotosSeason = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r=>r.json());
         const DriverSeason = document.getElementById('gridDriverSeason');
         DriverSeason.innerHTML = '';
           for (let i = 0; i < pilotosSeason.length; i++) {
@@ -655,8 +659,8 @@
     // Simulación: reemplazar fetch con tus endpoints reales
     async function cargarCampeonatos() {
       try {
-        const pilotos = await fetch(`http://localhost:1234/api/granPremio/obtenerWDCPorAnio/${Anio}`).then(r => r.json());
-        const constructores = await fetch(`http://localhost:1234/api/granPremio/obtenerWCCPorAnio/${Anio}`).then(r => r.json());
+        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${Anio}`).then(r => r.json());
+        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${Anio}`).then(r => r.json());
 
         const WDC = document.getElementById('gridWDC');
         WDC.innerHTML = '';

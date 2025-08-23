@@ -147,7 +147,7 @@
 
 
     async function cargarGPS(){
-    try{const GPs = await fetch(`http://localhost:1234/api/granPremio/obtenerGPTemporada/${CurrentYear}`).then(r=> r.json());
+    try{const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${CurrentYear}`).then(r=> r.json());
       const container = document.getElementById('gridGPs');
 
         container.innerHTML = '';
@@ -199,8 +199,8 @@
     // Simulación: reemplazar fetch con tus endpoints reales
     async function cargarCampeonatos() {
       try {
-        const pilotos = await fetch(`http://localhost:1234/api/granPremio/obtenerWDCPorAnio/${CurrentYear}`).then(r => r.json());
-        const constructores = await fetch(`http://localhost:1234/api/granPremio/obtenerWCCPorAnio/${CurrentYear}`).then(r => r.json());
+        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${CurrentYear}`).then(r => r.json());
+        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${CurrentYear}`).then(r => r.json());
 
         const WDC = document.getElementById('gridWDC');
         WDC.innerHTML = '';
