@@ -43,16 +43,25 @@ export class GPController {
             res.status(404).json({ message: 'Campeonato de constructores no encontrado' })
     }
 
+    obtenerLastWinnerGP = async (req, res) => {
+        const { nombreOficial } = req.params
+
+        const LastWinners = await this.gpModel.obtenerLastWinnerGP(nombreOficial)
+
+        if (LastWinners) return res.json(LastWinners)
+            res.status(404).json({ message: 'last Winners no encontrados' })
+    }
+
     registrarGP = async (req, res) => {
         const nuevoGP = await this.gpModel.registrarGP({ entrada: req.body })
         res.send(nuevoGP)
     } 
-/*
-    cambiarNombre = async (req, res) => {
-        const resultado = await this.gpModel.cambiarNombre({ entrada: req.body })
+
+    editarGP = async (req, res) => {
+        const resultado = await this.gpModel.editarGP({ entrada: req.body })
         res.status(200).json({ message: `${resultado}` })
     }
-
+/*
     cambiarFecha = async (req, res) => {
         const resultado = await this.gpModel.cambiarFecha({ entrada: req.body })
         res.status(200).json({ message: `${resultado}` })

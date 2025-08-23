@@ -39,6 +39,14 @@ POST http://localhost:1234/api/equipo/obtenerMonoplazaActual
 Content-Type: application/json
 
 {
-    "anio": 2025,
-    "idEquipo": 2
+    "idEquipo": 5
+}
+
+###obtener monoplaza actual
+POST http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear
+Content-Type: application/json
+
+{
+    "idEquipo": 1,
+    "anio": 2025
 }

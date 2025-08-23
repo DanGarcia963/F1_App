@@ -11,11 +11,82 @@
       #gridVictories{
     max-height: 300px;
   }
-  #gridMonoplaza img {
-  
-  max-height: 500px;
-  
+
+  .container{
+    width: 100%;
+    position: relative;
+    overflow: hidden;
   }
+
+/* imagen principal (monoplaza) */
+#monoplazaImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform .5s ease;
+  display: block;
+}
+
+/* solo la imagen del monoplaza escala al hacer hover del contenedor */
+.container:hover > #monoplazaImg,
+.container.dupla-open > #monoplazaImg,
+.container:focus-within > #monoplazaImg {
+  transform: scale(1.09);
+}
+
+  .content {
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top:-100%;
+    left:0;
+    text-align: justify;
+    height: 100%;
+    width: 100%;
+    color: #fff;
+    transition: all .5s;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    align-content: flex-start; /* controla cómo se comportan las filas dentro del alto */
+    overflow-y: auto;          /* si hay muchas cards, scroll vertical */
+  }
+
+  .content h3 {
+    text-align: center;
+    font-size: 25px;
+    border-bottom: 1px solid #808080;
+    padding: 20px 10px;
+  }
+
+  .content p {
+    padding: 20px 20px 15px 20px;
+    border-bottom:  1px solid #808080;
+  }
+
+  .container:hover .content{
+    top:0;
+  }
+  .card-driver{
+  width: 220px;  
+  min-width: 160px; 
+  overflow: hidden;
+  border-radius: 160px;
+    background: rgba(255,255,255,0.02);
+      padding: .6rem .8rem;
+  display:flex;
+  gap: .75rem;
+  align-items: center;
+}
+
+/* imagen interna */
+.card-driver img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 999px;
+}
+
    #gridTrayectoria, #gridDuplas{
         max-height: 250px;
   }
@@ -82,13 +153,24 @@
 
   <section class="bg-neutral-900 col-span-1  lg:col-span-2  xl:col-span-3 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg w-full p-6 gap-6">
 
-            <div class="relative">
+          <div class="relative">
           <div class="rounded-lg p-4 shadow">
             <p class="text-2xl max-w-full text-neutral-200 font-semibold">Monoplaza <span id="nombreMonoplaza"></span></p>
-            <div id="gridMonoplaza" class="gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+            <button id="btnPrev" class="absolute left-2 z-10 bg-black/50 text-white px-3 py-2 rounded-full">
+              ⬅
+            </button>
+            <button id="btnNext" class="absolute right-2 z-10 bg-black/50 text-white px-3 py-2 rounded-full">
+              ➡
+            </button>
+            <div id="gridMonoplaza" class="container animate-pulse gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+              <img id="monoplazaImg" src="" alt="Monoplaza" class="">
+              <div id="duplaEquipo" class="content">
+              </div>
             </div>
+            </div>
+
           </div>
-        </div>
+        
   </section>
 
   <section class="bg-neutral-900 col-span-1  lg:col-span-2  xl:col-span-3 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg w-full p-6 gap-6">
@@ -125,7 +207,7 @@
 
     async function obtenerImagenWikipedia(nombre) {
       const query = encodeURIComponent(nombre);
-      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=1000&origin=*`;
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
       try {
         const res = await fetch(url);
         const data = await res.json();
@@ -182,14 +264,14 @@ console.log(idEquipo)
         container.innerHTML='';
         for(let i=0; i<duplasPilotos.length;i++){
         const duplas = duplasPilotos[i];
-        const imgCURL = await obtenerImagenWikipedia(duplas.nombre_Circuito)
+        //const imgCURL = await obtenerImagenWikipedia(duplas.nombre_Circuito)
         const card = document.createElement('div');
 
         card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
         card.innerHTML =`                
                 <div class="p-4 flex flex-col items-center text-center">
                 <h3 class="text-lg font-bold text-white">${duplas.Dupla}</h3>
-                <!--${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${duplas.nombre_Circuito}" class="w-20 h-18 mb-2 border bg-white">` : ''}-->
+                
                 <p class="text-sm text-neutral-400">${duplas.anio}</p>
                 </div>
                 `;
@@ -201,13 +283,12 @@ console.log(idEquipo)
     }
     }
 
-    async function fetchMonoplazaActual(Anio, idEquipo){
+    async function fetchMonoplazaActual(){
     try {
       const res = await fetch(`/api/equipo/obtenerMonoplazaActual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-                "anio": Anio,
                 "idEquipo": idEquipo
         })
       });
@@ -222,6 +303,122 @@ console.log(idEquipo)
     }
   }
 
+
+      let currentIndex = 0;
+  async function inicializarCarrusel(){
+    const monoplaza = await obtenerMonoplazasEquipo();
+    console.log(monoplaza)
+    mostrarMonoplaza(currentIndex, monoplaza)
+
+          // 4. Eventos de los botones
+    document.getElementById("btnPrev")?.addEventListener("click", () => {
+      if (monoplaza.length === 0) return;
+      currentIndex = (currentIndex - 1 + monoplaza.length) % monoplaza.length;
+      mostrarMonoplaza(currentIndex,monoplaza);
+    });
+
+    document.getElementById("btnNext")?.addEventListener("click", () => {
+      if (monoplaza.length === 0) return;
+      currentIndex = (currentIndex + 1) % monoplaza.length;
+      mostrarMonoplaza(currentIndex,monoplaza);
+    });
+  }
+    async function mostrarMonoplaza(idx, monoplaza){
+      const mono = monoplaza[idx];
+      console.log(mono.anio, mono.F1_Car)
+      document.getElementById('nombreMonoplaza').textContent = `${mono.register_name} ${mono.anio} ${mono.F1_Car}`
+      let imgMUrl = await obtenerImagenWikipedia(`${monoplaza[idx].nombre} ${monoplaza[idx].F1_Car}`);
+      if(!imgMUrl){
+        imgMUrl = await obtenerImagenWikipedia(`${monoplaza[idx].register_name} ${monoplaza[idx].F1_Car}`);
+      }
+      const imgElement =document.getElementById("monoplazaImg");
+      
+      if(imgMUrl){
+
+       imgElement.src = imgMUrl;
+      imgElement.alt = mono.F1_Car;
+      }
+      else{
+        const div = document.getElementById('gridMonoplaza')
+        div.className=`invisible`
+      }
+      const statsEquipo = await obtenerStatsDuplaEquipo(mono.anio);
+      console.log(statsEquipo.length)
+      const contDupla = document.getElementById('duplaEquipo');
+      contDupla.innerHTML='';
+      for(let i = 0; i <statsEquipo.length; i++){
+        const dupla = statsEquipo[i];
+        console.log(dupla)
+        const imgCURL = await obtenerImagenWikipedia(dupla.nombre_completo)
+        const cardDriver = document.createElement('div');
+
+        cardDriver.className =`card-driver h-full w-1/2 flex flex-col`
+        cardDriver.innerHTML=`
+        <div>
+          ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${dupla.nombre_completo}" class="w-14 h-14 mb-2 border bg-white">` : ''}
+
+          </div>
+        <h3 class="text-lg font-bold text-white">${dupla.nombre_completo}</h3>
+        <p  class="mt-4 text-xl font-bold">victorias: ${dupla.victorias}</p>
+        <p class="text-neutral-400">podios: ${dupla.podios}</p>`;
+        contDupla.appendChild(cardDriver)
+      }
+      //const VictoriasPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerVictoriasPiloto/${idPiloto}`).then(r=>r.json());
+      /*
+      contDupla.innerHTML =     
+    `<div class="flex-shrink-0 flex flex-col items-center">
+      <span id="fotoPiloto"></span>
+      <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
+      <p id="equipoPiloto" class="text-neutral-400"></p>
+    </div>`*/
+
+    }
+
+      async function obtenerStatsDuplaEquipo(anio){
+    try{
+      const res = await fetch(`http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+                "idEquipo": idEquipo,
+                "anio": anio
+        })
+      });
+      if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
+      return data = await res.json();
+      //
+
+      // opcional: recargar la página para mostrar resultados recién guardados
+      //
+    } catch (err) {
+      console.error(err);
+      mostrarMsg('Error buscando monoplaza', 'err');
+      throw err;
+    }
+  }
+
+  async function obtenerMonoplazasEquipo(){
+    try{
+      const res = await fetch(`http://localhost:1234/api/equipo/obtenerMonoplazaActual`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+                "idEquipo": idEquipo
+        })
+      });
+      if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
+      return data = await res.json();
+      //
+
+      // opcional: recargar la página para mostrar resultados recién guardados
+      //
+    } catch (err) {
+      console.error(err);
+      mostrarMsg('Error buscando monoplaza', 'err');
+      throw err;
+    }
+  }
+
     async function cargarDatosPiloto() {
       try {
         // Ejemplo de llamada a tu backend para obtener info
@@ -230,15 +427,6 @@ console.log(idEquipo)
         console.log(CurrentYear)
         const infoEquipo = await fetch(`http://localhost:1234/api/equipo/obtenerEquipo/${idEquipo}`).then(r => r.json());
         const statsEquipo = await fetch(`http://localhost:1234/api/equipo/obtenerInfoEquipo/${idEquipo}`).then(r=> r.json());
-      const monoplaza = await fetch(`http://localhost:1234/api/equipo/obtenerMonoplazaActual`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-                "anio": CurrentYear,
-                "idEquipo": idEquipo
-        })
-      }).then(r=>r.json());
-        console.log(monoplaza[0])
         var acumPuntos=0
         var acumPodios=0
         var acumVictories=0
@@ -251,14 +439,11 @@ console.log(idEquipo)
                     acumPoles += Number(equipo.poles);
           }
 
-
+          inicializarCarrusel()
         const imgPUrl = await obtenerImagenWikipedia(infoEquipo.nombre_completo);
-        const imgMUrl = await obtenerImagenWikipedia(`${monoplaza[0].nombre} ${monoplaza[0].F1_Car}`)
-        console.log(`${monoplaza[0].nombre} ${monoplaza[0].F1_Car}`)
-        document.getElementById("gridMonoplaza").innerHTML = `<img src="${imgMUrl}" alt="${monoplaza[0].F1_Car}">`;
+        console.log(imgPUrl);
         document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoEquipo.nombre}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">`
         document.getElementById("nombrePiloto").textContent = infoEquipo.nombre;
-        document.getElementById("nombreMonoplaza").textContent = `${CurrentYear} ${monoplaza[0].F1_Car}`;
         document.getElementById("equipoPiloto").textContent = infoEquipo.Motor;
         document.getElementById("NameTeam").textContent = infoEquipo.nombre;
         document.getElementById("Motor").textContent = infoEquipo.Motor;

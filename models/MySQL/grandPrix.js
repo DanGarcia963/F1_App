@@ -50,9 +50,12 @@
             c.nombre as "Nombre_Circuito",
             t.id_Temporada,
             t.anio,
-            pp.id_Piloto,
+            gp.fecha,
+            gp.tiempo_pole,
+            gp.pole_position_piloto_id,
             pp.codigo_fia AS Pole_Position,
-            vr.id_Piloto,
+            gp.tiempo_vuelta_rapida,
+            gp.vuelta_rapida_piloto_id,
             vr.codigo_fia AS Vuelta_Rapida,
             gp.tipo_carrera
             FROM
@@ -118,6 +121,28 @@
         return WCC
     }
 
+      static async obtenerLastWinnerGP (nombreOficial){
+      const [LastWinners] = await connectionMySQL.query(`SELECT 
+      gp.id_GP,
+      t.anio,
+      concat(p.Nombre, ' ',p.Apellido) Winners,
+      gp.nombre_oficial,
+      c.nombre
+      FROM resultados rgp
+      JOIN piloto p
+      on p.id_Piloto = rgp.piloto_id
+      join grandes_premios gp 
+      on gp.id_GP = rgp.grand_prix_id
+      join circuito c 
+      on c.id_Circuito = gp.circuito_id
+      join temporada t 
+      on t.id_Temporada = gp.temporada_id
+      where rgp.posicion_final = 1 AND gp.nombre_oficial = ?
+      ORDER BY t.anio DESC `,[nombreOficial]);
+        if(LastWinners === 0) return false
+        return LastWinners
+    }
+
 static async registrarGP({ entrada }) {
   const {
     nombre_oficial:nombreGP, fecha, circuito_id:circuito,temporada_id:temporada, vueltas_totales:vueltas, pole_position_piloto_id:polePosition, vuelta_rapida_piloto_id:vueltaRapida, tipo_carrera: formatoCarrera
@@ -143,4 +168,36 @@ static async registrarGP({ entrada }) {
     throw new Error(error);
   }
 }
+
+static async editarGP({ entrada }) {
+  const {
+    fecha, pole_position_piloto_id:pilotoPP, tiempo_pole:PolePosition, vuelta_rapida_piloto_id:pilotoVR, tiempo_vuelta_rapida:vueltaRapida, id_GP:idGP
+  } = entrada;
+
+  try {
+    await connectionMySQL.query(
+      `UPDATE grandes_premios
+        SET 
+        fecha = ?, 
+        pole_position_piloto_id = ?,
+        tiempo_pole = ?,
+        vuelta_rapida_piloto_id = ?,
+        tiempo_vuelta_rapida = ?
+        WHERE id_GP = ?`,
+      [fecha, pilotoPP, PolePosition, pilotoVR, vueltaRapida, idGP]
+    );
+
+    // Si quieres devolver el GP recién insertado
+    const [nuevoGP] = await connectionMySQL.query(
+      'SELECT * FROM grandes_premios WHERE id_GP = ? AND fecha = ?',
+      [idGP, fecha]
+    );
+
+    return nuevoGP[0];
+    
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
  }

@@ -58,7 +58,7 @@
         </a>
         <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
           <a class="px-3 py-2 hover:text-white" href="/">Inicio</a>
-          <a class="px-3 py-2 hover:text-white" href="#">Equipos</a>
+          <a class="px-3 py-2 hover:text-white" href="/teams">Equipos</a>
           <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
           <a class="px-3 py-2 hover:text-white" href="/pilotos">Pilotos</a>
         </nav>
@@ -145,61 +145,66 @@
     </div>
 
                 <!-- Formulario oculto -->
-            <div id="formAgregarGP" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
-              <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
-                <h3 class="text-lg font-bold mb-4">Nuevo Gran Premio</h3>
-                <form id="gpForm" class="grid grid-cols-1 gap-4">
-                    <div>
-                        <label class="block text-sm mb-1">Nombre del GP</label>
-                        <input list="NombreGP" id="GP" name="grandPrix" placeholder="Escribe o selecciona" class="w-full bg-neutral-800 p-2 rounded" required>
-                        <datalist id="NombreGP"></datalist>
-                        <!--<select name="NombreGP" id="selectGP" class="w-full bg-gray-800 px-3 py-2 rounded" required>
-                        <option value="">Cargando...</option>-->
-                    </select>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Fecha</label>
-                    <input id="date" type="date" name="fecha" class="w-full bg-neutral-800 p-2 rounded" required>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Circuito</label>
-                    <select name="circuito" id="selectCircuito" class="w-full bg-neutral-800 p-2 rounded" required>
-                        <option value="">Cargando...</option>
-                    </select>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Formato de carrera</label>
-                    <select name="formatoCarrera" id="selectFormatoCarrera" class="w-full bg-neutral-800 p-2 rounded" required>
-                        <option value="" selected>Selecciona una opcion de formato de carrera</option>
-                        <option value="GP">Gran Premio (GP)</option>
-                        <option value="SP">Sprint (SP)</option>
-                    </select>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Vueltas Totales</label>
-                    <input id="Laps" type="number" name="vueltas" min="1" max="300" class="w-full bg-neutral-800 p-2 rounded">
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Piloto Pole Position</label>
-                    <select name="polePosition" id="selectPolePosition" class="w-full bg-neutral-800 p-2 rounded">
-                        <option value="">Cargando...</option>
-                    </select>
-                    </div>
-                    <div>
-                    <label class="block text-sm mb-1">Piloto Vuelta Rápida</label>
-                    <select name="vueltaRapida" id="selectVueltaRapida" class="w-full bg-neutral-800 p-2 rounded">
-                        <option value="">Cargando...</option>
-                    </select>
-                    </div>
-                    <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
-                      <div class="flex gap-2">
-                        <button type="submit" class="px-3 py-1 bg-neutral-800 rounded">Guardar</button>
-                        <button type="button" id="cancelarFormGP" class="px-3 py-1 bg-red-600 rounded">Cancelar</button>
-                      </div>
-                    </div>
-                </form>
-                </div>
+    <div id="formAgregarGP" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+      <div class="bg-neutral-900 w-1/4 max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
+        <h3 class="text-lg font-bold mb-4">Nuevo Gran Premio</h3>
+        <form id="gpForm" class="grid grid-cols-1 p-4 gap-4">
+          <div>
+            <label class="block text-sm mb-1">Nombre del GP</label>
+              <input list="NombreGP" id="GP" name="grandPrix" placeholder="Escribe o selecciona" class="w-full bg-neutral-800 p-2 rounded" required>
+              <datalist id="NombreGP"></datalist>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Fecha</label>
+            <input id="date" type="date" name="fecha" class="w-full bg-neutral-800 p-2 rounded" required>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Circuito</label>
+            <select name="circuito" id="selectCircuito" class="w-full bg-neutral-800 p-2 rounded" required>
+              <option value="">Cargando...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Formato de carrera</label>
+            <select name="formatoCarrera" id="selectFormatoCarrera" class="w-full bg-neutral-800 p-2 rounded" required>
+              <option value="" selected>Selecciona una opcion de formato de carrera</option>
+              <option value="GP">Gran Premio (GP)</option>
+              <option value="SP">Sprint (SP)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Vueltas Totales</label>
+            <input id="Laps" type="number" name="vueltas" min="1" max="300" class="w-full bg-neutral-800 p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Piloto Pole Position</label>
+            <select name="polePosition" id="selectPolePosition" class="w-full bg-neutral-800 p-2 rounded">
+              <option value="">Cargando...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Tiempo de Pole:</label>
+            <input id="tiempoPole" type="text" name="pole" placeholder="MM:SS.mmm" class="w-full bg-neutral-800 p-2 rounded">
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Piloto Vuelta Rápida</label>
+              <select name="vueltaRapida" id="selectVueltaRapida" class="w-full bg-neutral-800 p-2 rounded">
+                <option value="">Cargando...</option>
+              </select>
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Tiempo de Vuelta Rapida:</label>
+            <input id="tiempoVR" type="text" name="VR"  placeholder="MM:SS.mmm" class="w-full bg-neutral-800 p-2 rounded">
+          </div>
+          <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+            <div class="flex gap-2">
+              <button type="submit" class="px-3 py-1 bg-neutral-800 rounded">Guardar</button>
+              <button type="button" id="cancelarFormGP" class="px-3 py-1 bg-red-600 rounded">Cancelar</button>
             </div>
+          </div>
+        </form>
+      </div>
+    </div>      
 
             <!-- Modal: Agregar pilotos a temporada -->
     <div id="modalAddPilotos" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
@@ -237,6 +242,7 @@
         </div>
       </div>
     </div>
+
     <!-- Footer -->
     <footer class="mt-12 text-center text-sm text-gray-400">
       <p>Plantilla inspirada en F1 TV — Mockup sin fines comerciales.</p>
@@ -284,11 +290,13 @@
         //abrir formulario agregar gran premio
         btnAbrirFormGP.addEventListener("click", () => {
             formContainerGP.classList.remove("hidden");
+            modal.classList.add('flex');
             cargarSelectsFormulario();
         });
         //cerrar formulario agregar gran premio
         btnCancelarFormGP.addEventListener("click", () => {
             formContainerGP.classList.add("hidden");
+            modal.classList.remove('flex');
         });
 
         async function openAddPilotosModal(){
@@ -309,7 +317,8 @@
           }
           // limpiar filas y abrir con 1 fila por defecto
           rowsTbody.innerHTML = '';
-          addRow(); // agrega una fila inicial
+          addRow(); 
+        // agrega una fila inicial
             // opcional: mover al body si no lo hiciste en HTML
           if (modal.parentElement !== document.body) document.body.appendChild(modal);
           modal.classList.remove('hidden'); modal.classList.add('flex');
@@ -343,7 +352,11 @@
 
         // agrega una fila al tbody. opcional: data prellenado
         let filaCount = 0;
+
         function addRow(data = {}) {
+			
+		  const currentRows = rowsTbody.querySelectorAll('tr').length;
+
           filaCount++;
           const tr = document.createElement('tr');
           tr.dataset.row = filaCount;

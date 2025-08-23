@@ -36,7 +36,8 @@ export class PilotSeasonModel {
             ON p.id_Piloto = pt.piloto_id
             JOIN temporada t
             ON t.id_Temporada = pt.temporada_id
-            WHERE pt.temporada_id = ?;`, [idTemporada])
+            WHERE pt.temporada_id = ?
+            ORDER BY e.nombre;`, [idTemporada])
         if (pilotosTemporada.length === 0) return false 
         return pilotosTemporada
     }

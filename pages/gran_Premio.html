@@ -6,6 +6,40 @@
   <title>Resultados - Gran Premio</title>
    <script src="https://cdn.tailwindcss.com"></script>
   <link href="styles/style.css" rel="stylesheet">
+  <style>
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .card-img { background-size: cover; background-position: center; }
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+}
+  #gridLastWinner {
+    max-height: 450px;
+  }
+
+.scrollbar-hide::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Mostrar scrollbar solo al hacer hover */
+.hover\\:scrollbar-default:hover {
+  scrollbar-width: auto; /* Firefox */
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+.hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+  </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
 
@@ -22,9 +56,68 @@
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto p-6">
+  <main class="min-w-md max-w-full mx-auto px-4 py-8">
     <!-- Contenedor de resultados (se muestra si hay datos) -->
-    <section id="gridResultados" class="hidden bg-neutral-900 border border-neutral-700 rounded-lg p-4 shadow">
+     <div class="grid grid-flow-row-dense grid-cols-4 grid-rows-3">
+    <section id="gridGrandPrixEdit" class="col-span-2 row-span-1 bg-neutral-900 border border-neutral-700 rounded-lg p-4 shadow">
+      <h2 class="text-xl font-semibold mb-4">Gran Premio</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-400">
+              <th class="p-2">Nombre</th>
+              <th class="p-2">Circuito</th>
+              <th class="p-2">Fecha</th>
+              <th class="p-2">Pole Position</th>
+              <th class="p-2">Vuelta Rapida</th>
+              <th class="p-2">Vueltas</th>
+              <th class="p-2" id="btnEdit">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#3498db" viewBox="0 0 16 16">
+                  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                </svg>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="EditGrandPrix" class="divide-y divide-neutral-800"></tbody>
+        </table>
+      </div>
+    </section>
+
+        <!-- Modal / Panel formulario Resultados de Gran Premio -->
+    <div id="modalFormGP" class="fixed inset-0 hidden items-center justify-center bg-black/60 z-50 p-4">
+      <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
+        <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+          <h3 class="text-lg font-semibold">Editar - Gran Premio <span id="gpIdInModal"></span></h3>
+          <div class="flex gap-2">
+            <button id="btnCancelarGP" class="px-3 py-1 bg-neutral-800 rounded">Cancelar</button>
+            <button id="btnGuardarGP" class="px-3 py-1 bg-red-600 rounded">Guardar cambios</button>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <p class="text-sm text-gray-300 mb-4">Asegúrate de no equivocarte en los datos.</p>
+
+          <form id="formGrandPrix" class="space-y-4">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead>
+                  <tr class="text-left text-gray-400">
+                    <th class="p-2 w-12">Fecha</th>
+                    <th class="p-2 w-24">Piloto Pole Position</th>
+                    <th class="p-2 w-24">Tiempo Pole Position</th>
+                    <th class="p-2 w-24">Piloto Vuelta Rapida</th>
+                    <th class="p-2 w-24">Tiempo Vuelta Rapida</th>
+                  </tr>
+                </thead>
+                <tbody id="openEdit" class="divide-y divide-neutral-800"></tbody>
+              </table>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <section id="gridResultados" class="col-span-2 row-span-3 hidden bg-neutral-900 border border-neutral-700 rounded-lg p-4 shadow">
       <h2 class="text-xl font-semibold mb-4">Resultados del Gran Premio</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -44,7 +137,7 @@
     </section>
 
     <!-- Contenedor vacío (si no hay resultados) -->
-    <section id="noResultados" class="hidden bg-neutral-900 border border-neutral-700 rounded-lg p-6 shadow mt-6">
+    <section id="noResultados" class="col-span-2 row-span-2 bg-neutral-900 border border-neutral-700 rounded-lg p-6 shadow mt-6">
       <h2 class="text-xl font-semibold mb-4">No se encontraron resultados para este Gran Premio</h2>
       <p class="text-sm text-gray-300 mb-4">Puedes agregar manualmente los resultados para este GP.</p>
       <div>
@@ -52,7 +145,22 @@
       </div>
     </section>
 
-    <!-- Modal / Panel formulario -->
+    <section class="col-span-2 row-span-2  rounded-lg overflow-hidden shadow-lg relative">
+        <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Last Winners</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridLastWinner" class="grid grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+      </section>
+    </div>
+
+    <!-- Modal / Panel formulario Resultados de Gran Premio -->
     <div id="modalForm" class="fixed inset-0 hidden items-center justify-center bg-black/60 z-50 p-4">
       <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
         <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
@@ -65,6 +173,10 @@
 
         <div class="p-4">
           <p class="text-sm text-gray-300 mb-4">Selecciona el piloto para cada posición (1 → 25 pts). Asegúrate de no repetir pilotos.</p>
+          <div class="mb-4 flex gap-2">
+            <button id="btnAddRow" type="button" class="px-3 py-2 bg-green-600 rounded text-sm">+ Agregar fila</button>
+            <button id="btnClearRows" type="button" class="px-3 py-2 bg-neutral-700 rounded text-sm">Limpiar filas</button>
+          </div>
 
           <form id="formResultados" class="space-y-4">
             <div class="overflow-x-auto">
@@ -117,8 +229,8 @@
   const endpointGuardar = `/api/resultados/crearResultado/`;      // POST -> guarda resultados (ajusta)
 
   // Puntos según posición (1..20)
-  
-  const puntosPorPosGP = [25,18,15,12,10,8,6,4,2,1,0,0,0,0,0,0,0,0,0,0];
+  const puntosPorPosGP03_09 = [10,8,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0]
+  const puntosPorPosGP10_Act = [25,18,15,12,10,8,6,4,2,1,0,0,0,0,0,0,0,0,0,0];
   const puntosPorPosSP = [8,7,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0];
   let puntosPorPos;
   const resultadosSection = document.getElementById('gridResultados');
@@ -126,7 +238,7 @@
   const resultadosBody = document.getElementById('resultadosBody');
   console.log(GPPoint[0].tipo_carrera === 'GP')
   if(GPPoint[0].tipo_carrera == 'GP'){
-    puntosPorPos = [...puntosPorPosGP];
+    puntosPorPos = [...puntosPorPosGP10_Act];
   }
   else if(GPPoint[0].tipo_carrera =='SP'){
     puntosPorPos = [...puntosPorPosSP];
@@ -137,8 +249,11 @@
   const btnAbrir = document.getElementById('btnAbrirForm');
   const btnCancelar = document.getElementById('btnCancelar');
   const btnGuardar = document.getElementById('btnGuardar');
+  const btnAddRow = document.getElementById('btnAddRow');
+  const btnClearRows = document.getElementById('btnClearRows');
   const formRows = document.getElementById('formRows');
   const msg = document.getElementById('msg');
+  let pilotosList = [];
 
   function mostrarMsg(text, tipo='info') {
     msg.textContent = text;
@@ -182,75 +297,148 @@
     // No hay resultados -> mostrar botón para abrir formulario
     resultadosSection.classList.add('hidden');
     noResultadosSection.classList.remove('hidden');
-
-    // Prepara lista de pilotos para selects
-    let pilotosList = [];
       // fallback a endpoint general de pilotos
       try {
         const resp2 = await fetch(endpointAllPilotos);
         pilotosList = await resp2.json();
       } catch (e2) {
-        pilotosList = [];
+        console.error('Error cargando pilotos', err);
+            alert('No se pudieron cargar pilotos. Revisa la conexión.');
+            return;
       }
     
 
     // btn abrir
     btnAbrir?.addEventListener('click', () => {
-      openForm(pilotosList);
+      formRows.innerHTML = '';
+      for(let i=0;i<20;i++){
+      openForm();}
+      if (modal.parentElement !== document.body) document.body.appendChild(modal);
+      modal.classList.remove('hidden'); modal.classList.add('flex');
     });
   }
 
-  // Función para abrir formulario y crear 20 filas
-  function openForm(pilotos) {
-    formRows.innerHTML = ''; // limpiar
-    // Si no hay pilotos, muestra mensaje y no permitir continuar
-    if (!Array.isArray(pilotos) || pilotos.length === 0) {
-      mostrarMsg('No hay pilotos disponibles para seleccionar.', 'err');
-      return;
-    }
-
-    for (let pos = 1; pos <= 20; pos++) {
-      const tr = document.createElement('tr');
-      // construir select options
-      const options = pilotos.map(p => {
-        // adaptable: nombres y ids pueden variar según tu API
-        const id = p.id_Piloto ?? p.id ?? p.id_piloto ?? p.idPiloto;
-        const name = p.nombre_completo ?? p.nombre ?? p.name ?? `${p.Nombre ?? ''} ${p.Apellido ?? ''}`.trim();
-        return `<option value="${id}">${name}</option>`;
-      }).join('');
-
-      
-      tr.innerHTML = `
-        <td class="p-2 align-top font-semibold">${pos}</td>
-        <td class="p-2">
-          <select class="w-full bg-neutral-800 p-2 rounded select-piloto" required>
-            <option value="">-- seleccionar piloto --</option>
-            ${options}
-          </select>
-        </td>
-        <td class="p-2">
-          <input type="number" min="1" class="w-full bg-neutral-800 p-2 rounded input-clasif" placeholder="Pos. clasif.">
-        </td>
-        <td class="p-2">
-          <input type="number" min="0" class="w-full bg-neutral-800 p-2 rounded input-vueltas" placeholder="Vueltas completadas">
-        </td>
-        <td class="p-2">
-          <input type="number" class="w-full bg-neutral-700 p-2 rounded input-puntos" value="${puntosPorPos[pos-1]}">
-        </td>
-      `;
-      formRows.appendChild(tr);
-    }
-
-    // mostrar modal
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-
-    // eventos
-    btnCancelar?.addEventListener('click', closeModal);
-    btnGuardar?.addEventListener('click', onSave);
+  function mkPilotoOptions() {
+    return pilotosList.map(p => {
+      const id = p.id_Piloto ?? p.id ?? p.id_piloto;
+      const name = p.nombre_completo ?? `${p.Nombre ?? ''} ${p.Apellido ?? ''}`.trim();
+      return `<option value="${id}">${escapeHtml(name)}</option>`;
+    }).join('');
+  }
+        // helper para escapar texto en HTML
+  function escapeHtml(str) {
+    if (!str && str !== 0) return '';
+      return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
   }
 
-  async function fetchGuardarResultadoGP(resultadoGP){
+  let filaCount = 0;
+  // Función para abrir formulario y crear 20 filas
+  function openForm(data = {}) {
+    const currentRows = formRows.querySelectorAll('tr').length;
+    filaCount++;
+    const tr = document.createElement('tr');
+    tr.dataset.row = filaCount;
+
+    const PilotoVal = data.id_Piloto ?? '' ;
+    const clasifVal = data.Pos_Clasif ?? '';
+    const vueltasVal = data.Vueltas_Comp ?? '';
+    const puntosVal = puntosPorPos[filaCount-1] ?? 0;
+        
+    tr.innerHTML = `
+            <td class="p-2 align-top font-semibold">${filaCount}</td>
+            <td class="p-2">
+              <select class="w-full bg-neutral-800 p-2 rounded select-piloto" required>
+                <option value="">-- seleccionar piloto --</option>
+                ${mkPilotoOptions()}
+              </select>
+            </td>
+            <td class="p-2">
+              <input type="number" min="1" class="w-full bg-neutral-800 p-2 rounded input-clasif" placeholder="Pos. clasif." value="${clasifVal}">
+            </td>
+            <td class="p-2">
+              <input type="number" min="0" class="w-full bg-neutral-800 p-2 rounded input-vueltas" placeholder="Vueltas completadas" value="${vueltasVal}">
+            </td>
+            <td class="p-2">
+              <input type="number" class="w-full bg-neutral-700 p-2 rounded input-puntos" value="${puntosVal}">
+            </td>
+            <td class="p-2">
+              <button type="button" class="btn-remove-row px-2 py-1 bg-neutral-700 rounded text-sm">Eliminar</button>
+            </td>
+          `;
+          formRows.appendChild(tr);
+          if (PilotoVal) tr.querySelector('.select-piloto').value = PilotoVal;
+          if (clasifVal) tr.querySelector('.input-clasif').value = clasifVal;
+          if (vueltasVal) tr.querySelector('.input-vueltas').value = vueltasVal;
+          if(puntosVal) tr.querySelector('.input-puntos').value = puntosVal;
+          tr.querySelector('.btn-remove-row').addEventListener('click', () => {
+          tr.remove();
+                        // reenumerar filas
+            Array.from(formRows.querySelectorAll('tr')).forEach((r, idx) => {
+              r.querySelector('td:first-child').textContent = idx + 1;
+            });
+          });
+  }
+
+  function clearRows() {
+  formRows.innerHTML = '';
+  filaCount = 0;
+
+  for(let i=0;i<20;i++){
+    openForm()
+  }
+  }
+
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  // Validación y envío
+   function onSave() {
+
+    // Recoger filas
+    const rows = Array.from(formRows.querySelectorAll('tr'));
+    const payload = [];
+    const selectedPilotos = new Set();
+
+
+      for(let i = 0; i < rows.length;i++){
+      const position_final = i + 1;
+      const r = rows[i];
+      const pilotoId = r.querySelector('.select-piloto')?.value;
+      const posicion_clasificacion = r.querySelector('.input-clasif')?.value;
+      const vueltas_completadas = r.querySelector('.input-vueltas')?.value;
+      const puntos = r.querySelector('.input-puntos')?.value;
+
+      // Si no seleccionó piloto, lo tratamos como posición vacía: no agregamos al payload
+      if (!pilotoId || !posicion_clasificacion || !vueltas_completadas || !puntos) {
+        // skip empty rows (posiciones sin piloto)
+         return { ok: false, msg: `Fila ${i+1}: completa piloto, posicion de clasificacion, vueltas completadas y los puntos que obtuvo.` };
+      }
+
+      // verificar repetidos
+      if (selectedPilotos.has(pilotoId, posicion_clasificacion)) {
+          return { ok: false, msg: `Piloto duplicado en la fila ${position_final}.` };
+      } 
+      selectedPilotos.add(pilotoId);
+
+      // agregar al payload
+      payload.push({
+        piloto_id: pilotoId,
+        grand_prix_id:idGP,
+        posicion_final:position_final,
+        posicion_inicio:posicion_clasificacion,
+        vueltas_completadas,
+        puntos_obtenidos:puntos
+      });
+    }
+
+    if (payload.length === 0) return { ok: false, msg: 'No hay filas para guardar.' };
+          return { ok: true, payload };
+  }
+
+    async function fetchGuardarResultadoGP(resultadoGP){
     try {
       const res = await fetch(endpointGuardar, {
         method: 'POST',
@@ -266,87 +454,313 @@
     } catch (err) {
       console.error(err);
       mostrarMsg('Error guardando resultados', 'err');
+      throw err;
     }
   }
 
-  function closeModal() {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  }
-
-  // Validación y envío
-  async function onSave(e) {
-    e.preventDefault();
-
-    // Recoger filas
-    const rows = Array.from(formRows.querySelectorAll('tr'));
-    const payload = [];
-    const selectedPilotos = new Set();
-    let ok = true;
-    let firstInvalid = null;
-
-    rows.forEach((row, idx) => {
-      const position_final = idx + 1;
-      const select = row.querySelector('.select-piloto');
-      const clasif = row.querySelector('.input-clasif');
-      const vueltas = row.querySelector('.input-vueltas');
-      const puntosInput = row.querySelector('.input-puntos');
-
-      const pilotoId = select?.value?.trim();
-      const posicion_clasificacion = clasif?.value ? Number(clasif.value) : null;
-      const vueltas_completadas = vueltas?.value ? Number(vueltas.value) : null;
-      const puntos = puntosInput ? Number(puntosInput.value) : 0;
-
-      // Si no seleccionó piloto, lo tratamos como posición vacía: no agregamos al payload
-      if (!pilotoId) {
-        // skip empty rows (posiciones sin piloto)
+  btnCancelar?.addEventListener('click',closeModal);
+  btnAddRow?.addEventListener('click',() => openForm())
+  btnClearRows?.addEventListener('click',()=>clearRows())
+  btnGuardar?.addEventListener('click',async ()=>{
+    const { ok, payload, msg } = onSave();
+      if (!ok) {
+        alert(msg);
         return;
       }
+      if (!confirm(`Se agregarán ${payload.length} resultados. ¿Continuar?`)) return;
+        try {
+          payload.forEach(async(resultadosGP)=>{
+          console.log(resultadosGP)
+          await fetchGuardarResultadoGP(resultadosGP);
 
-      // verificar repetidos
-      if (selectedPilotos.has(pilotoId)) {
-        ok = false;
-        if (!firstInvalid) firstInvalid = `Piloto repetido en la posición ${position_final}`;
-      } else {
-        selectedPilotos.add(pilotoId);
+          closeModal();
+            // refrescar strip y WDC/WCC
+            
+            })
+                      alert('Resultados agregados correctamente');
+                      setTimeout(()=> location.reload(), 800);
+ 
+          } catch (err) {
+            alert('Error guardando resultados. Revisa la consola.');
+          }
+  });
+
+    function loadGP(data = {}) {
+    const currentRows = formRows.querySelectorAll('tr').length;
+    filaCount++;
+    const tr = document.createElement('tr');
+    tr.dataset.row = filaCount;
+
+    const PilotoVal = data.id_Piloto ?? '' ;
+    const clasifVal = data.Pos_Clasif ?? '';
+    const vueltasVal = data.Vueltas_Comp ?? '';
+    const puntosVal = puntosPorPos[filaCount-1] ?? 0;
+        
+    tr.innerHTML = `
+            <td class="p-2 align-top font-semibold">${filaCount}</td>
+            <td class="p-2">
+              <select class="w-full bg-neutral-800 p-2 rounded select-piloto" required>
+                <option value="">-- seleccionar piloto --</option>
+                ${mkPilotoOptions()}
+              </select>
+            </td>
+            <td class="p-2">
+              <input type="number" min="1" class="w-full bg-neutral-800 p-2 rounded input-clasif" placeholder="Pos. clasif." value="${clasifVal}">
+            </td>
+            <td class="p-2">
+              <input type="number" min="0" class="w-full bg-neutral-800 p-2 rounded input-vueltas" placeholder="Vueltas completadas" value="${vueltasVal}">
+            </td>
+            <td class="p-2">
+              <input type="number" class="w-full bg-neutral-700 p-2 rounded input-puntos" value="${puntosVal}">
+            </td>
+            <td class="p-2">
+              <button type="button" class="btn-remove-row px-2 py-1 bg-neutral-700 rounded text-sm">Eliminar</button>
+            </td>
+          `;
+          formRows.appendChild(tr);
+          if (PilotoVal) tr.querySelector('.select-piloto').value = PilotoVal;
+          if (clasifVal) tr.querySelector('.input-clasif').value = clasifVal;
+          if (vueltasVal) tr.querySelector('.input-vueltas').value = vueltasVal;
+          if(puntosVal) tr.querySelector('.input-puntos').value = puntosVal;
+          tr.querySelector('.btn-remove-row').addEventListener('click', () => {
+          tr.remove();
+                        // reenumerar filas
+            Array.from(formRows.querySelectorAll('tr')).forEach((r, idx) => {
+              r.querySelector('td:first-child').textContent = idx + 1;
+            });
+          });
+  }
+
+  const btnEditGP = document.getElementById('btnEdit');
+  const formGP = document.getElementById('EditGrandPrix');
+  //modalFormGP
+    const btnCancelarGP = document.getElementById('btnCancelarGP');
+  const btnGuardarGP = document.getElementById('btnGuardarGP');
+  const modalFormGP = document.getElementById('modalFormGP');
+  const openEditGp = document.getElementById('openEdit');
+    const GpSection = document.getElementById('gridGrandPrixEdit');
+  if (Array.isArray(GPPoint) && GPPoint.length > 0) {
+    // Rellenar tabla
+    formGP.innerHTML = '';
+    GPPoint.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2 align-top">${row.Nombre_GP || '—'}</td>
+          <td class="p-2 align-top">${row.Nombre_Circuito ||'—'}</td>
+          <td class="p-2 align-top">${row.fecha || '—'}</td>
+          <td class="p-2 align-top">${row.Pole_Position || '—'} ${row.tiempo_pole || 'No Time'}</td>
+          <td class="p-2 align-top">${row.Vuelta_Rapida || '—'} ${row.tiempo_vuelta_rapida || 'No Time'}</td>
+          <td class="p-2 align-top">${row.puntos || row.puntos_obtenidos || 0}</td>
+        `;
+        formGP.appendChild(tr);
+      });
+  }
+
+  btnEditGP?.addEventListener('click',()=>{
+    openEditGp.innerHTML = '';
+    openEditGP(GPPoint[0]);;
+      if (modalFormGP.parentElement !== document.body) document.body.appendChild(modalFormGP);
+      modalFormGP.classList.remove('hidden'); modalFormGP.classList.add('flex');
+  })
+
+    async function openEditGP(data = {}) {
+    const currentRows = openEditGp.querySelectorAll('tr').length;
+    console.log(data)
+    filaCount++;
+    const tr = document.createElement('tr');
+    tr.dataset.row = filaCount;
+  const fecha = new Date(data.fecha);
+  const day = String(fecha.getDate()).padStart(2, '0');
+  const month = String(fecha.getMonth() + 1).padStart(2, '0');
+  const year = fecha.getFullYear();
+  const fechaVal = `${year}-${month}-${day}`;
+
+  const PilotoPPVal = Number(data.pole_position_piloto_id) ?? '';
+  const PilotoVRVal = data.vuelta_rapida_piloto_id ?? '';
+  const VRVal = data.tiempo_vuelta_rapida ?? '';
+  const PPVal = data.tiempo_pole ?? '';
+//value="${PilotoPPVal}" value="${PilotoVRVal}"
+console.log()
+  if(pilotosList.length === 0){
+    try {
+        const resp3 = await fetch(endpointAllPilotos);
+        pilotosList = await resp3.json();
+      } catch (e2) {
+        console.error('Error cargando pilotos', err);
+            alert('No se pudieron cargar pilotos. Revisa la conexión.');
+            return;
+      }
+  }
+    tr.innerHTML = `
+            <td class="p-2 align-top font-semibold">
+              <input type="date" id="date" name="min" min="0" max="59" placeholder="MM" class="w-full border input-fecha rounded p-2" value="${fechaVal}">
+            </td>
+            <td class="p-2">
+              <input type="text" id="pole" name="pole" placeholder="MM:SS.mmm" pattern="^[0-9]{1,2}:[0-5][0-9]\.[0-9]{3}$" title="Formato: M:SS.mmm (ej. 1:32.273)" class="border w-full input-PP rounded p-2" value="${PPVal}">
+            </td>
+            <td class="p-2">
+              <select class="w-full bg-neutral-800 p-2 w-full rounded select-piloto-PP" required>
+                <option value="">-- seleccionar piloto Pole Position --</option>
+                ${mkPilotoOptions()}
+              </select>
+            </td>
+            <td class="p-2">
+              <input type="text" id="pole" name="pole" placeholder="MM:SS.mmm" pattern="^[0-9]{1,2}:[0-5][0-9]\.[0-9]{3}$" title="Formato: M:SS.mmm (ej. 1:32.273)" class="border w-full input-VR rounded p-2"value="${VRVal}">
+            </td>
+            <td class="p-2">
+              <select class="w-full bg-neutral-800 p-2 rounded w-full select-piloto-VR"  required>
+                <option value="">-- seleccionar piloto vuelta rapida --</option>
+                ${mkPilotoOptions()}
+              </select>
+            </td>
+          `;
+          openEditGp.appendChild(tr);
+          if (fechaVal) tr.querySelector('.input-fecha').value = fechaVal;
+          if (PPVal) tr.querySelector('.input-PP').value = PPVal;
+          if (PilotoPPVal) tr.querySelector('.select-piloto-PP').value = PilotoPPVal;
+          if(VRVal) tr.querySelector('.input-VR').value = VRVal;
+          if(PilotoVRVal) tr.querySelector('.select-piloto-VR').value = PilotoVRVal;
+
+  }
+    function closeModalGP() {
+    modalFormGP.classList.add('hidden');
+    modalFormGP.classList.remove('flex');
+  }
+   function onChange() {
+
+    // Recoger filas
+    const rows = Array.from(openEditGp.querySelectorAll('tr'));
+    const payload = [];
+
+
+      for(let i = 0; i < rows.length;i++){
+      const r = rows[i];
+      const fecha = r.querySelector('.input-fecha')?.value;
+      const PP = r.querySelector('.input-PP')?.value;
+      const pilotoPP = r.querySelector('.select-piloto-PP')?.value;
+      const VR = r.querySelector('.input-VR')?.value;
+      const pilotoVR = r.querySelector('.select-piloto-VR')?.value;
+
+      // Si no seleccionó piloto, lo tratamos como posición vacía: no agregamos al payload
+      if (!fecha) {
+        // skip empty rows (posiciones sin piloto)
+         return { ok: false, msg: `Fila ${i+1}: completa la fecha.` };
       }
 
       // agregar al payload
       payload.push({
-        piloto_id: pilotoId,
-        grand_prix_id:idGP,
-        posicion_final:position_final,
-        posicion_inicio:posicion_clasificacion,
-        vueltas_completadas,
-        puntos_obtenidos:puntos
+        fecha: fecha,
+        pole_position_piloto_id:pilotoPP,
+        tiempo_pole:PP,
+        vuelta_rapida_piloto_id:pilotoVR,
+        tiempo_vuelta_rapida:VR,
+        id_GP:idGP
       });
-    });
-
-    if (!ok) {
-      mostrarMsg(firstInvalid || 'Hay errores en el formulario', 'err');
-      return;
     }
 
-    if (payload.length === 0) {
-      mostrarMsg('No hay resultados seleccionados para guardar.', 'err');
-      return;
-    }
-
-    // confirmación simple
-    if (!confirm(`Se guardarán ${payload.length} resultados para el GP ${idGP}. ¿Continuar?`)) return;
-
-      payload.forEach(async (resultadosGP)=>{
-        console.log(resultadosGP)
-    await fetchGuardarResultadoGP(resultadosGP);
-          mostrarMsg('Resultados guardados correctamente', 'ok');
-          closeModal();
-          setTimeout(()=> location.reload(), 800);
-  })
-         
-
+    if (payload.length === 0) return { ok: false, msg: 'No hay filas para cambiar.' };
+          return { ok: true, payload };
   }
 
+    async function fetchEditarGP(datosGP){
+    try {
+      const res = await fetch(`http://localhost:1234/api/granPremio/editarGP`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosGP)
+      });
+      if (!res.ok) throw new Error('Error en el guardado');
+      const data = await res.json();
+      //
+
+      // opcional: recargar la página para mostrar resultados recién guardados
+      //
+    } catch (err) {
+      console.error(err);
+      mostrarMsg('Error guardando cambios grand prix', 'err');
+      throw err;
+    }
+  }
+
+  btnCancelarGP?.addEventListener('click',closeModalGP);
+
+  btnGuardarGP?.addEventListener('click', ()=>{
+    const { ok, payload, msg } = onChange();
+      if (!ok) {
+        alert(msg);
+        return;
+      }
+      if (!confirm(`Se agregarán los cambios del Gran Premio. ¿Continuar?`)) return;
+        try {
+          payload.forEach(async(cambiosGP)=>{
+          console.log(cambiosGP)
+          await fetchEditarGP(cambiosGP);
+
+          closeModal();
+            // refrescar strip y WDC/WCC
+            
+            })
+                      alert('Cambios actualizados correctamente');
+                      setTimeout(()=> location.reload(), 800);
+ 
+          } catch (err) {
+            alert('Error guardando los cambios. Revisa la consola.');
+          }
+  });
+
+      async function obtenerImagenWikipedia(nombre) {
+      const query = encodeURIComponent(nombre);
+      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=1000&origin=*`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const pages = data.query.pages;
+        const page = Object.values(pages)[0];
+        return page.thumbnail ? page.thumbnail.source : null;
+      } catch (err) {
+        console.error('Error obteniendo imagen de', nombre, err);
+        return null;
+      }
+    }
+
+      async function cargarLastWinners() {
+      try {
+          const Winners = await fetch(`http://localhost:1234/api/granPremio/obtenerLastWinners/${nombreGP}`).then(r => r.json());
+          console.log(Winners)
+
+        const lastWinner = document.getElementById('gridLastWinner');
+        lastWinner.innerHTML = '';
+          for (let i = 0; i < Winners.length; i++) {
+          const p = Winners[i];
+        const imgUrl = await obtenerImagenWikipedia(p.Winners);
+        const cardDriver = document.createElement('div');
+
+        cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardDriver.innerHTML = `
+                <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
+                <p class="text-sm text-neutral-400 w-3 text-center">${p.anio}</p>
+                <div class="p-4 gap-4">
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.Winners}" class="w-14 h-14 rounded-full mb-2 gap-4 border">` : ''}
+                </div>
+                <p class="text-sm text-neutral-400 w-5 text-center">${p.Winners}</p>
+                </div>
+        `;
+        cardDriver.dataset.IdGP = p.id_GP
+        cardDriver.addEventListener('click', () => {
+        window.location.href = `/granPremio?id=${p.id_GP}`; // ejemplo de redirección con query
+        });
+        lastWinner.appendChild(cardDriver)
+
+        };
+      } catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+    cargarLastWinners();
 })();
+
+
+
 </script>
 
 </body>

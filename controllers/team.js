@@ -33,6 +33,14 @@ export class TeamController {
         if (monoplaza) return res.json(monoplaza)
             res.status(404).json({ message: 'monoplaza no encontrado' })
     }
+    
+    obtenerPilotoseEquipoTemporada = async (req, res) => {
+
+        const pilotos = await this.teamModel.obtenerPilotoseEquipoTemporada({ entrada: req.body })
+
+        if (pilotos) return res.json(pilotos)
+            res.status(404).json({ message: 'pilotos de equipo en esa temporada no encontrado' })
+    }
 
     obtenerInfoEquipoPorId = async (req, res) => {
         const { id } = req.params

@@ -2,7 +2,7 @@ import { connectionMySQL } from '../../helpers/connectionMySQL.js'
 
 export class PilotModel {
     static async obtenerTodosLosPilotos () {
-      const [pilotos] = await connectionMySQL.query('SELECT id_Piloto, CONCAT(nombre, " ", apellido) AS "nombre_completo", CONCAT("#", numero, " - ", codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut FROM piloto ORDER BY numero;')
+      const [pilotos] = await connectionMySQL.query('SELECT id_Piloto, CONCAT(nombre, " ", apellido) AS "nombre_completo", CONCAT("#", numero, " - ", codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut FROM piloto ORDER BY nombre_completo;')
   
       return pilotos
     }

@@ -68,6 +68,39 @@ export class TeamModel {
             return victorias
     }
 
+    static async obtenerPilotoseEquipoTemporada ({ entrada }) {
+        const {
+            idEquipo, anio
+        }=entrada
+        const [pilotos] = await connectionMySQL.query(`SELECT
+            pt.piloto_id,
+            CONCAT(p.Nombre, ' ', p.Apellido) AS nombre_completo,
+            COALESCE(SUM(
+                CASE 
+                WHEN rgp.posicion_final = 1 AND gp.temporada_id = t.id_Temporada AND gp.tipo_carrera='GP' THEN 1 
+                ELSE 0 
+                END
+            ),0) AS victorias,
+            COALESCE(SUM(
+                CASE 
+                WHEN rgp.posicion_final BETWEEN 1 AND 3 AND gp.temporada_id = t.id_Temporada AND gp.tipo_carrera='GP' THEN 1 
+                ELSE 0 
+                END
+            ),0) AS podios
+            FROM pilotos_temporada pt
+            JOIN piloto p ON p.id_Piloto = pt.piloto_id
+            JOIN temporada t ON t.id_Temporada = pt.temporada_id
+            LEFT JOIN resultados rgp ON rgp.piloto_id = pt.piloto_id
+            LEFT JOIN grandes_premios gp ON gp.id_GP = rgp.grand_prix_id
+            WHERE pt.equipo_id = ?
+            AND t.anio = ?
+            GROUP BY pt.piloto_id, nombre_completo, pt.numero
+            ORDER BY (pt.numero IS NULL), pt.numero ASC, nombre_completo;
+            `, [idEquipo, anio])
+        if (pilotos.length === 0) return false 
+        return pilotos
+    }
+    
         static async obtenerInfoEquipoPorId (idEquipo) {
         const [equipo] = await connectionMySQL.query(`SELECT 
       t.anio,
@@ -98,17 +131,20 @@ export class TeamModel {
 
     static async obtenerMonoplazaActualEquipo ({ entrada }) {
         const {
-            anio, idEquipo
+            idEquipo
         }=entrada
         const [monoplaza] = await connectionMySQL.query(`SELECT 
         e.nombre,
-        et.monoplaza as F1_Car
+        et.monoplaza as F1_Car,
+        et.register_name,
+        t.anio
         from equipo e 
         join equipos_temporada et
         on et.equipo_id = e.id_Equipo
         join temporada t 
         on t.id_Temporada = et.temporada_id
-        where t.anio = ? and e.id_Equipo = ?`, [anio, idEquipo])
+        where e.id_Equipo = ?
+        ORDER BY t.anio DESC`, [idEquipo])
         if (monoplaza.length === 0) return false 
         return monoplaza
     }

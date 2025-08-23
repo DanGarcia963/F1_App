@@ -19,6 +19,19 @@ Content-Type: application/json
     "vuelta_rapida_piloto_id": 2
 }
 
+###
+POST http://localhost:1234/api/granPremio/editarGP
+Content-Type: application/json
+
+{ 
+    "fecha": "2024-09-15",
+    "pole_position_piloto_id" : 2,
+    "tiempo_pole":"01:15.096",
+    "vuelta_rapida_piloto_id": 2,
+    "tiempo_vuelta_rapida" : "01:22.167",
+    "id_GP" : 1
+}
+
 ### 
 GET http://localhost:1234/api/granPremio/obtenerGPTemporada/2023
 
@@ -36,5 +49,8 @@ GET http://localhost:1234/api/granPremio/obtenerTemporadaAnio/2026
 GET http://localhost:1234/api/granPremio/
 
 ###
-GET http://localhost:1234/api/granPremio/obtenerGP/1
+GET http://localhost:1234/api/granPremio/obtenerGP/2
+
+###
+GET http://localhost:1234/api/granPremio/obtenerLastWinners/
     

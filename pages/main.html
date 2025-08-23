@@ -46,7 +46,7 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <a href="#" class="flex items-center gap-2">
-          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold"></div>
+          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold"><span id="Logo" class="font-semibold text-lg"></span></div>
           <span class="font-semibold text-lg">F1 APP — Mock</span>
         </a>
         <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
@@ -81,7 +81,7 @@
             </div>
           </div>
         </div>
-        <div id="gridWCC" class="grid grid-cols-1 sm:grid-cols- md:grid-cols- lg:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        <div id="gridWCC" class=" animate-pulse grid grid-cols-1 sm:grid-cols- md:grid-cols- lg:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
         </div>
       </section>
 
@@ -149,6 +149,7 @@
     async function cargarGPS(){
     try{const GPs = await fetch(`http://localhost:1234/api/granPremio/obtenerGPTemporada/${CurrentYear}`).then(r=> r.json());
       const container = document.getElementById('gridGPs');
+
         container.innerHTML = '';
           for (let i = 0; i < GPs.length; i++) {
           const gp = GPs[i];
@@ -212,7 +213,7 @@
         cardDriver.innerHTML = `
                 <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
                 <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-12 h-14 rounded-full mb-2 border">` : ''}
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-14 h-14 rounded-full mb-2 border">` : ''}
                 <div class="flex flex-col">
                 <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.Piloto}</p>
                 <p class="text-sm mx-2 text-neutral-400">Puntos: ${p.puntos_totales}</p>
@@ -251,6 +252,7 @@
         console.error('Error cargando campeonatos', err);
       }
     }
+    
     cargarGPS();
     cargarCampeonatos();
   </script>
