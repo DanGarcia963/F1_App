@@ -147,9 +147,34 @@
 
 
     async function cargarGPS(){
-    try{const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${CurrentYear}`).then(r=> r.json());
-      const container = document.getElementById('gridGPs');
+      const cacheKey = `gps_${CurrentYear}`;
+      const cacheTimeKey = `gps_time_${CurrentYear}`;
+      const cacheDuration = 60 * 1000; // 120 segundos
 
+      const now = Date.now();
+      const cachedData = localStorage.getItem(cacheKey);
+      const cachedTime = localStorage.getItem(cacheTimeKey);
+
+      if (cachedData && cachedTime && (now - cachedTime < cacheDuration)) {
+        renderGPs(JSON.parse(cachedData));
+        console.log('Datos de GP cargados desde caché');
+        return;
+      }
+
+    try{
+      const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${CurrentYear}`).then(r=> r.json());
+        localStorage.setItem(cacheKey, JSON.stringify(GPs));
+        localStorage.setItem(cacheTimeKey, now);
+        renderGPs(GPs);
+
+    }
+      catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+
+    async function renderGPs(GPs){
+        const container = document.getElementById('gridGPs');
         container.innerHTML = '';
           for (let i = 0; i < GPs.length; i++) {
           const gp = GPs[i];
@@ -192,20 +217,12 @@
           container.appendChild(card);          
         };
       }
-      catch (err) {
-        console.error('Error cargando campeonatos', err);
-      }
-    }
-    // Simulación: reemplazar fetch con tus endpoints reales
-    async function cargarCampeonatos() {
-      try {
-        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${CurrentYear}`).then(r => r.json());
-        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${CurrentYear}`).then(r => r.json());
-
-        const WDC = document.getElementById('gridWDC');
+    
+    async function renderWDCChampionship(WDCDATA){
+       const WDC = document.getElementById('gridWDC');
         WDC.innerHTML = '';
-          for (let i = 0; i < pilotos.length; i++) {
-          const p = pilotos[i];
+          for (let i = 0; i < WDCDATA.length; i++) {
+          const p = WDCDATA[i];
         const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
         const cardDriver = document.createElement('div');
 
@@ -227,11 +244,14 @@
         WDC.appendChild(cardDriver)
 
         };
+    }
 
+    async function renderWCCChampionships(WCCDATA){
+      
         const WCC = document.getElementById('gridWCC');
         WCC.innerHTML = '';
-          for (let i = 0; i < constructores.length; i++) {
-          const c = constructores[i];
+          for (let i = 0; i < WCCDATA.length; i++) {
+          const c = WCCDATA[i];
         const imgUrl = await obtenerImagenWikipedia(c.equipo);
         const cardTeam = document.createElement('div');
         
@@ -248,6 +268,43 @@
         `;
         WCC.appendChild(cardTeam)
         };
+        
+    }
+    
+    // Simulación: reemplazar fetch con tus endpoints reales
+    async function cargarCampeonatos() {
+      const cachekeyWDC = `wdc_${CurrentYear}`;
+      const cacheTimeKeyWDC = `wdc_time_${CurrentYear}`;
+
+      const cachekeyWCC = `wcc_${CurrentYear}`;
+      const cacheTimeKeyWCC = `wcc_time_${CurrentYear}`;
+
+      const cacheDuration = 60 * 1000; // 120 segundos
+
+      const now = Date.now();
+
+      const cachedDataWDC = localStorage.getItem(cachekeyWDC);
+      const cachedTimeWDC = localStorage.getItem(cacheTimeKeyWDC);  
+
+      const cachedDataWCC = localStorage.getItem(cachekeyWCC);
+      const cachedTimeWCC = localStorage.getItem(cacheTimeKeyWCC);
+
+      if (cachedDataWDC && cachedTimeWDC && (now - cachedTimeWDC < cacheDuration) && cachedDataWCC && cachedTimeWCC && (now - cachedTimeWCC < cacheDuration)) {
+        renderWDCChampionship(JSON.parse(cachedDataWDC));
+        renderWCCChampionships(JSON.parse(cachedDataWCC));
+        console.log('Datos de WDC y WCC cargados desde caché');
+        return;
+      }
+      try {
+        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${CurrentYear}`).then(r => r.json());
+        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${CurrentYear}`).then(r => r.json());
+        localStorage.setItem(cachekeyWDC, JSON.stringify(pilotos));
+        localStorage.setItem(cacheTimeKeyWDC, now);
+
+        localStorage.setItem(cachekeyWCC, JSON.stringify(constructores));
+        localStorage.setItem(cacheTimeKeyWCC, now);
+        renderWDCChampionship(pilotos);
+        renderWCCChampionships(constructores);
       } catch (err) {
         console.error('Error cargando campeonatos', err);
       }
