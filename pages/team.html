@@ -67,6 +67,58 @@
   .container:hover .content{
     top:0;
   }
+
+.victory-content img {
+  max-width: 80%;
+  max-height: 120px;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+.victory-content p {
+  font-size: 1.1rem;
+  word-break: break-word;
+  text-align: center;
+  margin: 0;
+  padding: 0 0.5rem;
+}
+
+/* Responsive para cards pequeñas */
+@media (max-width: 500px) {
+  .victory-content img {
+    max-width: 60%;
+    max-height: 70px;
+  }
+  .victory-content p {
+    font-size: 0.95rem;
+  }
+}
+
+.victory-content {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20,20,20,0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all .5s;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.group:hover .victory-content {
+  top: 0;
+  opacity: 1;
+  pointer-events: auto;
+}
+
   .card-driver{
   width: 220px;  
   min-width: 160px; 
@@ -271,15 +323,21 @@ console.log(idEquipo)
         const year = fecha.getFullYear();
         const newDate = `${day}/${month}/${year}`;
 
-        card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-        card.innerHTML =`                
-                <div class="p-4 flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-white">${victory.nombre_oficial} ${year}</h3>
-                ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${victory.nombre_Circuito}" class="w-20 h-18 mb-2 border bg-white">` : ''}
-                <p class="text-sm text-neutral-400">${victory.Winner}</p>
-                <p class="text-sm text-neutral-400">${newDate}</p>
-                </div>
-                `;
+const imgPiloto = await obtenerFotoPiloto(victory.Winner, year); // O ajusta el nombre según tu modelo de datos
+
+card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+card.innerHTML =`                
+  <div class="p-4 flex flex-col items-center text-center relative">
+    <h3 class="text-lg font-bold text-white">${victory.nombre_oficial} ${year}</h3>
+    ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${victory.nombre_Circuito}" class="w-20 h-18 mb-2 border bg-white">` : ''}
+    <p class="text-sm text-neutral-400">${victory.Winner}</p>
+    <p class="text-sm text-neutral-400">${newDate}</p>
+    <div class="victory-content">
+      ${imgPiloto ? `<img src="${imgPiloto}" alt="Piloto ${victory.Winner}" class="w-24 h-24 rounded-full border-2 h-96 border-white mx-auto mb-2">` : ''}
+      <p class="text-white font-bold">${victory.Winner}</p>
+    </div>
+  </div>
+`;
                 container.appendChild(card)
       };
     }      

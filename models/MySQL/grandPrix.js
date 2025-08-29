@@ -170,10 +170,17 @@ static async registrarGP({ entrada }) {
 }
 
 static async editarGP({ entrada }) {
-  const {
-    fecha, pole_position_piloto_id:pilotoPP, tiempo_pole:PolePosition, vuelta_rapida_piloto_id:pilotoVR, tiempo_vuelta_rapida:vueltaRapida, id_GP:idGP
-  } = entrada;
+  // Limpia los valores: si son '' o undefined, pon null
+  function limpiar(valor) {
+    return (valor === '' || valor === undefined) ? null : valor;
+  }
 
+  const fecha = limpiar(entrada.fecha);
+  const pilotoPP = limpiar(entrada.pole_position_piloto_id);
+  const PolePosition = limpiar(entrada.tiempo_pole);
+  const pilotoVR = limpiar(entrada.vuelta_rapida_piloto_id);
+  const vueltaRapida = limpiar(entrada.tiempo_vuelta_rapida);
+  const idGP = limpiar(entrada.id_GP);
   try {
     await connectionMySQL.query(
       `UPDATE grandes_premios
