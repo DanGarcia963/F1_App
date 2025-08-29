@@ -42,6 +42,9 @@ Content-Type: application/json
     "idEquipo": 5
 }
 
+###
+GET http://localhost:1234/api/equipo/obtenerVictoriasEquipo/1
+
 ###obtener monoplaza actual
 POST http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear
 Content-Type: application/json

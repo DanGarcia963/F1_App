@@ -90,12 +90,11 @@
         </div>
       </div>
     </div>
-    <a id="mi-boton" class="hidden inline-block sm:inline-block md:none" href="#WDCSection">WDC</a>
-    <a id="mi-Boton2" class="hidden inline-block sm:inline-block md:none " href="#GPSection">Grandes Premios</a>
+
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
       
       <!-- World Constructors Championship -->
-      <section class="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-2 2xl:col-span-2  rounded-lg overflow-hidden shadow-lg relative">
+      <section id="WCCSection" class="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-2 2xl:col-span-2  rounded-lg overflow-hidden shadow-lg relative">
         <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
             <div class="p-4 flex flex-row items-center gap-4">
@@ -110,7 +109,7 @@
       </section>
 
       <!-- Grand Prix Section -->
-      <section id="GPSection"class="col-span-1 md:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-5 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
+      <section id="GPSection" class="col-span-1 md:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-5 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
         <div class="relative">
           <div class="bg-gray-800 rounded-lg p-4 shadow">
             <h2 class="text-2xl font-bold">Grandes Premios <span id="anio"></span></h2>
@@ -128,7 +127,7 @@
       </section>
 
       <!-- World Drivers Championship Section -->
-      <section id="WDCSection"class="md:col-span-3  lg:col-span-2 xl:col-span-2 2xl:col-span-2 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
+      <section id="WDCSection"class="md:col-span-3  lg:col-span-2 xl:col-span-2 2xl:col-span-2 bg-gray-800 gap-4 rounded-lg overflow-hidden shadow-lg relative">
         <!-- Campeonato -->
         <div id="infoGridWDC" class="grid grid-cols-1 gap-6 p-6 items-start">
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
@@ -139,9 +138,14 @@
             </div>
           </div>
         </div>
-        <div id="gridWDC" class="grid grid-cols-1 xl:grid-cols-2 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        <div id="gridWDC" class="grid grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
         </div>
       </section>
+    </div>
+
+
+    <div id="gridLineUp" class="hidden grid grid-flow-row-dense grid-cols-1 grid-rows-1 md:grid-cols-2 md:grid-rows-2 lg:grid-cols-3 lg:grid-rows-3 xl:grid-cols-4 xl:grid-rows-4 2xl:grid-cols-5 2xl:grid-rows-5 gap-4">
+          <!-- Contenedor pilotos -->
     </div>
 
                 <!-- Formulario oculto -->
@@ -579,10 +583,66 @@
         return null;
       }
     }
-    
+
+    async function obtenerFotoPiloto(nombrePiloto, anio) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreCarpeta = nombrePiloto.trim();
+  const extensiones = ['png'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/${encodeURIComponent(anio)}.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombrePiloto);
+}
+
+    async function obtenerFotoEquipo(nombreEquipo) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreImagen = nombreEquipo.trim();
+  const extensiones = ['jpg', 'png', 'jpeg', 'webp', 'avif'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Team_photos/${encodeURIComponent(nombreImagen)}.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombreEquipo);
+}
+
     async function cargarGPS(){
-    try{const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${Anio}`).then(r=> r.json());
-      const container = document.getElementById('gridGPs');
+      const cacheKey = `gps_${Anio}`;
+      const cacheTimeKey = `gps_time_${Anio}`;
+      const cacheDuration = 120 * 1000; // 120 segundos
+
+      const now = Date.now();
+      const cachedData = localStorage.getItem(cacheKey);
+      const cachedTime = localStorage.getItem(cacheTimeKey);
+
+      if (cachedData && cachedTime && (now - cachedTime < cacheDuration)) {
+        renderGPs(JSON.parse(cachedData));
+        console.log('Datos de GP cargados desde caché');
+        return;
+      }
+
+    try{
+      const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${Anio}`).then(r=> r.json());
+        localStorage.setItem(cacheKey, JSON.stringify(GPs));
+        localStorage.setItem(cacheTimeKey, now);
+        renderGPs(GPs);
+
+    }
+      catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+
+    async function renderGPs(GPs){
+        const container = document.getElementById('gridGPs');
         container.innerHTML = '';
           for (let i = 0; i < GPs.length; i++) {
           const gp = GPs[i];
@@ -625,11 +685,7 @@
           container.appendChild(card);          
         };
       }
-      catch (err) {
-        console.error('Error cargando campeonatos', err);
-      }
-    }
-
+    
     async function cargarPilotosTemporada(){
       try{
         const pilotosSeason = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r=>r.json());
@@ -637,13 +693,16 @@
         DriverSeason.innerHTML = '';
           for (let i = 0; i < pilotosSeason.length; i++) {
             const p = pilotosSeason[i];
-            const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+            const imgUrl = await getPilotoImageURL(p.nombre_completo, Anio);
+            if (!imgUrl) {
+              imgUrl = obtenerFotoPiloto(p.nombre_completo, Anio);
+            }
             const cardDriver = document.createElement('div');
 
             cardDriver.className =`group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-x-auto shadow-lg gap-5 p-5 border border-neutral-700 transition-all duration-500 cursor-pointer relative`
             cardDriver.innerHTML = `
               <div id="idPiloto" class="p-4 flex flex-row items-center gap-3 p-3">
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-12 h-14 rounded-full mb-2 border">` : ''}
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-16 h-16 bg-white rounded-full mb-2 border">` : ''}
                 <div class="flex flex-col gap-3 p-3">
                   <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.nombre_completo}</p>
                 </div>
@@ -656,24 +715,19 @@
       }
     }
 
-    // Simulación: reemplazar fetch con tus endpoints reales
-    async function cargarCampeonatos() {
-      try {
-        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${Anio}`).then(r => r.json());
-        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${Anio}`).then(r => r.json());
-
-        const WDC = document.getElementById('gridWDC');
+    async function renderWDCChampionship(WDCDATA){
+       const WDC = document.getElementById('gridWDC');
         WDC.innerHTML = '';
-          for (let i = 0; i < pilotos.length; i++) {
-          const p = pilotos[i];
-        const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+          for (let i = 0; i < WDCDATA.length; i++) {
+          const p = WDCDATA[i];
+        const imgUrl = await obtenerFotoPiloto(p.nombre_completo, Anio);
         const cardDriver = document.createElement('div');
 
         cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
         cardDriver.innerHTML = `
                 <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
                 <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-12 h-14 rounded-full mb-2 border">` : ''}
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-14 h-14 bg-white rounded-full mb-2 border">` : ''}
                 <div class="flex flex-col">
                 <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.Piloto}</p>
                 <p class="text-sm mx-2 text-neutral-400">Puntos: ${p.puntos_totales}</p>
@@ -687,12 +741,15 @@
         WDC.appendChild(cardDriver)
 
         };
+    }
 
+    async function renderWCCChampionships(WCCDATA){
+      
         const WCC = document.getElementById('gridWCC');
         WCC.innerHTML = '';
-          for (let i = 0; i < constructores.length; i++) {
-          const c = constructores[i];
-        const imgUrl = await obtenerImagenWikipedia(c.equipo);
+          for (let i = 0; i < WCCDATA.length; i++) {
+          const c = WCCDATA[i];
+        const imgUrl = await obtenerFotoEquipo(c.equipo);
         const cardTeam = document.createElement('div');
         
         cardTeam.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
@@ -706,12 +763,252 @@
                 </div>
                 </div>
         `;
+        cardTeam.dataset.IdEquipo = c.id_Equipo
+        cardTeam.addEventListener('click', () => {
+        window.location.href = `/team?id=${c.id_Equipo}`; // ejemplo de redirección con query
+        });
         WCC.appendChild(cardTeam)
         };
+        
+    }
+    
+    // Simulación: reemplazar fetch con tus endpoints reales
+    async function cargarCampeonatos() {
+      const cachekeyWDC = `wdc_${Anio}`;
+      const cacheTimeKeyWDC = `wdc_time_${Anio}`;
+
+      const cachekeyWCC = `wcc_${Anio}`;
+      const cacheTimeKeyWCC = `wcc_time_${Anio}`;
+
+      const cacheDuration = 120 * 1000; // 120 segundos
+
+      const now = Date.now();
+
+      const cachedDataWDC = localStorage.getItem(cachekeyWDC);
+      const cachedTimeWDC = localStorage.getItem(cacheTimeKeyWDC);  
+
+      const cachedDataWCC = localStorage.getItem(cachekeyWCC);
+      const cachedTimeWCC = localStorage.getItem(cacheTimeKeyWCC);
+
+      if (cachedDataWDC && cachedTimeWDC && (now - cachedTimeWDC < cacheDuration) && cachedDataWCC && cachedTimeWCC && (now - cachedTimeWCC < cacheDuration)) {
+        renderWDCChampionship(JSON.parse(cachedDataWDC));
+        renderWCCChampionships(JSON.parse(cachedDataWCC));
+        console.log('Datos de WDC y WCC cargados desde caché');
+        return;
+      }
+      try {
+        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${Anio}`).then(r => r.json());
+        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${Anio}`).then(r => r.json());
+        localStorage.setItem(cachekeyWDC, JSON.stringify(pilotos));
+        localStorage.setItem(cacheTimeKeyWDC, now);
+
+        localStorage.setItem(cachekeyWCC, JSON.stringify(constructores));
+        localStorage.setItem(cacheTimeKeyWCC, now);
+        renderWDCChampionship(pilotos);
+        renderWCCChampionships(constructores);
       } catch (err) {
         console.error('Error cargando campeonatos', err);
       }
     }
+    
+
+    async function fetchObtenerPilotosEquipo(idTem, idTeam) {
+      try {
+    const response = await fetch(
+      "/api/pilotoTemporada/duplaPilotos",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idTemporada: idTem,
+          idEquipo: idTeam,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    //console.log("Pilotos:", data);
+    return data;
+  } catch (err) {
+    console.error("Error en fetch:", err);
+  }
+  
+  }
+
+
+
+    const currentYear = new Date().getFullYear();
+    console.log(currentYear)
+    console.log(Number(Anio))
+    console.log(Number(Anio) > currentYear)
+    if (Number(Anio) > currentYear) {
+      document.getElementById('gridLineUp').classList.remove('hidden');
+      //document.getElementById('lineupYear').textContent = Anio;
+      document.getElementById('WDCSection').parentElement.classList.add('hidden');
+      document.getElementById('WCCSection').parentElement.classList.add('hidden');
+      document.getElementById('GPSection').classList.add('hidden');
+      //LineUp();
+    }
+
+async function checkUrlExists(url) {
+  try {
+    // Primero intenta HEAD (rápido)
+    const r = await fetch(url, { method: "HEAD", cache: "no-store" });
+    if (r.ok) return true;
+
+    // Si el server no soporta HEAD, intenta GET
+    if (r.status === 405 || r.status === 501) {
+      const r2 = await fetch(url, { method: "GET", cache: "no-store" });
+      return r2.ok;
+    }
+    return false;
+  } catch {
+    // Error de red / CORS / etc.
+    try {
+      const r2 = await fetch(url, { method: "GET", cache: "no-store" });
+      return r2.ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
+async function getPilotoImageURL(nombrePiloto, anio) {
+  const nombre = (nombrePiloto || "").trim();
+  if (!nombre) return "/Driver_photos/default.png";
+
+  const base = `/Driver_photos/${encodeURIComponent(nombre)}`;
+  const years = [anio, anio - 1];
+  const exts = ["png"]; // orden de preferencia
+
+  for (const y of years) {
+    for (const ext of exts) {
+      const url = `${base}/${encodeURIComponent(y)}.${ext}`;
+      if (await checkUrlExists(url)) {
+        return url;
+      }
+    }
+  }
+  return "/Driver_photos/default.png";
+}
+
+
+async function LineUp() {
+  try {
+    const equipos = await fetch(`/api/equipoTemporada/obtenerEquiposPorTemporada/${idSeason}`)
+      .then(r => r.json())
+      .catch(() => []); // si falla, al menos devuelvo array vacío
+    
+    const pilotos = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`)
+      .then(r => r.json())
+      .catch(() => []);
+
+    const container = document.getElementById('gridLineUp');
+    container.innerHTML = ""; // limpiar antes de renderizar
+
+    for (let i = 0; i < (equipos?.length ?? 0); i++) {
+      const equipo = equipos[i];
+      if (!equipo) continue; // seguridad extra
+
+      console.log("Equipo:", equipo);
+
+      let pilotosTeam = [];
+      try {
+        const data = await fetchObtenerPilotosEquipo(idSeason, equipo.id_Equipo);
+        if (Array.isArray(data)) {
+          pilotosTeam = data;
+        }
+      } catch (err) {
+        console.warn("Error obteniendo pilotos de equipo:", err);
+      }
+
+      // valores por defecto
+      let URLPiloto1 = "";
+      let URLPiloto2 = "";
+      let namePiloto1 = "?";
+      let namePiloto2 = "?";
+
+// piloto 1
+if (pilotosTeam?.[0]) {
+  namePiloto1 = pilotosTeam[0]?.nombre_completo ?? "?";
+  URLPiloto1 = await getPilotoImageURL(namePiloto1, Anio);
+}
+
+// piloto 2
+if (pilotosTeam?.[1]) {
+  namePiloto2 = pilotosTeam[1]?.nombre_completo ?? "?";
+  URLPiloto2 = await getPilotoImageURL(namePiloto2, Anio);
+}
+
+      console.log("Pilotos del equipo:", pilotosTeam);
+
+      const cardScuderia = document.createElement("div");
+      cardScuderia.className = `col-span-1 row-span-1 flex flex-row justify-between px-4 py-6 relative`;
+
+      cardScuderia.innerHTML = `
+
+        <!-- Piloto 1 -->
+        <div id="idPiloto1" class="flex flex-col items-center w-1/3">
+          <img src="${URLPiloto1 || "/Driver_photos/default.webp"}" alt="Piloto 1" class="w-28 h-40 object-cover piloto1-img">
+          <div class="bg-red-500 text-white font-bold px-6 py-2 skew-x-[-12deg] mt-2">
+            <span class="skew-x-[12deg] block">${namePiloto1}</span>
+          </div>
+        </div>
+
+        <!-- Logo central -->
+        <div class="w-24">
+          <img src="/Team_photos/${encodeURIComponent(equipo?.Nombre_Equipos ?? "Default")}.png" 
+               alt="Logo" class="w-full equipo-img">
+        </div>
+
+        <!-- Piloto 2 -->
+        <div id="idPiloto2" class="flex flex-col items-center w-1/3">
+          <img src="${URLPiloto2 || "/Driver_photos/default.webp"}" alt="Piloto 2" class="w-28 h-40 object-cover piloto2-img">
+          <div class="bg-red-500 text-white font-bold px-6 py-2 skew-x-[-12deg] mt-2">
+            <span class="skew-x-[12deg] block">${namePiloto2}</span>
+          </div>
+        </div>
+      `;
+// Agrega listeners de click para redirección
+const piloto1Img = cardScuderia.querySelector('.piloto1-img');
+const piloto2Img = cardScuderia.querySelector('.piloto2-img');
+const equipoImg = cardScuderia.querySelector('.equipo-img');
+
+if (piloto1Img && pilotosTeam?.[0]?.id_Piloto) {
+  piloto1Img.style.cursor = 'pointer';
+  piloto1Img.addEventListener('click', () => {
+    window.location.href = `/piloto?id=${pilotosTeam[0].id_Piloto}`;
+  });
+}
+if (piloto2Img && pilotosTeam?.[1]?.id_Piloto) {
+  piloto2Img.style.cursor = 'pointer';
+  piloto2Img.addEventListener('click', () => {
+    window.location.href = `/piloto?id=${pilotosTeam[1].id_Piloto}`;
+  });
+}
+
+if (equipoImg && equipo?.id_Equipo) {
+  equipoImg.style.cursor = 'pointer';
+  equipoImg.addEventListener('click', () => {
+    window.location.href = `/team?id=${equipo.id_Equipo}`;
+  });
+}
+      container.appendChild(cardScuderia);
+    }
+  } catch (err) {
+    console.error("Error en LineUp:", err);
+  }
+}
+
+LineUp();
+
+
     cargarPilotosTemporada();
     cargarGPS();
     cargarCampeonatos();

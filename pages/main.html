@@ -112,7 +112,7 @@
             </div>
           </div>
         </div>
-        <div id="gridWDC" class="grid grid-cols-1 xl:grid-cols-2 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        <div id="gridWDC" class="grid grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
         </div>
       </section>
     </div>
@@ -139,6 +139,37 @@
       }
     }
 
+    async function obtenerFotoPiloto(nombrePiloto, anio) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreCarpeta = nombrePiloto.trim();
+  const extensiones = ['jpg', 'png', 'jpeg', 'webp', 'avif'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/${encodeURIComponent(anio)}.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombrePiloto);
+}
+
+    async function obtenerFotoEquipo(nombreEquipo) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreImagen = nombreEquipo.trim();
+  const extensiones = ['jpg', 'png', 'jpeg', 'webp', 'avif'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Team_photos/${encodeURIComponent(nombreImagen)}.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombreEquipo);
+}
+
+
     var today = new Date()
     var CurrentYear = today.getFullYear()
     const season = document.getElementById('anio')
@@ -149,7 +180,7 @@
     async function cargarGPS(){
       const cacheKey = `gps_${CurrentYear}`;
       const cacheTimeKey = `gps_time_${CurrentYear}`;
-      const cacheDuration = 60 * 1000; // 120 segundos
+      const cacheDuration = 120 * 1000; // 120 segundos
 
       const now = Date.now();
       const cachedData = localStorage.getItem(cacheKey);
@@ -223,14 +254,14 @@
         WDC.innerHTML = '';
           for (let i = 0; i < WDCDATA.length; i++) {
           const p = WDCDATA[i];
-        const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+        const imgUrl = await obtenerFotoPiloto(p.nombre_completo, CurrentYear);
         const cardDriver = document.createElement('div');
 
         cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
         cardDriver.innerHTML = `
                 <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
                 <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-14 h-14 rounded-full mb-2 border">` : ''}
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-14 h-14 bg-white rounded-full mb-2 border">` : ''}
                 <div class="flex flex-col">
                 <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.Piloto}</p>
                 <p class="text-sm mx-2 text-neutral-400">Puntos: ${p.puntos_totales}</p>
@@ -252,20 +283,24 @@
         WCC.innerHTML = '';
           for (let i = 0; i < WCCDATA.length; i++) {
           const c = WCCDATA[i];
-        const imgUrl = await obtenerImagenWikipedia(c.equipo);
+        const imgUrl = await obtenerFotoEquipo(c.equipo);
         const cardTeam = document.createElement('div');
         
         cardTeam.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
         cardTeam.innerHTML = `
                 <div class="p-4 flex flex-row items-center gap-4">
                 <p class="text-sm text-neutral-400 w-6 text-center">${i+1}</p>
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 rounded-full mb-2 border">` : ''}
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 mb-2 ">` : ''}
                 <div class="flex flex-col">
                 <p class="text-sm mx-8 text-neutral-200 font-semibold">${c.equipo}</p>
                 <p class="text-sm mx-8 text-neutral-400">${c.puntos_totales}</p>
                 </div>
                 </div>
         `;
+        cardTeam.dataset.IdEquipo = c.id_Equipo
+        cardTeam.addEventListener('click', () => {
+        window.location.href = `/team?id=${c.id_Equipo}`; // ejemplo de redirección con query
+        });
         WCC.appendChild(cardTeam)
         };
         
@@ -279,7 +314,7 @@
       const cachekeyWCC = `wcc_${CurrentYear}`;
       const cacheTimeKeyWCC = `wcc_time_${CurrentYear}`;
 
-      const cacheDuration = 60 * 1000; // 120 segundos
+      const cacheDuration = 120 * 1000; // 120 segundos
 
       const now = Date.now();
 

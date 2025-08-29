@@ -13,7 +13,7 @@ export class TeamSeasonModel {
     }
 
     static async obtenerEquiposPorTemporadaPorId (idTemporada) {
-        const [equiposTemporada] = await connectionMySQL.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombres Equipos", 
+        const [equiposTemporada] = await connectionMySQL.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombre_Equipos", 
             temporada.id_Temporada, temporada.anio as "Temporada anio"
             FROM equipos_temporada 
             JOIN equipo 

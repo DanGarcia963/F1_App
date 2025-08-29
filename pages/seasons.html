@@ -90,45 +90,81 @@
   </main>
 
   <script>
+    async function renderSeasons(temporadas) {
+
+      const containerSeasons = document.getElementById('gridSeasons');
+      containerSeasons.innerHTML = '';
+      const cacheDuration = 120 * 1000;
+      for (let i = 0; i < temporadas.length; i++) {
+        const season = temporadas[i];
+        const cardSeason = document.createElement('div');
+        // --- Cache para campeones de cada temporada ---
+        const pilotosCacheKey = `wdc_${season.anio}`;
+        const pilotosCacheTimeKey = `wdc_time_${season.anio}`;
+        const now = Date.now();
+        let pilotos = null;
+        const cachedPilotos = localStorage.getItem(pilotosCacheKey);
+        const cachedPilotosTime = Number(localStorage.getItem(pilotosCacheTimeKey));
+        if (cachedPilotos && cachedPilotosTime && (now - cachedPilotosTime < cacheDuration)) {
+          pilotos = JSON.parse(cachedPilotos);
+        } else {
+          try {
+            pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${season.anio}`).then(r => r.json());
+            localStorage.setItem(pilotosCacheKey, JSON.stringify(pilotos));
+            localStorage.setItem(pilotosCacheTimeKey, String(now));
+          } catch (err) {
+            pilotos = [];
+          }
+        }
+        if (pilotos.length > 0) {
+          const campeon = pilotos[0];
+          cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+          cardSeason.innerHTML = `
+            <div class="p-4 flex flex-col items-center text-center">
+            <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
+            <p class="text-sm text-neutral-400">Campeón: ${campeon.nombre_completo}</p>
+            </div>
+          `;
+        } else {
+          cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+          cardSeason.innerHTML = `
+            <div class="p-4 flex flex-col items-center text-center">
+            <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
+            <p class="text-sm text-neutral-400">Campeón: Desconocido</p>
+            </div>
+          `;
+        }
+        cardSeason.dataset.IdSeason = season.id_Temporada;
+        cardSeason.dataset.Anio = season.anio;
+        cardSeason.addEventListener('click', () => {
+          const url = `/season?id=${season.id_Temporada}&anio=${season.anio}`;
+          console.log("Redirigiendo a:", url);
+          window.location.href = url;
+        });
+        containerSeasons.appendChild(cardSeason);
+      }
+    }
+
     async function cargarTemporadas(){
+      const cacheKey = 'temporadasCache';
+      const cacheTimeKey = 'temporadasCacheTime';
+      const cacheDuration = 120 * 1000; //
+
+      const now = Date.now();
+      const cachedData = localStorage.getItem(cacheKey);  
+      const cachedTime = localStorage.getItem(cacheTimeKey);
+      if (cachedData && cachedTime && (now - cachedTime < cacheDuration)) {
+        console.log('Usando datos en caché para temporadas');
+        const temporadas = JSON.parse(cachedData);
+        renderSeasons(temporadas);
+        return;
+      }
       try{
         
         const temporadas = await fetch(`/api/temporada/`).then(r=>r.json());
-        const containerSeasons =document.getElementById('gridSeasons')
-        containerSeasons.innerHTML='';
-        for(let i=0; i<temporadas.length;i++){
-            console.log(temporadas[i])
-          const season = temporadas[i];
-          const cardSeason = document.createElement('div');
-          const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${season.anio}`).then(r => r.json());
-          if (pilotos.length > 0) {
-            const campeon = pilotos[0]; // Tomamos el primero
-            cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-            cardSeason.innerHTML = `
-                <div class="p-4 flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
-                <p class="text-sm text-neutral-400">Campeón: ${campeon.nombre_completo}</p>
-                </div>
-            `;
-            } else {
-            cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-            cardSeason.innerHTML = `
-                <div class="p-4 flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
-                <p class="text-sm text-neutral-400">Campeón: Desconocido</p>
-                </div>
-            `;
-            }
-        cardSeason.dataset.IdSeason = season.id_Temporada
-
-        cardSeason.dataset.Anio = season.anio
-        cardSeason.addEventListener('click', () => {
-        const url = `/season?id=${season.id_Temporada}&anio=${season.anio}`; // ejemplo de redirección con query
-        console.log("Redirigiendo a:", url);
-        window.location.href = url
-        });     
-          containerSeasons.appendChild(cardSeason)
-        }
+        localStorage.setItem(cacheKey, JSON.stringify(temporadas));
+        localStorage.setItem(cacheTimeKey, now);
+        renderSeasons(temporadas);
       }catch (err) {
         console.error('Error cargando trayectoria', err);
     }

@@ -39,6 +39,10 @@ export const crearApp = (Modelos) => {
 
   // Rutas del sitio web estático
   app.use(express.static(__dirname + '/public'))
+  app.use('/Driver_photos', express.static(path.join(process.cwd(), 'Driver_photos')));
+  app.use('/Team_photos', express.static(path.join(process.cwd(), 'Team_photos')));
+  app.use('/Logos', express.static(path.join(process.cwd(), 'Logos')));
+
   // Pruebas de backend
   app.get('/piloto', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/piloto.html'))
   app.get('/', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/main.html'))

@@ -205,6 +205,36 @@
   <!-- Script para cargar datos -->
   <script>
 
+    async function obtenerFotoPiloto(nombrePiloto, anio) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreCarpeta = nombrePiloto.trim();
+  const extensiones = ['png'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/${encodeURIComponent(anio)}.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombrePiloto);
+}
+
+    async function obtenerFotoEquipo(nombreEquipo) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreImagen = nombreEquipo.trim();
+  const extensiones = ['jpg', 'png', 'jpeg', 'webp', 'avif'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Team_photos/${encodeURIComponent(nombreImagen)}.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombreEquipo);
+}
+
     async function obtenerImagenWikipedia(nombre) {
       const query = encodeURIComponent(nombre);
       const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
@@ -246,6 +276,7 @@ console.log(idEquipo)
                 <div class="p-4 flex flex-col items-center text-center">
                 <h3 class="text-lg font-bold text-white">${victory.nombre_oficial} ${year}</h3>
                 ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${victory.nombre_Circuito}" class="w-20 h-18 mb-2 border bg-white">` : ''}
+                <p class="text-sm text-neutral-400">${victory.Winner}</p>
                 <p class="text-sm text-neutral-400">${newDate}</p>
                 </div>
                 `;
@@ -283,30 +314,11 @@ console.log(idEquipo)
     }
     }
 
-    async function fetchMonoplazaActual(){
-    try {
-      const res = await fetch(`/api/equipo/obtenerMonoplazaActual`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-                "idEquipo": idEquipo
-        })
-      });
-      if (!res.ok) throw new Error('Error en el guardado');
-      const data = await res.json();
-      //
-
-      // opcional: recargar la página para mostrar resultados recién guardados
-      //
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-
-      let currentIndex = 0;
+ let currentIndex = 0;
   async function inicializarCarrusel(){
-    const monoplaza = await obtenerMonoplazasEquipo();
+    const monoplazasAll = await obtenerMonoplazasEquipo();
+    const CurrentYear = new Date().getFullYear();
+    const monoplaza = monoplazasAll.filter(m => m.anio <= CurrentYear);
     console.log(monoplaza)
     mostrarMonoplaza(currentIndex, monoplaza)
 
@@ -349,7 +361,7 @@ console.log(idEquipo)
       for(let i = 0; i <statsEquipo.length; i++){
         const dupla = statsEquipo[i];
         console.log(dupla)
-        const imgCURL = await obtenerImagenWikipedia(dupla.nombre_completo)
+        const imgCURL = await obtenerFotoPiloto(dupla.nombre_completo, mono.anio)
         const cardDriver = document.createElement('div');
 
         cardDriver.className =`card-driver h-full w-1/2 flex flex-col`
@@ -363,11 +375,20 @@ console.log(idEquipo)
         <p class="text-neutral-400">podios: ${dupla.podios}</p>`;
         contDupla.appendChild(cardDriver)
       }
+      //const VictoriasPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerVictoriasPiloto/${idPiloto}`).then(r=>r.json());
+      /*
+      contDupla.innerHTML =     
+    `<div class="flex-shrink-0 flex flex-col items-center">
+      <span id="fotoPiloto"></span>
+      <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
+      <p id="equipoPiloto" class="text-neutral-400"></p>
+    </div>`*/
+
     }
 
       async function obtenerStatsDuplaEquipo(anio){
     try{
-      const res = await fetch(`/api/equipo/obtenerStatsDuplaEquipoYear`, {
+      const res = await fetch(`http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -390,7 +411,7 @@ console.log(idEquipo)
 
   async function obtenerMonoplazasEquipo(){
     try{
-      const res = await fetch(`/api/equipo/obtenerMonoplazaActual`, {
+      const res = await fetch(`http://localhost:1234/api/equipo/obtenerMonoplazaActual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -431,7 +452,7 @@ console.log(idEquipo)
           }
 
           inicializarCarrusel()
-        const imgPUrl = await obtenerImagenWikipedia(infoEquipo.nombre_completo);
+        const imgPUrl = await obtenerFotoEquipo(infoEquipo.nombre);
         console.log(imgPUrl);
         document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoEquipo.nombre}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">`
         document.getElementById("nombrePiloto").textContent = infoEquipo.nombre;

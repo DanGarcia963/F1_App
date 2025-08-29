@@ -65,13 +65,21 @@
     <!-- Datos del piloto -->
     <div class="flex-1">
       <h2 class="text-2xl font-semibold mb-4 border-b border-neutral-700 pb-2">Detalles</h2>
-      <ul class="space-y-2">
-        <li><span class="font-semibold">Nacionalidad:</span> <span id="nacionalidadPiloto"></span></li>
-        <li><span class="font-semibold">Fecha de nacimiento:</span> <span id="fechaNacimiento"></span></li>
-        <li><span class="font-semibold">Número:</span> <span id="numeroPiloto"></span></li>
-        <li><span class="font-semibold">Puntos totales:</span> <span id="puntosTotales"></span></li>
-        <li><span class="font-semibold">Victorias:</span> <span id="victoriasPiloto"></span></li>
-      </ul>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Columna 1: Datos personales -->
+        <ul class="space-y-2 col-span-1">
+          <li><span class="font-semibold">Nacionalidad:</span> <span id="nacionalidadPiloto"></span></li>
+          <li><span class="font-semibold">Fecha de nacimiento:</span> <span id="fechaNacimiento"></span></li>
+          <li><span class="font-semibold">Número:</span> <span id="numeroPiloto"></span></li>
+        </ul>
+        <!-- Columna 2: Stats con logos -->
+        <ul class="space-y-2 col-span-1">
+          <li class="flex items-center gap-2"><span class="inline-flex items-center justify-center w-10 h-10"><img src="/Logos/victories.png" alt="Victorias" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/></span><span class="font-semibold">Victorias:</span> <span id="victoriasPiloto"></span></li>
+          <li class="flex items-center gap-2"><span class="inline-flex items-center justify-center w-10 h-10"><img src="/Logos/podium.png" alt="Podios" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/></span><span class="font-semibold">Podios:</span> <span id="podiosPiloto"></span></li>
+          <li class="flex items-center gap-2"><span class="inline-flex items-center justify-center w-10 h-10"><img src="/Logos/grid.png" alt="Poles" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/></span><span class="font-semibold">Poles:</span> <span id="polesPiloto"></span></li>
+          <li><span class="font-semibold">Puntos totales:</span> <span id="puntosTotales"></span></li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -120,6 +128,21 @@
 </div>
   <!-- Script para cargar datos -->
   <script>
+
+    async function obtenerFotoPiloto(nombrePiloto) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreCarpeta = nombrePiloto.trim();
+  const extensiones = ['jpg', 'png', 'jpeg', 'webp','avif'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/driver.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombrePiloto);
+}
 
     async function obtenerImagenWikipedia(nombre) {
       const query = encodeURIComponent(nombre);
@@ -256,7 +279,7 @@ console.log(idPiloto)
         const year = fecha.getFullYear();
 
         const newDate = `${day}/${month}/${year}`;
-        const imgPUrl = await obtenerImagenWikipedia(infoPiloto.nombre_completo);
+        const imgPUrl = await obtenerFotoPiloto(infoPiloto.nombre_completo);
         document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoPiloto.nombre_completo}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">`
         document.getElementById("nombrePiloto").textContent = infoPiloto.nombre_completo;
         document.getElementById("equipoPiloto").textContent = infoPiloto.equipo;
@@ -265,6 +288,8 @@ console.log(idPiloto)
         document.getElementById("numeroPiloto").textContent = infoPiloto.identificador;
         document.getElementById("puntosTotales").textContent = acumPuntos;
         document.getElementById("victoriasPiloto").textContent = acumVictories;
+        document.getElementById("podiosPiloto").textContent = acumPodios;
+        document.getElementById("polesPiloto").textContent = acumPoles;
       } catch (error) {
         console.error("Error cargando datos del piloto:", error);
       }

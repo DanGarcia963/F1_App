@@ -44,7 +44,7 @@ export class TeamModel {
             gp.nombre_oficial,
             t.anio,
             c.nombre as nombre_Circuito,
-            concat(p.codigo_fia, ' ',pt.numero) as Winner,
+            concat(p.Nombre, ' ',p.Apellido) as Winner,
             gp.fecha
             FROM resultados rgp
             JOIN grandes_premios gp
