@@ -617,7 +617,7 @@
     async function cargarGPS(){
       const cacheKey = `gps_${Anio}`;
       const cacheTimeKey = `gps_time_${Anio}`;
-      const cacheDuration = 120 * 1000; // 120 segundos
+      const cacheDuration = 60 * 1000; // 120 segundos
 
       const now = Date.now();
       const cachedData = localStorage.getItem(cacheKey);
@@ -780,7 +780,7 @@
       const cachekeyWCC = `wcc_${Anio}`;
       const cacheTimeKeyWCC = `wcc_time_${Anio}`;
 
-      const cacheDuration = 120 * 1000; // 120 segundos
+      const cacheDuration = 60 * 1000; // 120 segundos
 
       const now = Date.now();
 

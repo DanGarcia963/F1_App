@@ -94,7 +94,7 @@
 
       const containerSeasons = document.getElementById('gridSeasons');
       containerSeasons.innerHTML = '';
-      const cacheDuration = 120 * 1000;
+      const cacheDuration = 60 * 1000;
       for (let i = 0; i < temporadas.length; i++) {
         const season = temporadas[i];
         const cardSeason = document.createElement('div');
@@ -148,7 +148,7 @@
     async function cargarTemporadas(){
       const cacheKey = 'temporadasCache';
       const cacheTimeKey = 'temporadasCacheTime';
-      const cacheDuration = 120 * 1000; //
+      const cacheDuration = 60 * 1000; //
 
       const now = Date.now();
       const cachedData = localStorage.getItem(cacheKey);  

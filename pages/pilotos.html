@@ -86,7 +86,7 @@
           </div>
         </div>
         
-        <div id="gridPilotos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default w-full">
+        <div id="gridPilotos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default w-full">
 
         </div>
       </section>
@@ -336,6 +336,21 @@
           }
         });
 
+    async function obtenerFotoPiloto(nombrePiloto) {
+  // Normaliza el nombre para que coincida con la carpeta
+  const nombreCarpeta = nombrePiloto.trim();
+  const extensiones = ['jpg', 'png', 'jpeg', 'webp', 'avif'];
+  for (let ext of extensiones) {
+    const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/driver.${ext}`;
+    try {
+      const res = await fetch(urlLocal, { method: 'HEAD' });
+      if (res.ok) return urlLocal;
+    } catch (e) { /* ignorar */ }
+  }
+  // Si no hay foto local, busca en Wikipedia
+  return await obtenerImagenWikipedia(nombrePiloto);
+}
+
     async function obtenerImagenWikipedia(nombre) {
       const query = encodeURIComponent(nombre);
       const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=1000&origin=*`;
@@ -361,7 +376,7 @@
         gridpilotos.innerHTML = '';
           for (let i = 0; i < pilotos.length; i++) {
           const p = pilotos[i];
-        const imgUrl = await obtenerImagenWikipedia(p.nombre_completo);
+        const imgUrl = await obtenerFotoPiloto(p.nombre_completo);
         const cardDriver = document.createElement('div');
 
         cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`

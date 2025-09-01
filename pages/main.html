@@ -12,7 +12,7 @@
   scrollbar-width: none; /* Firefox */
 }
   #gridWDC, #gridWCC, #gridGPs {
-    max-height: 540px;
+    max-height: 700px;
   }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -180,7 +180,7 @@
     async function cargarGPS(){
       const cacheKey = `gps_${CurrentYear}`;
       const cacheTimeKey = `gps_time_${CurrentYear}`;
-      const cacheDuration = 120 * 1000; // 120 segundos
+      const cacheDuration = 60 * 1000; // 120 segundos
 
       const now = Date.now();
       const cachedData = localStorage.getItem(cacheKey);
@@ -314,7 +314,7 @@
       const cachekeyWCC = `wcc_${CurrentYear}`;
       const cacheTimeKeyWCC = `wcc_time_${CurrentYear}`;
 
-      const cacheDuration = 120 * 1000; // 120 segundos
+      const cacheDuration = 60 * 1000; // 120 segundos
 
       const now = Date.now();
 
