@@ -58,4 +58,21 @@ export class SeasonModel {
           return error
         }
     }
+    static async finalizarTemporada({ entrada }) {
+        const {
+          id_Temporada: idTemporada
+        } = entrada
+        const existeTemporada = await this.obtenerTemporadaPorId(idTemporada)
+        if (!existeTemporada) return 'La temporada no existe'
+    
+        try {
+            await connectionMySQL.query(
+                'UPDATE temporada SET finalizada = 1 WHERE id_Temporada = ?',
+                [idTemporada]
+            );
+            return `La temporada ${existeTemporada.anio} ha sido finalizada.`
+        } catch (error) {
+          return error
+        }
+    }
 }

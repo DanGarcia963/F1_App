@@ -35,4 +35,9 @@ export class SeasonController {
         const resultado = await this.seasonModel.cambiarAnio({ entrada: req.body })
         res.status(200).json({ message: `${resultado}` })
     }
+    
+    finalizarTemporada = async (req, res) => {
+        const resultado = await this.seasonModel.finalizarTemporada({ entrada: req.body })
+        res.status(200).json({ message: `${resultado}` })
+    }
 }

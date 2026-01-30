@@ -9,9 +9,9 @@ export class TeamSeasonController {
     }
 
     obtenerEquiposPorTemporadaPorId = async (req, res) => {
-        const { id } = req.params
+        const {categoria, id } = req.params
 
-        const equiposTemporada = await this.teamSeasonModel.obtenerEquiposPorTemporadaPorId(id)
+        const equiposTemporada = await this.teamSeasonModel.obtenerEquiposPorTemporadaPorId(categoria, id)
 
         if (equiposTemporada) return res.json(equiposTemporada)
             res.status(404).json({ message: 'equipos por temporada no encontrados' })

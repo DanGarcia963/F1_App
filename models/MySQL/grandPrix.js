@@ -14,7 +14,7 @@
         return GPs
      }
  
-    static async obtenerGPTemporadaPorId (Anio) {
+    static async obtenerGPTemporadaPorId (Categoria, Anio) {
         const [GPsTemporada] = await connectionMySQL.query(`
         SELECT 
             gp.id_GP,
@@ -23,8 +23,8 @@
             c.pais AS Pais,
             gp.fecha,
             IFNULL(g.codigo_fia, 'Aún no se disputa') AS Ganador,
-            IFNULL(pp.codigo_fia, 'Aún no se disputa') AS Pole_Position,
-            IFNULL(vr.codigo_fia, 'Aún no se disputa') AS Vuelta_Rapida
+            IFNULL(pp.codigo_fia, 'NO TIME') AS Pole_Position,
+            IFNULL(vr.codigo_fia, 'NO TIME') AS Vuelta_Rapida
         FROM grandes_premios gp
         LEFT JOIN piloto pp
             ON pp.id_Piloto = gp.pole_position_piloto_id
@@ -36,10 +36,12 @@
             ON g.id_Piloto = r.piloto_id
         JOIN temporada t
             ON t.id_Temporada = gp.temporada_id
+        JOIN categoria cat
+            ON cat.id_Categoria = gp.id_Categoria
         JOIN circuito c
             ON c.id_Circuito = gp.circuito_id
-        WHERE t.anio = ?
-        ORDER BY gp.fecha ASC;`, [Anio])
+        WHERE t.anio = ? AND cat.id_Categoria = ?
+        ORDER BY gp.fecha ASC;`, [Anio, Categoria])
         if (GPsTemporada.length === 0) return false 
         return GPsTemporada
     }
@@ -57,7 +59,8 @@
             gp.tiempo_vuelta_rapida,
             gp.vuelta_rapida_piloto_id,
             vr.codigo_fia AS Vuelta_Rapida,
-            gp.tipo_carrera
+            gp.tipo_carrera,
+            gp.id_Categoria
             FROM
             grandes_premios gp
             LEFT JOIN piloto pp
@@ -73,7 +76,7 @@
         return GP
      }
 
-    static async obtenerCampeonatoPilotosPorAnio (Anio){
+    static async obtenerCampeonatoPilotosPorAnio (Categoria, Anio){
         const [WDC] = await connectionMySQL.query(`select 
                 t.anio as temporada,
                 p.id_Piloto,
@@ -93,17 +96,20 @@
                 and pt.piloto_id = p.id_Piloto
                 join equipo e
                 on e.id_Equipo = pt.equipo_id
-                where t.anio = ?
+                JOIN categoria cat
+                ON cat.id_Categoria = gp.id_Categoria
+                where t.anio = ? AND cat.id_Categoria = ?
                 group by  p.id_Piloto, e.nombre, t.anio  
                 ORDER BY puntos_totales desc
-            `,[Anio]);
+            `,[Anio,Categoria]);
         if(WDC === 0) return false
         return WDC
     }
-        static async obtenerCampeonatoConstructoresPorAnio (Anio){
+        static async obtenerCampeonatoConstructoresPorAnio (Categoria,Anio){
         const [WCC] = await connectionMySQL.query(`SELECT 
             e.id_Equipo,
             e.nombre AS equipo,
+            et.register_name AS register,
             t.anio AS temporada,
             SUM(rgp.puntos_obtenidos) AS puntos_totales
             FROM resultados rgp
@@ -113,10 +119,14 @@
             JOIN pilotos_temporada pt ON pt.piloto_id = p.id_Piloto 
             AND pt.temporada_id = t.id_Temporada
             JOIN equipo e ON e.id_Equipo = pt.equipo_id
-            WHERE t.anio = ? 
+            JOIN equipos_temporada et ON et.equipo_id = e.id_Equipo
+            AND et.temporada_id = t.id_Temporada
+                 JOIN categoria cat
+                ON cat.id_Categoria = gp.id_Categoria
+                where t.anio = ? AND cat.id_Categoria = ?
             GROUP BY e.id_Equipo, t.anio
             ORDER BY puntos_totales DESC;
-            `,[Anio]);
+            `,[Anio,Categoria]);
         if(WCC === 0) return false
         return WCC
     }
@@ -145,15 +155,15 @@
 
 static async registrarGP({ entrada }) {
   const {
-    nombre_oficial:nombreGP, fecha, circuito_id:circuito,temporada_id:temporada, vueltas_totales:vueltas, pole_position_piloto_id:polePosition, tiempo_pole:tiempoPole, vuelta_rapida_piloto_id:vueltaRapida, tiempo_vuelta_rapida:tiempoVR, tipo_carrera: formatoCarrera
+    nombre_oficial:nombreGP, fecha, circuito_id:circuito,temporada_id:temporada, vueltas_totales:vueltas, pole_position_piloto_id:polePosition, tiempo_pole:tiempoPole, vuelta_rapida_piloto_id:vueltaRapida, tiempo_vuelta_rapida:tiempoVR, tipo_carrera: formatoCarrera, id_Categoria: idCategoria
   } = entrada;
 
   try {
     await connectionMySQL.query(
       `INSERT INTO grandes_premios
-      (nombre_oficial, fecha, circuito_id, temporada_id, vueltas_totales, pole_position_piloto_id, tiempo_pole,vuelta_rapida_piloto_id, tiempo_vuelta_rapida,tipo_carrera)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nombreGP, fecha, circuito, temporada, vueltas, polePosition, tiempoPole, vueltaRapida, tiempoVR, formatoCarrera]
+      (nombre_oficial, fecha, circuito_id, temporada_id, vueltas_totales, pole_position_piloto_id, tiempo_pole,vuelta_rapida_piloto_id, tiempo_vuelta_rapida,tipo_carrera, id_Categoria)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
+      [nombreGP, fecha, circuito, temporada, vueltas, polePosition, tiempoPole, vueltaRapida, tiempoVR, formatoCarrera,idCategoria]
     );
 
     // Si quieres devolver el GP recién insertado

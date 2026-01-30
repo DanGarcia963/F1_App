@@ -17,27 +17,28 @@ export class GPController {
             res.status(404).json({ message: 'gran premio no encontrado' })
     }
 
-    obtenerGPTemporadaPorId = async (req, res) => {
-        const { Anio} = req.params;
-        const GPsSeason = await this.gpModel.obtenerGPTemporadaPorId(Anio)
+obtenerGPTemporadaPorId = async (req, res) => {
+    const { Categoria, Anio } = req.params;
+    const GPsSeason = await this.gpModel.obtenerGPTemporadaPorId(Categoria, Anio);
 
-        if (GPsSeason) return res.json(GPsSeason)
-            res.status(404).json({ message: 'gran premio de esta temporada no encontrado' })
-    }
+    if (GPsSeason) return res.json(GPsSeason);
+    res.status(404).json({ message: 'gran premio de esta temporada no encontrado' });
+}
+
 
     obtenerCampeonatoPilotosPorAnio = async (req, res) => {
-        const { Anio } = req.params
+        const { Categoria, Anio } = req.params;
 
-        const WDC = await this.gpModel.obtenerCampeonatoPilotosPorAnio(Anio)
+        const WDC = await this.gpModel.obtenerCampeonatoPilotosPorAnio(Categoria, Anio)
 
         if (WDC) return res.json(WDC)
             res.status(404).json({ message: 'Campeonato de pilotos encontrado' })
     }
 
     obtenerCampeonatoConstructoresPorAnio = async (req, res) => {
-        const { Anio } = req.params
+        const { Categoria, Anio } = req.params;
 
-        const WCC = await this.gpModel.obtenerCampeonatoConstructoresPorAnio(Anio)
+        const WCC = await this.gpModel.obtenerCampeonatoConstructoresPorAnio(Categoria, Anio)
 
         if (WCC) return res.json(WCC)
             res.status(404).json({ message: 'Campeonato de constructores no encontrado' })

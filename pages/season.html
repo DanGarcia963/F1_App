@@ -13,13 +13,12 @@
   scrollbar-width: none; /* Firefox */
 }
   #gridWDC, #gridWCC, #gridGPs {
-    max-height: 540px;
+    max-height: 500px;
   }
 
   #gridDriverSeason{
     max-width:  100%;
     overflow-x: scroll;
-
   }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -49,24 +48,20 @@
 </head>
 <body class="bg-gray-900 text-gray-100 antialiased">
   <!-- NAV -->
-  <header class="sticky top-0 z-40 bg-black/60 glass border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+  <header class="sticky max-w-full top-0 z-40 bg-black/60 glass border-b border-gray-800">
+    <div class="max-w-full mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <a href="#" class="flex items-center gap-2">
-          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold"></div>
-          <span class="font-semibold text-lg">F1 APP — Mock</span>
+          <div class="w-10 h-10 rounded flex items-center justify-center font-bold"><span id="Logo" class="font-semibold text-lg"><img src="/Logos/LogoF1.png" alt="Logo" class="w-full h-full rounded"></span></div>
+
         </a>
         <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
-          <a class="px-3 py-2 hover:text-white" href="/">Inicio</a>
-          <a class="px-3 py-2 hover:text-white" href="/teams">Equipos</a>
-          <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
-          <a class="px-3 py-2 hover:text-white" href="/pilotos">Pilotos</a>
+          <a id="mainPage" class="px-3 py-2 hover:text-white">Inicio</a>
+          <a id="teamsPage" class="px-3 py-2 hover:text-white">Equipos</a>
+          <a id="seasonPage" class="px-3 py-2 hover:text-white">Temporadas</a>
+          <a id="driversPage" class="px-3 py-2 hover:text-white">Pilotos</a>
+          <a class="px-3 py-2 hover:text-white" href="/circuitos">Circuitos</a>
         </nav>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <input class="hidden sm:inline-block bg-gray-800 text-sm px-3 py-2 rounded" placeholder="Buscar pilotos, carreras..." />
-        <button class="px-4 py-2 bg-red-600 rounded text-sm font-medium">Suscribirse</button>
       </div>
     </div>
   </header>
@@ -75,26 +70,68 @@
 
   <!-- HERO -->
   <main class="min-w-md max-w-full mx-auto px-4 py-8">
+    
+    <div class=" max-w-full mx-auto px-4 mb-6 scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+      <div id="driverAddBtnCard" 
+        class="w-full h-auto rounded-lg shadow-lg p-3 
+        flex flex-row gap-4 items-center justify-center cursor-pointer">
+        <button id="openAddPilotosBtn" 
+        class="flex items-center gap-2 text-sm text-white px-3 py-2 rounded-lg bg-green-700 hover:bg-green-800 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Agregar Piloto
+        </button>
+        <button id="FinishSeason" 
+        class="flex items-center gap-2 text-sm text-white px-3 py-2 rounded-lg bg-red-700 hover:bg-red-800 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+          </svg>
+          Finalizar temporada
+        </button>
+      </div>
+      <div class="flex flex-col y-2">
 
-    <div class="max-w-screen-xl mx-auto px-4 mb-6 overflow-x-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
-        <div id="driverAddBtnCard" class="flex-none w-20 h-28 bg-green-700/10 border border-green-600 rounded-lg shadow-lg p-3 flex items-center justify-center cursor-pointer">
-          <button id="openAddPilotosBtn" class="flex items-center gap-2 text-sm text-white px-3 py-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-            Agregar Piloto
-          </button>
-        </div>
-      <div class="flex gap-4 py-2">
-
-        <div id="gridDriverSeason" class="flex-shrink-0 bg-gray-800 rounded-lg shadow-lg p-3 overflow-x-auto flex">
+        <div id="gridDriverSeason" 
+          class="flex-shrink-0 bg-gray-800 rounded-lg shadow-lg p-3 
+          overflow-x-auto 
+          flex">
         <!-- Aquí tu contenido dinámico -->
         </div>
+
+        <div id="gridTeamSeason" 
+          class="flex-shrink-0 bg-gray-800 rounded-lg shadow-lg p-3 
+          overflow-x-auto 
+          flex">
+        <!-- Aquí tu contenido dinámico -->
+        </div>
+
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
-      
+      <section id="WDCSection"class=" md:col-span-3 lg:col-span-2 lg:col-start-4 lg:row-start-2 xl:col-span-2 xl:col-start-6 xl:row-start-1 2xl:col-span-2 2xl:col-start-8 bg-gray-800 gap-4 p-4 rounded-lg overflow-hidden shadow-lg relative">
+        <!-- Campeonato -->
+        <div id="infoGridWDC" class="grid grid-cols-1 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Drivers Championship</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="gridWDC"
+          class="flex lg:grid lg:grid-cols-1 gap-6 p-6 max-w-full items-start 
+          overflow-x-auto lg:overflow-x-visible 
+          overflow-y-hidden lg:overflow-y-auto 
+          scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+
+      </section>
       <!-- World Constructors Championship -->
-      <section id="WCCSection" class="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-2 2xl:col-span-2  rounded-lg overflow-hidden shadow-lg relative">
+      <section id="WCCSection" class="col-span-1 md:col-span-3 lg:col-span-5 lg:col-start-1 lg:row-start-1 xl:col-span-2 xl:col-start-1 xl:row-start- 2xl:col-span-2 2xl:col-start-1 2xl:row-start-1 bg-gray-800 gap-4 p-4 rounded-lg overflow-hidden shadow-lg relative">
         <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
             <div class="p-4 flex flex-row items-center gap-4">
@@ -104,16 +141,24 @@
             </div>
           </div>
         </div>
-        <div id="gridWCC" class="grid grid-cols-1 sm:grid-cols- md:grid-cols- lg:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        <div id="gridWCC" 
+          class="flex xl:grid xl:grid-cols-1 gap-6 p-6 max-w-full items-start 
+          overflow-x-auto xl:overflow-x-visible 
+          overflow-y-hidden xl:overflow-y-auto 
+          scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
         </div>
-      </section>
 
+      </section>
       <!-- Grand Prix Section -->
-      <section id="GPSection" class="col-span-1 md:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-5 bg-gray-800 rounded-lg overflow-hidden shadow-lg relative">
+      <section id="GPSection" class="col-span-1 md:col-span-3 lg:col-span-3 lg:col-start-1 lg:row-start-2 xl:col-span-3 xl:col-start-3 xl:row-start-1 2xl:col-span-5 2xl:col-start-3 2xl:row-start-1 bg-gray-800 gap-4 p-4 rounded-lg overflow-hidden shadow-lg relative">
         <div class="relative">
           <div class="bg-gray-800 rounded-lg p-4 shadow">
             <h2 class="text-2xl font-bold">Grandes Premios <span id="anio"></span></h2>
-            <div id="gridGPs" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+            <div id="gridGPs" 
+              class="flex lg:grid lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 max-w-full items-start 
+                overflow-x-auto lg:overflow-x-visible 
+                overflow-y-hidden lg:overflow-y-auto 
+              scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
             </div>
             <div id="btnAgregarGP" class="p-6">
                 <button id="abrirFormGP" class="px-4 py-2 bg-green-600 rounded text-sm font-medium">Agregar GP</button>
@@ -126,21 +171,6 @@
         </div>
       </section>
 
-      <!-- World Drivers Championship Section -->
-      <section id="WDCSection"class="md:col-span-3  lg:col-span-2 xl:col-span-2 2xl:col-span-2 bg-gray-800 gap-4 rounded-lg overflow-hidden shadow-lg relative">
-        <!-- Campeonato -->
-        <div id="infoGridWDC" class="grid grid-cols-1 gap-6 p-6 items-start">
-          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
-            <div class="p-4 flex flex-row items-center gap-4">
-              <div class="flex flex-col">
-                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Drivers Championship</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="gridWDC" class="grid grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
-        </div>
-      </section>
     </div>
 
 
@@ -247,10 +277,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-12 text-center text-sm text-gray-400">
-      <p>Plantilla inspirada en F1 TV — Mockup sin fines comerciales.</p>
-    </footer>
   </main>
 
   <script>
@@ -258,18 +284,21 @@
         const params = new URLSearchParams(window.location.search);
         const idSeason = params.get("id");
         const Anio = params.get("anio");
+        const idCategoria = params.get("categoria")
+        console.log(window.location.search);
+        console.log(idCategoria);
         console.log(idSeason)
         console.log(Anio)
-
         //Formulario agregar gran premio a la temporada
+        const btnFinishSeason = document.getElementById("FinishSeason");
         const btnAbrirFormGP = document.getElementById("abrirFormGP");
         const formContainerGP = document.getElementById("formAgregarGP");
         const btnCancelarFormGP = document.getElementById("cancelarFormGP");
         
 
         // endpoints (ajusta si tu API tiene rutas distintas)
-        const endpointAllPilotos = '/api/piloto/'; // devuelve array de pilotos { id_Piloto, nombre_completo }
-        const endpointAllEquipos = '/api/equipo/'; // devuelve array de equipos { id_Equipo, nombre }
+        const endpointAllPilotos = `/api/piloto/${idCategoria}`; // devuelve array de pilotos { id_Piloto, nombre_completo }
+        const endpointAllEquipos = `/api/equipo/${idCategoria}`; // devuelve array de equipos { id_Equipo, nombre }
 
         //Formulario agregar piloto temporada
         const modal = document.getElementById('modalAddPilotos');
@@ -359,7 +388,7 @@
 
         function addRow(data = {}) {
 			
-		  const currentRows = rowsTbody.querySelectorAll('tr').length;
+		      const currentRows = rowsTbody.querySelectorAll('tr').length;
 
           filaCount++;
           const tr = document.createElement('tr');
@@ -418,6 +447,8 @@
           const rows = Array.from(rowsTbody.querySelectorAll('tr'));
           const payload = [];
           const pilotosSeleccionados = new Set();
+          const teamSeasonPayload = [];
+          const TeamsSeleccionados = new Set();
           for (let i = 0; i < rows.length; i++) {
             const r = rows[i];
             const pilotoId = r.querySelector('.select-piloto-season')?.value;
@@ -429,11 +460,19 @@
               return { ok: false, msg: `Fila ${i+1}: completa piloto, equipo y número.` };
             }
 
-            if (pilotosSeleccionados.has(pilotoId)) {
+            if(!TeamsSeleccionados.has(equipoId,idSeasonLocal)){
+              teamSeasonPayload.push({
+                equipo_id: Number(equipoId),
+                temporada_id: Number(idSeasonLocal)
+              });
+            }
+
+            if (pilotosSeleccionados.has(pilotoId, equipoId)) {
               return { ok: false, msg: `Piloto duplicado en la fila ${i+1}.` };
             }
-            pilotosSeleccionados.add(pilotoId);
 
+            pilotosSeleccionados.add(pilotoId);
+            
             payload.push({
               piloto_id: Number(pilotoId),
               equipo_id: Number(equipoId),
@@ -441,12 +480,45 @@
               numero: Number(numero)
             });
           }
+          console.log(teamSeasonPayload);
+          // si no hay filas, rechazar
+          console.log(payload);
 
           if (payload.length === 0) return { ok: false, msg: 'No hay filas para guardar.' };
           return { ok: true, payload };
         }
 
-          // enviar payload al backend (batch)
+        // Nueva función para registrar equipos en la temporada, evitando duplicados
+        async function saveEquiposTemporada(equipos, temporadaId) {
+          if (!Array.isArray(equipos) || equipos.length === 0) return;
+          try {
+            // Obtener equipos ya registrados para la temporada
+            const resExist = await fetch(`/api/equipoTemporada/obtenerEquiposPorTemporada/${idCategoria}/${temporadaId}`);
+            let existentes = [];
+            if (resExist.ok) {
+              existentes = await resExist.json();
+            }
+            const idsExistentes = new Set((existentes || []).map(e => e.id_Equipo || e.id));
+            // Filtrar solo los equipos nuevos
+            const nuevos = equipos.filter(eid => !idsExistentes.has(Number(eid)));
+            if (nuevos.length === 0) return;
+            // Registrar equipos nuevos
+            for (const equipoId of nuevos) {
+              await fetch(`/api/equipoTemporada/crearEquipoTemporada`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  equipo_id: Number(equipoId),
+                  temporada_id: Number(temporadaId)
+                })
+              });
+            }
+          } catch (err) {
+            console.error('Error guardando equipos temporada', err);
+          }
+        }
+
+        // enviar payload al backend (batch)
         async function savePilotosSeason(payload) {
           try {
             // endpoint: AJUSTA si tu API espera otra ruta
@@ -467,6 +539,43 @@
         }
 
         openAddPilotosBtn.addEventListener('click', openAddPilotosModal);
+
+        btnFinishSeason.addEventListener('click', async () => {
+          if (!confirm(`¿Seguro que deseas finalizar la temporada ${Anio}? Esta acción no se puede deshacer.`)) return;
+          try {
+            const res = await fetch(`/api/temporada/finalizarTemporada`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id_Temporada: idSeasonLocal })
+            });
+            if (res.ok) {
+              alert('Temporada finalizada correctamente.');
+              window.location.reload();
+            } else {
+              const txt = await res.text();
+              throw new Error(txt || 'Error en servidor');
+            }
+          } catch (err) {
+            console.error('Error finalizando temporada', err);
+            alert('No se pudo finalizar la temporada. Revisa la consola.');
+          }
+        });
+
+document.getElementById("mainPage").addEventListener("click",()=>{
+  window.location.href=`/main/?id=${idCategoria}`
+})
+
+document.getElementById("teamsPage").addEventListener("click",()=>{
+  window.location.href=`/teams/?id=${idCategoria}`
+})
+
+document.getElementById("driversPage").addEventListener("click",()=>{
+    window.location.href=`/pilotos/?id=${idCategoria}`
+})
+document.getElementById("seasonPage").addEventListener("click",()=>{
+    window.location.href=`/seasons/?id=${idCategoria}`
+})
+
         btnClose.addEventListener('click', closeModalAddPilotos);
         btnAddRow.addEventListener('click', () => addRow());
         btnClearRows.addEventListener('click', () => clearRows());
@@ -479,19 +588,19 @@
           }
           if (!confirm(`Se agregarán ${payload.length} pilotos a la temporada ${Anio}. ¿Continuar?`)) return;
           try {
-            payload.forEach(async(pilotoTemporada)=>{
-              console.log(pilotoTemporada)
-           await savePilotosSeason(pilotoTemporada);
-           
-            alert('Pilotos agregados correctamente');
+            // Obtener equipos únicos de los pilotos seleccionados
+            const equiposUnicos = Array.from(new Set(payload.map(p => p.equipo_id)));
+            // Registrar equipos temporada (sin duplicados)
+            await saveEquiposTemporada(equiposUnicos, idSeasonLocal);
+            // Registrar pilotos temporada
+            for (const pilotoTemporada of payload) {
+              await savePilotosSeason(pilotoTemporada);
+            }
+            alert('Pilotos y equipos agregados correctamente');
             closeModalAddPilotos();
-            // refrescar strip y WDC/WCC
-            
-            })
-            await cargarPilotosTemporada(); // tu función ya definida arriba
- 
+            await cargarPilotosTemporada(); // refrescar strip y WDC/WCC
           } catch (err) {
-            alert('Error guardando pilotos. Revisa la consola.');
+            alert('Error guardando pilotos o equipos. Revisa la consola.');
           }
         });
 
@@ -511,7 +620,7 @@
             selGPs.appendChild(option)
         });
         // Pilotos
-        const pilotos = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r => r.json());
+        const pilotos = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idCategoria}/${idSeason}`).then(r => r.json());
         const selVR = document.getElementById("selectVueltaRapida");
         const selPP = document.getElementById("selectPolePosition");
         selVR.innerHTML = `<option value="">Seleccione el piloto que hizo la Vuelta Rapida</option>`;
@@ -522,6 +631,29 @@
         console.error("Error cargando datos del formulario", err);
         }
     }
+
+    async function verificarEstadoTemporada() {
+        const stateSeason = await fetch(`/api/temporada/obtenerTemporada/${idSeasonLocal}`).then(r=> r.json());
+        console.log(stateSeason);
+        if(stateSeason.finalizada){
+        document.getElementById("driverAddBtnCard").classList.add("hidden");
+
+        document.getElementById("btnAgregarGP").classList.add("hidden");
+        }
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        document.title = `Temporada ${Anio} — F1 App Mock`;
+        cargarPilotosTemporada();
+        cargarEquiposTemporada();
+        cargarCampeonatos();
+        cargarGPS();
+        verificarEstadoTemporada();
+        LineUp();
+
+
+
+    });
 
     document.getElementById("gpForm").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -537,7 +669,7 @@
         const vueltaRapida = document.getElementById('selectVueltaRapida').value;
         const formatoCarrera = document.getElementById('selectFormatoCarrera').value;
 
-        console.log(nombre_GP, fecha, circuito,idSeason, totalLaps, polePosition,tiempoPole, vueltaRapida, tiempoVR,formatoCarrera);
+        console.log(nombre_GP, fecha, circuito,idSeason, totalLaps, polePosition,tiempoPole, vueltaRapida, tiempoVR,formatoCarrera, idCategoria);
 
         try {
         const res = await fetch("/api/granPremio/registrarGP", {
@@ -553,7 +685,8 @@
                 tiempo_pole: tiempoPole || null,
                 vuelta_rapida_piloto_id: vueltaRapida || null,
                 tiempo_vuelta_rapida: tiempoVR || null,
-                tipo_carrera: formatoCarrera
+                tipo_carrera: formatoCarrera,
+                id_Categoria : Number(idCategoria)
             })
         });
         if (res.ok) {
@@ -601,8 +734,8 @@
 
     async function obtenerFotoEquipo(nombreEquipo) {
   // Normaliza el nombre para que coincida con la carpeta
-  const nombreImagen = nombreEquipo.trim();
-  const extensiones = ['jpg', 'png', 'jpeg', 'webp', 'avif'];
+  const nombreImagen = nombreEquipo;
+  const extensiones = ['png'];
   for (let ext of extensiones) {
     const urlLocal = `/Team_photos/${encodeURIComponent(nombreImagen)}.${ext}`;
     try {
@@ -611,7 +744,7 @@
     } catch (e) { /* ignorar */ }
   }
   // Si no hay foto local, busca en Wikipedia
-  return await obtenerImagenWikipedia(nombreEquipo);
+  //return await obtenerImagenWikipedia(nombreEquipo);
 }
 
     async function cargarGPS(){
@@ -630,7 +763,7 @@
       }
 
     try{
-      const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${Anio}`).then(r=> r.json());
+      const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${idCategoria}/${Anio}`).then(r => r.json());
         localStorage.setItem(cacheKey, JSON.stringify(GPs));
         localStorage.setItem(cacheTimeKey, now);
         renderGPs(GPs);
@@ -657,7 +790,7 @@
 
         const newDate = `${day}/${month}/${year}`;
 
-        card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+        card.className = 'group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
         card.innerHTML = `
                 <div class="p-4 flex flex-col items-center text-center">
                 ${imgPUrl ? `<img src="${imgPUrl}" alt="Bandera ${gp.Pais}" class="w-12 h-8 mb-2 border">` : ''}
@@ -680,16 +813,60 @@
         `;
         card.dataset.IdGP = gp.id_GP
         card.addEventListener('click', () => {
-        window.location.href = `/granPremio?id=${gp.id_GP}`; // ejemplo de redirección con query
+        window.location.href = `/granPremio?id=${gp.id_GP}&categoria=${idCategoria}`; // ejemplo de redirección con query
         });
           container.appendChild(card);          
         };
       }
     
+    async function cargarEquiposTemporada() {
+      try{
+        const equiposSeason = await fetch(`/api/equipoTemporada/obtenerEquiposPorTemporada/${idCategoria}/${idSeason}`).then(r=> r.json());
+        const stateTemporada = await fetch(`/api/temporada/obtenerTemporada/${idSeason}`).then(r=> r.json());
+        
+        const TeamSeason = document.getElementById('gridTeamSeason');
+        if(stateTemporada.finalizada){
+          TeamSeason.classList.add("hidden");
+        }
+
+         console.log(equiposSeason);
+        TeamSeason.innerHTML = '';
+          for (let i = 0; i < equiposSeason.length; i++) {
+            const e = equiposSeason[i];
+        let imgUrl = await obtenerFotoEquipo(e.register);
+        console.log(`${e.register} - ${imgUrl}`);
+        if(imgUrl === null || imgUrl === undefined){
+          imgUrl = await obtenerFotoEquipo(e.Nombre_Equipos);
+        }
+            const cardTeam = document.createElement('div');
+
+            cardTeam.className =`group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-x-auto shadow-lg gap-5 p-5 border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+            cardTeam.innerHTML = `
+              <div id="idEquipo" class="p-4 flex flex-row items-center gap-3 p-3">
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${e.Nombre_Equipos}" class="w-16 h-16 rounded-none mb-2">` : ''}
+                <div class="flex flex-col gap-3 p-3">
+                  <p class="text-sm mx-2 text-neutral-200 font-semibold">${e.register}</p>
+                </div>
+              </div>
+              `;
+            TeamSeason.appendChild(cardTeam)
+          };
+      }catch (err) {
+        console.error('Error cargando campeonatos', err);
+      }
+    }
+
     async function cargarPilotosTemporada(){
       try{
-        const pilotosSeason = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`).then(r=>r.json());
+        const pilotosSeason = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idCategoria}/${idSeason}`).then(r=>r.json());
+        const stateTemporada = await fetch(`/api/temporada/obtenerTemporada/${idSeason}`).then(r=> r.json());
+        
         const DriverSeason = document.getElementById('gridDriverSeason');
+        if(stateTemporada.finalizada){
+          DriverSeason.classList.add("hidden");
+        }
+
+         console.log(pilotosSeason);
         DriverSeason.innerHTML = '';
           for (let i = 0; i < pilotosSeason.length; i++) {
             const p = pilotosSeason[i];
@@ -723,7 +900,7 @@
         const imgUrl = await obtenerFotoPiloto(p.nombre_completo, Anio);
         const cardDriver = document.createElement('div');
 
-        cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardDriver.className =`group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
         cardDriver.innerHTML = `
                 <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
                 <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
@@ -749,16 +926,20 @@
         WCC.innerHTML = '';
           for (let i = 0; i < WCCDATA.length; i++) {
           const c = WCCDATA[i];
-        const imgUrl = await obtenerFotoEquipo(c.equipo);
+        let imgUrl = await obtenerFotoEquipo(c.register);
+        console.log(`${c.register} - ${imgUrl}`);
+        if(imgUrl === null || imgUrl === undefined){
+          imgUrl = await obtenerFotoEquipo(c.equipo);
+        }
         const cardTeam = document.createElement('div');
         
-        cardTeam.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
+        cardTeam.className =`group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
         cardTeam.innerHTML = `
                 <div class="p-4 flex flex-row items-center gap-4">
                 <p class="text-sm text-neutral-400 w-6 text-center">${i+1}</p>
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 rounded-full mb-2 border">` : ''}
+                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 rounded-none mb-2">` : ''}
                 <div class="flex flex-col">
-                <p class="text-sm mx-8 text-neutral-200 font-semibold">${c.equipo}</p>
+                <p class="text-sm mx-8 text-neutral-200 font-semibold">${c.register}</p>
                 <p class="text-sm mx-8 text-neutral-400">${c.puntos_totales}</p>
                 </div>
                 </div>
@@ -797,8 +978,8 @@
         return;
       }
       try {
-        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${Anio}`).then(r => r.json());
-        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${Anio}`).then(r => r.json());
+        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${idCategoria}/${Anio}`).then(r => r.json());
+        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${idCategoria}/${Anio}`).then(r => r.json());
         localStorage.setItem(cachekeyWDC, JSON.stringify(pilotos));
         localStorage.setItem(cacheTimeKeyWDC, now);
 
@@ -901,11 +1082,11 @@ async function getPilotoImageURL(nombrePiloto, anio) {
 
 async function LineUp() {
   try {
-    const equipos = await fetch(`/api/equipoTemporada/obtenerEquiposPorTemporada/${idSeason}`)
+    const equipos = await fetch(`/api/equipoTemporada/obtenerEquiposPorTemporada/${idCategoria}/${idSeason}`)
       .then(r => r.json())
       .catch(() => []); // si falla, al menos devuelvo array vacío
     
-    const pilotos = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`)
+    const pilotos = await fetch(`/api/pilotoTemporada/obtenerPilotosPorTemporada/${idCategoria}/${idSeason}`)
       .then(r => r.json())
       .catch(() => []);
 
@@ -955,7 +1136,7 @@ if (pilotosTeam?.[1]) {
 
         <!-- Piloto 1 -->
         <div id="idPiloto1" class="flex flex-col items-center w-1/3">
-          <img src="${URLPiloto1 || "/Driver_photos/default.webp"}" alt="Piloto 1" class="w-28 h-40 object-cover piloto1-img">
+          <img src="${URLPiloto1 || "/Driver_photos/default.png"}" alt="Piloto 1" class="w-28 h-40 object-cover piloto1-img">
           <div class="bg-red-500 text-white font-bold px-6 py-2 skew-x-[-12deg] mt-2">
             <span class="skew-x-[12deg] block">${namePiloto1}</span>
           </div>
@@ -969,7 +1150,7 @@ if (pilotosTeam?.[1]) {
 
         <!-- Piloto 2 -->
         <div id="idPiloto2" class="flex flex-col items-center w-1/3">
-          <img src="${URLPiloto2 || "/Driver_photos/default.webp"}" alt="Piloto 2" class="w-28 h-40 object-cover piloto2-img">
+          <img src="${URLPiloto2 || "/Driver_photos/default.png"}" alt="Piloto 2" class="w-28 h-40 object-cover piloto2-img">
           <div class="bg-red-500 text-white font-bold px-6 py-2 skew-x-[-12deg] mt-2">
             <span class="skew-x-[12deg] block">${namePiloto2}</span>
           </div>
@@ -1006,12 +1187,7 @@ if (equipoImg && equipo?.id_Equipo) {
   }
 }
 
-LineUp();
 
-
-    cargarPilotosTemporada();
-    cargarGPS();
-    cargarCampeonatos();
   </script>
 </body>
 </html>

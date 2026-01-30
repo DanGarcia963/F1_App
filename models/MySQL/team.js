@@ -1,8 +1,8 @@
 import { connectionMySQL } from '../../helpers/connectionMySQL.js'
 
 export class TeamModel {
-    static async obtenerTodosLosEquipos () {
-      const [equipos] = await connectionMySQL.query('SELECT * FROM equipo;')
+    static async obtenerTodosLosEquipos (idCategoria) {
+      const [equipos] = await connectionMySQL.query('SELECT * FROM equipo where id_Categoria = ?;',[idCategoria])
   
       return equipos
     }
@@ -151,14 +151,14 @@ export class TeamModel {
 
     static async registrarEquipo ({ entrada }) {
         const {
-            nombre, Motor, pais
+            nombre, Motor, pais, id_Categoria
         } = entrada
 
         const equipoExiste= await this.obtenerEquipoPorNombre(nombre)
         if (equipoExiste !== false) return 'Ya existe un equipo con este nombre'
     
         try {
-            await connectionMySQL.query('insert into equipo (nombre, Motor, pais) values(?, ?, ?);', [nombre, Motor, pais])
+            await connectionMySQL.query('insert into equipo (nombre, Motor, pais, id_Categoria) values(?, ?, ?, ?);', [nombre, Motor, pais, id_Categoria])
             const equipoCreado = await this.obtenerEquipoPorNombre(nombre)
             return equipoCreado
         } catch (error) {

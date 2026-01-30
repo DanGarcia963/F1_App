@@ -25,7 +25,7 @@ export class PilotSeasonModel {
       return pilotosTemporadas
     }
 
-    static async obtenerPilotosPorTemporadaPorId (idTemporada) {
+    static async obtenerPilotosPorTemporadaPorId (idCategoria, idTemporada) {
         const [pilotosTemporada] = await connectionMySQL.query(`SELECT 
             p.id_Piloto,
             CONCAT(p.nombre, " ", p.apellido) AS "nombre_completo"
@@ -36,8 +36,8 @@ export class PilotSeasonModel {
             ON p.id_Piloto = pt.piloto_id
             JOIN temporada t
             ON t.id_Temporada = pt.temporada_id
-            WHERE pt.temporada_id = ?
-            ORDER BY e.nombre;`, [idTemporada])
+            WHERE pt.temporada_id = ? AND p.id_Categoria = ?
+            ORDER BY e.nombre;`, [idTemporada, idCategoria])
         if (pilotosTemporada.length === 0) return false 
         return pilotosTemporada
     }

@@ -4,7 +4,8 @@ export class TeamController {
     }
  
     obtenerTodosLosEquipos = async (req, res) => {
-        const Equipos = await this.teamModel.obtenerTodosLosEquipos()
+        const {id}=req.params
+        const Equipos = await this.teamModel.obtenerTodosLosEquipos(id)
         res.json(Equipos)
     }
 

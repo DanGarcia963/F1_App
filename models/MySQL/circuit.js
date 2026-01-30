@@ -21,6 +21,69 @@ export class CircuitModel {
         return circuito
     }
 
+    static async obtenerRecordPolePorId (idCircuito) {
+        const [recordPole] = await connectionMySQL.query(
+            `SELECT 
+              CONCAT(pp.Nombre, ' ',pp.Apellido)AS nombre_completo,
+              gp.tiempo_pole,
+              gp.fecha,
+              gp.nombre_oficial
+              FROM grandes_premios gp 
+              JOIN circuito c
+              ON c.id_Circuito = gp.circuito_id
+              JOIN piloto pp
+              ON pp.id_Piloto = gp.pole_position_piloto_id
+              WHERE c.id_Circuito = ?
+              AND gp.tiempo_pole IS NOT NULL
+              ORDER BY gp.tiempo_pole ASC;
+              `, [idCircuito]
+        )
+        if (recordPole.length === 0) return false
+        return recordPole[0]
+    }
+
+    static async obtenerRecordVueltaPorId (idCircuito) {
+        const [recordVuelta] = await connectionMySQL.query(
+            `SELECT 
+              CONCAT(vr.Nombre, ' ',vr.Apellido)AS nombre_completo,
+              gp.tiempo_vuelta_rapida,
+              gp.fecha,
+              gp.nombre_oficial
+              FROM grandes_premios gp 
+              JOIN circuito c
+              ON c.id_Circuito = gp.circuito_id
+              JOIN piloto vr
+              ON vr.id_Piloto = gp.vuelta_rapida_piloto_id
+              WHERE c.id_Circuito = ?
+              AND gp.tiempo_vuelta_rapida IS NOT NULL
+              ORDER BY gp.tiempo_vuelta_rapida ASC
+              `, [idCircuito]
+        )
+        if (recordVuelta.length === 0) return false
+        return recordVuelta[0]
+    }
+
+    static async obtenerMaxVencedorPorId (idCircuito) {
+        const [maxVencedor] = await connectionMySQL.query(
+            `SELECT 
+              CONCAT(p.Nombre, ' ',p.Apellido)AS nombre_completo,
+              COUNT(r.posicion_final) AS total_victorias
+              FROM resultados r
+              JOIN grandes_premios gp
+              ON gp.id_GP = r.grand_prix_id
+              JOIN circuito c
+              ON c.id_Circuito = gp.circuito_id
+              JOIN piloto p
+              ON p.id_Piloto = r.piloto_id
+              WHERE c.id_Circuito = ? AND r.posicion_final = 1 AND gp.tipo_carrera = 'GP'
+              GROUP BY p.id_Piloto
+              ORDER BY total_victorias DESC
+              LIMIT 1`, [idCircuito]
+        )
+        if (maxVencedor.length === 0) return false
+        return maxVencedor[0]
+    }
+
     static async registrarCircuito ({ entrada }) {
         const {
             nombre, ciudad, pais, longitud_km:kmLongitud, curvas

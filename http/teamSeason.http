@@ -19,8 +19,8 @@ POST http://localhost:1234/api/equipoTemporada/crearEquipoTemporada
 Content-Type: application/json
 
 { 
-    "equipo_id": 2,
-    "temporada_id": 2
+    "equipo_id": 1,
+    "temporada_id": 4
 }
 
 ### 

@@ -4,7 +4,8 @@ export class PilotoController {
     }
  
     obtenerTodosLosPilotos = async (req, res) => {
-        const pilotos = await this.pilotModel.obtenerTodosLosPilotos()
+        const {id}=req.params
+        const pilotos = await this.pilotModel.obtenerTodosLosPilotos(id)
         res.json(pilotos)
     }
 

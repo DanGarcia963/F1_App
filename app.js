@@ -14,6 +14,7 @@ import { TeamSeasonRouter } from './routes/teamSeason.js'
 import { GPRouter } from './routes/grandPrix.js'
 import { PilotSeasonRouter } from './routes/pilotSeason.js'
 import { ResultsRouter } from './routes/results.js'
+import { CategoriesRouter } from './routes/categories.js'
 
 // Imports para __dirname
 import path from 'path'
@@ -36,6 +37,7 @@ export const crearApp = (Modelos) => {
     app.use('/api/granPremio', GPRouter(Modelos))
   app.use('/api/pilotoTemporada', PilotSeasonRouter(Modelos))
   app.use('/api/resultados', ResultsRouter(Modelos))
+  app.use('/api/categoria',CategoriesRouter(Modelos))
 
   // Rutas del sitio web estático
   app.use(express.static(__dirname + '/public'))
@@ -45,16 +47,16 @@ export const crearApp = (Modelos) => {
 
   // Pruebas de backend
   app.get('/piloto', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/piloto.html'))
-  app.get('/', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/main.html'))
+  app.get('/main', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/main.html'))
   app.get('/seasons', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/seasons.html'))
   app.get('/season', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/season.html'))
   app.get('/granPremio', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/gran_Premio.html'))
   app.get('/pilotos', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/pilotos.html'))
   app.get('/teams', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/teams.html'))
   app.get('/team', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/team.html'))
-  app.get('/inicioAdmin', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/inicioAdmin.html'))
-  app.get('/museums', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/Museums.html'))
-  app.get('/MisFavoritos', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/MisFavoritos.html'))
+  app.get('/circuito', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/circuito.html'))
+  app.get('/circuitos', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/circuitos.html'))
+  app.get('/', soloPublico, (req, res) => res.sendFile(__dirname + '/pages/categories.html'))
   app.get('/MisVisitados', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/MisVisitados.html'))
   app.get('/cuenta_verificada', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/Cuenta_verificada.html'))
   app.get('/perfilTurista', soloAdmin, (req, res) => res.sendFile(__dirname + '/pages/perfilTurista.html'))

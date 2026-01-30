@@ -14,7 +14,7 @@
   scrollbar-width: none; /* Firefox */
 }
   #gridPilotos {
-    max-height: 470px;
+    max-height: 435px;
   }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -48,21 +48,18 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <a href="#" class="flex items-center gap-2">
-          <div class="w-10 h-10 bg-red-600 rounded flex items-center justify-center font-bold"></div>
-          <span class="font-semibold text-lg">F1 APP — Mock</span>
+          <div class="w-10 h-10 rounded flex items-center justify-center font-bold"><span id="Logo" class="font-semibold text-lg"><img src="/Logos/LogoF1.png" alt="Logo" class="w-full h-full rounded"></span></div>
+
         </a>
         <nav class="hidden md:flex gap-3 ml-6 text-sm text-gray-300">
-          <a class="px-3 py-2 hover:text-white" href="/">Inicio</a>
-          <a class="px-3 py-2 hover:text-white" href="/teams">Equipos</a>
-          <a class="px-3 py-2 hover:text-white" href="/seasons">Temporadas</a>
-          <a class="px-3 py-2 hover:text-white" href="/pilotos">Pilotos</a>
+          <a id="mainPage" class="px-3 py-2 hover:text-white">Inicio</a>
+          <a id="teamsPage" class="px-3 py-2 hover:text-white">Equipos</a>
+          <a id="seasonPage" class="px-3 py-2 hover:text-white">Temporadas</a>
+          <a id="driversPage" class="px-3 py-2 hover:text-white">Pilotos</a>
+          <a class="px-3 py-2 hover:text-white" href="/circuitos">Circuitos</a>
         </nav>
       </div>
 
-      <div class="flex items-center gap-3">
-        <input class="hidden sm:inline-block bg-gray-800 text-sm px-3 py-2 rounded" placeholder="Buscar pilotos, carreras..." />
-        <button class="px-4 py-2 bg-red-600 rounded text-sm font-medium">Suscribirse</button>
-      </div>
     </div>
   </header>
 
@@ -131,16 +128,16 @@
       </div>
     </div>
     <!-- Footer -->
-    <footer class="mt-12 text-center text-sm text-gray-400">
-      <p>Plantilla de temporadas — integra tus datos desde la API y adapta los campos necesarios.</p>
-    </footer>
+
   </main>
 
   <script>
-
+    const params = new URLSearchParams(window.location.search);
+    const idCategoria = params.get("id");
+    console.log(idCategoria)
     // endpoints (ajusta si tu API tiene rutas distintas)
-    const endpointAllPilotos = '/api/piloto/'; // devuelve array de pilotos { id_Piloto, nombre_completo }
-
+    const endpointAllPilotos = `/api/piloto/${idCategoria}`; // devuelve array de pilotos { id_Piloto, nombre_completo }
+    
     //Formulario agregar piloto temporada
     const modal = document.getElementById('modalAddPilotos');
     const btnClose = document.getElementById('btnCloseAddPilotos');
@@ -279,7 +276,8 @@
               Fecha_Nacimiento: birthdate,
               Fecha_Debut: debut,
               numero: Number(numero),
-              codigo_fia:codigo
+              codigo_fia:codigo,
+              id_Categoria: Number(idCategoria)
             });
           }
 
@@ -306,6 +304,21 @@
             throw err;
           }
         }
+
+document.getElementById("mainPage").addEventListener("click",()=>{
+  window.location.href=`/main/?id=${idCategoria}`
+})
+
+document.getElementById("teamsPage").addEventListener("click",()=>{
+  window.location.href=`/teams/?id=${idCategoria}`
+})
+
+document.getElementById("driversPage").addEventListener("click",()=>{
+    window.location.href=`/pilotos/?id=${idCategoria}`
+})
+document.getElementById("seasonPage").addEventListener("click",()=>{
+    window.location.href=`/seasons/?id=${idCategoria}`
+})
 
         openAddPilotosBtn.addEventListener('click', openAddPilotosModal);
         btnClose.addEventListener('click', closeModalAddPilotos);
@@ -371,7 +384,7 @@
     async function cargarPilotos() {
       try {
         const pilotos = await fetch(endpointAllPilotos).then(r => r.json());
-
+        console.log(pilotos)
         const gridpilotos = document.getElementById('gridPilotos');
         gridpilotos.innerHTML = '';
           for (let i = 0; i < pilotos.length; i++) {

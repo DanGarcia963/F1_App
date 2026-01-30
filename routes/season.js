@@ -11,6 +11,8 @@ export const SeasonRouter = (Modelos) => {
   SeasonRouter.get('/obtenerTemporadaAnio/:anio',cacheControl(120), seasonController.obtenerTemporadaPorAnio)
   SeasonRouter.post('/crearTemporada', seasonController.registrarTemporada)
   SeasonRouter.post('/cambiarAnio', seasonController.cambiarAnio)
+  SeasonRouter.post('/finalizarTemporada', seasonController.finalizarTemporada)
+  
   
   return SeasonRouter
 }

@@ -1,534 +1,547 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Información del Piloto</title>
-  <link href="styles/style.css" rel="stylesheet">
-  <style>
-    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
-    .card-img { background-size: cover; background-position: center; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Información del Piloto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="styles/style.css" rel="stylesheet">
+    <style>
+
+      .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+      .card-img { background-size: cover; background-position: center; }
       #gridVictories{
-    max-height: 300px;
-  }
+        max-height: 300px;
+      }
 
-  .container{
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-  }
+      .container{
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+      }
 
-/* imagen principal (monoplaza) */
-#monoplazaImg {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  transition: transform .5s ease;
-  display: block;
-}
+      /* imagen principal (monoplaza) */
+      #monoplazaImg {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform .5s ease;
+        display: block;
+      }
 
-/* solo la imagen del monoplaza escala al hacer hover del contenedor */
-.container:hover > #monoplazaImg,
-.container.dupla-open > #monoplazaImg,
-.container:focus-within > #monoplazaImg {
-  transform: scale(1.09);
-}
+      /* solo la imagen del monoplaza escala al hacer hover del contenedor */
+      .container:hover > #monoplazaImg,
+      .container.dupla-open > #monoplazaImg,
+      .container:focus-within > #monoplazaImg {
+        transform: scale(1.09);
+      }
 
-  .content {
-    background-color: rgba(0, 0, 0, 0.7);
-    position: absolute;
-    top:-100%;
-    left:0;
-    text-align: justify;
-    height: 100%;
-    width: 100%;
-    color: #fff;
-    transition: all .5s;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem;
-    align-content: flex-start; /* controla cómo se comportan las filas dentro del alto */
-    overflow-y: auto;          /* si hay muchas cards, scroll vertical */
-  }
+      .content {
+        background-color: rgba(0, 0, 0, 0.7);
+        position: absolute;
+        top:-100%;
+        left:0;
+        text-align: justify;
+        height: 100%;
+        width: 100%;
+        color: #fff;
+        transition: all .5s;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        
+        align-content: flex-start; /* controla cómo se comportan las filas dentro del alto */
+        overflow-y: auto;          /* si hay muchas cards, scroll vertical */
+      }
 
-  .content h3 {
-    text-align: center;
-    font-size: 25px;
-    border-bottom: 1px solid #808080;
-    padding: 20px 10px;
-  }
+      .content h3 {
+        text-align: center;
+        font-size: 25px;
+        border-bottom: 1px solid #808080;
+        padding: 20px 10px;
+      }
 
-  .content p {
-    padding: 20px 20px 15px 20px;
-    border-bottom:  1px solid #808080;
-  }
+      .content p {
+        padding: 20px 20px 15px 20px;
+        border-bottom:  1px solid #808080;
+      }
 
-  .container:hover .content{
-    top:0;
-  }
+      .container:hover .content{
+        top:0;
+      }
 
-.victory-content img {
-  max-width: 80%;
-  max-height: 120px;
-  width: auto;
-  height: auto;
-  object-fit: cover;
-  margin-bottom: 0.5rem;
-}
+      .victory-content img {
+        max-width: 80%;
+        max-height: 120px;
+        width: auto;
+        height: auto;
+        object-fit: cover;
+        margin-bottom: 0.5rem;
+      }
 
-.victory-content p {
-  font-size: 1.1rem;
-  word-break: break-word;
-  text-align: center;
-  margin: 0;
-  padding: 0 0.5rem;
-}
+      .victory-content p {
+        font-size: 1.1rem;
+        word-break: break-word;
+        text-align: center;
+        margin: 0;
+        padding: 0 0.5rem;
+      }
 
-/* Responsive para cards pequeñas */
-@media (max-width: 500px) {
-  .victory-content img {
-    max-width: 60%;
-    max-height: 70px;
-  }
-  .victory-content p {
-    font-size: 0.95rem;
-  }
-}
+      /* Responsive para cards pequeñas */
+      @media (max-width: 500px) {
+        .victory-content img {
+          max-width: 60%;
+          max-height: 70px;
+        }
+        .victory-content p {
+          font-size: 0.95rem;
+        }
+      }
 
-.victory-content {
-  position: absolute;
-  top: -100%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(20,20,20,0.92);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: all .5s;
-  pointer-events: none;
-  z-index: 10;
-}
+      .victory-content {
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(20,20,20,0.92);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all .5s;
+        pointer-events: none;
+        z-index: 10;
+      }
 
-.group:hover .victory-content {
-  top: 0;
-  opacity: 1;
-  pointer-events: auto;
-}
+      .group:hover .victory-content {
+        top: 0;
+        opacity: 1;
+        pointer-events: auto;
+      }
 
-  .card-driver{
-  width: 220px;  
-  min-width: 160px; 
-  overflow: hidden;
-  border-radius: 160px;
-    background: rgba(255,255,255,0.02);
-      padding: .6rem .8rem;
-  display:flex;
-  gap: .75rem;
-  align-items: center;
-}
+      .card-driver{
+        width: 220px;  
+        min-width: 160px; 
+        overflow: hidden;
+        border-radius: 160px;
+        background: rgba(255,255,255,0.02);
+        padding: .6rem .8rem;
+        display:flex;
+        align-items: center;
+      }
 
-/* imagen interna */
-.card-driver img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 999px;
-}
+      /* imagen interna */
+      .card-driver img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 999px;
+      }
 
-   #gridTrayectoria, #gridDuplas{
+      #gridTrayectoria, #gridDuplas{
         max-height: 250px;
-  }
-    .scrollbar-hide {
-      scrollbar-width: none; /* Firefox */
-    }
+      }
+      .scrollbar-hide {
+        scrollbar-width: none; /* Firefox */
+      }
 
-    .scrollbar-hide::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-    }
+      .scrollbar-hide::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+      }
 
-    /* Mostrar scrollbar solo al hacer hover */
-    .hover\\:scrollbar-default:hover {
-      scrollbar-width: auto; /* Firefox */
-    }
+      /* Mostrar scrollbar solo al hacer hover */
+      .hover\\:scrollbar-default:hover {
+        scrollbar-width: auto; /* Firefox */
+      }
 
-    .hover\\:scrollbar-default:hover::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
+      .hover\\:scrollbar-default:hover::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
 
-    .hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.5);
-      border-radius: 4px;
-    }
+      .hover\\:scrollbar-default:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+      }
 
-    .hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-  </style>
-</head>
-<body class="bg-neutral-950 text-white min-h-screen flex flex-col items-center p-6">
+      .hover\\:scrollbar-default:hover::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+    </style>
+  </head>
+  <body class="bg-neutral-950 text-white min-h-screen flex flex-col items-center p-6">
 
-  <!-- Botón Volver -->
-  <div class="w-full mb-4">
-    <a href="/" class="inline-block bg-neutral-800 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 transition">
-      ⬅ Volver
-    </a>
-  </div>
+    <div class="grid grid-cols-1 lg:grid-cols-5  xl:grid-cols-7 2xl:grid-cols-9 rounded-lg overflow-hidden shadow-lg relative">
+      <!-- Contenedor principal -->
+      <section id="gridPiloto"class="bg-neutral-900 col-span-1 lg:col-span-3 xl:col-span-4 2xl:col-span-5 border border-neutral-700 rounded-xl shadow-lg w-full  p-6  gap-6">    
+        <!-- Foto del piloto -->
+        <div class="flex-shrink-0 flex flex-col items-center">
+          <span id="fotoPiloto"></span>
+          <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
+          <p id="equipoPiloto" class="text-neutral-400"></p>
+        </div>
+        <!-- Datos del piloto -->
+        <div class="flex-1">
+          <h2 class="text-2xl font-semibold mb-4 border-b border-neutral-700 pb-2">Detalles</h2>
+          <ul class="space-y-2">
+            <li><span class="font-semibold">Nombre Equipo:</span> <span id="NameTeam"></span></li>
+            <li><span class="font-semibold">Motor:</span> <span id="Motor"></span></li>
+            <li><span class="font-semibold">País:</span> <span id="nacionalidadPiloto"></span></li>
+            <li><span class="font-semibold">Puntos totales:</span> <span id="puntosTotales"></span></li>
+            <li><span class="font-semibold">Victorias:</span> <span id="victoriasPiloto"></span></li>
+          </ul>
+        </div>
+      </section>
 
-  <div class="grid grid-cols-1 lg:grid-cols-5  xl:grid-cols-7 2xl:grid-cols-9 rounded-lg overflow-hidden shadow-lg relative">
-  
-    <!-- Contenedor principal -->
-  <section id="gridPiloto"class="bg-neutral-900 col-span-1 lg:col-span-3 xl:col-span-4 2xl:col-span-5 border border-neutral-700 rounded-xl shadow-lg w-full  p-6  gap-6">    
-    <!-- Foto del piloto -->
-    <div class="flex-shrink-0 flex flex-col items-center">
-      <span id="fotoPiloto"></span>
-      <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
-      <p id="equipoPiloto" class="text-neutral-400"></p>
-    </div>
-    <!-- Datos del piloto -->
-    <div class="flex-1">
-      <h2 class="text-2xl font-semibold mb-4 border-b border-neutral-700 pb-2">Detalles</h2>
-      <ul class="space-y-2">
-        <li><span class="font-semibold">Nombre Equipo:</span> <span id="NameTeam"></span></li>
-        <li><span class="font-semibold">Motor:</span> <span id="Motor"></span></li>
-        <li><span class="font-semibold">País:</span> <span id="nacionalidadPiloto"></span></li>
-        <li><span class="font-semibold">Puntos totales:</span> <span id="puntosTotales"></span></li>
-        <li><span class="font-semibold">Victorias:</span> <span id="victoriasPiloto"></span></li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="bg-neutral-900 col-span-1  lg:col-span-2  xl:col-span-3 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg w-full p-6 gap-6">
-
-          <div class="relative">
+      <section class="bg-neutral-900 col-span-1  lg:col-span-2  xl:col-span-3 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg w-full p-6 gap-6">
+        <div class="relative">
           <div class="rounded-lg p-4 shadow">
             <p class="text-2xl max-w-full text-neutral-200 font-semibold">Monoplaza <span id="nombreMonoplaza"></span></p>
+            <div class="flex flex-row">
             <button id="btnPrev" class="absolute left-2 z-10 bg-black/50 text-white px-3 py-2 rounded-full">
-              ⬅
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+              </svg>
             </button>
-            <button id="btnNext" class="absolute right-2 z-10 bg-black/50 text-white px-3 py-2 rounded-full">
-              ➡
-            </button>
-            <div id="gridMonoplaza" class="container animate-pulse gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+            <div id="gridMonoplaza" class="container p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
               <img id="monoplazaImg" src="" alt="Monoplaza" class="">
-              <div id="duplaEquipo" class="content">
+              <div id="duplaEquipo" class="content flex flex-row">
+                <!-- Contenido dinámico de la dupla -->
               </div>
             </div>
+            <button id="btnNext" class="absolute right-2 z-10 bg-black/50 text-white px-3 py-2 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
             </div>
-
           </div>
+        </div>    
+      </section>
+
+      <section class="bg-neutral-900 col-span-1  lg:col-span-2  xl:col-span-3 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg w-full p-6 gap-6">
+        <div id="infoGridVictorias" class="grid grid-cols-1 gap-6 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Victorias</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridVictories" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+      </section>
+
+      <section class="max-w-screen-xl col-span-1  lg:col-span-3 xl:col-span-2 xl:col-span-4 2xl:col-span-5 border border-neutral-700 rounded-lg shadow-lg overflow-hidden p-6 gap-6 bg-neutral-900">    
+        <div id="infoGridDuplas" class="grid grid-cols-1 gap-6 p-6 items-start">
+          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
+            <div class="p-4 flex flex-row items-center gap-4">
+              <div class="flex flex-col">
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Duplas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gridDuplas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        </div>
+      </section>
+
+    </div>
+    <!-- Script para cargar datos -->
+    <script>
+
+      async function obtenerFotoPiloto(nombrePiloto, anio) {
+        // Normaliza el nombre para que coincida con la carpeta
+        const nombreCarpeta = nombrePiloto.trim();
+        const extensiones = ['png'];
+        for (let ext of extensiones) {
+          const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/${encodeURIComponent(anio)}.${ext}`;
+          try {
+            const res = await fetch(urlLocal, { method: 'HEAD' });
+            if (res.ok) return urlLocal;
+          } catch (e) { /* ignorar */ }
+        }
+        // Si no hay foto local, busca en Wikipedia
+        return await obtenerImagenWikipedia(nombrePiloto);
+      }
+
+      async function obtenerFotoEquipo(nombreEquipo) {
+        // Normaliza el nombre para que coincida con la carpeta
+        const nombreImagen = nombreEquipo.trim();
+        const extensiones = ['png'];
+        for (let ext of extensiones) {
+          const urlLocal = `/Team_photos/${encodeURIComponent(nombreImagen)}.${ext}`;
+          try {
+            const res = await fetch(urlLocal, { method: 'HEAD' });
+            if (res.ok) return urlLocal;
+          } catch (e) { /* ignorar */ }
+        }
+        // Si no hay foto local, busca en Wikipedia
+        return await obtenerImagenWikipedia(nombreEquipo);
+      }
+
+            async function obtenerFotoMonoplaza(team,name) {
+        // Normaliza el nombre para que coincida con la carpeta
+        const nombreImagen = name.trim();
+        const nombreTeam = team.trim()
+        const extensiones = ['png','jpg','avif','webp'];
+        for (let ext of extensiones) {
+          const urlLocal = `/Team_photos/Monoplazas/${encodeURIComponent(nombreTeam)}/${encodeURIComponent(nombreImagen)}.${ext}`;
+          try {
+            const res = await fetch(urlLocal, { method: 'HEAD' });
+            if (res.ok) return urlLocal;
+          } catch (e) { /* ignorar */ }
+        }
         
-  </section>
+      }
 
-  <section class="bg-neutral-900 col-span-1  lg:col-span-2  xl:col-span-3 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg w-full p-6 gap-6">
-    <div id="infoGridVictorias" class="grid grid-cols-1 gap-6 p-6 items-start">
-      <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
-        <div class="p-4 flex flex-row items-center gap-4">
-          <div class="flex flex-col">
-            <p class="text-2xl max-w-full text-neutral-200 font-semibold">Victorias</p>
-          </div>
+      async function obtenerImagenWikipedia(nombre) {
+        const query = encodeURIComponent(nombre);
+        const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          const pages = data.query.pages;
+          const page = Object.values(pages)[0];
+          return page.thumbnail ? page.thumbnail.source : null;
+        } catch (err) {
+          console.error('Error obteniendo imagen de', nombre, err);
+          return null;
+        }
+      }
+
+      // Obtiene el id del piloto desde la URL
+      const params = new URLSearchParams(window.location.search);
+      const idEquipo = params.get("id");
+      console.log(idEquipo)
+
+      async function cargarVictoriasPiloto(){
+          try{
+            const VictoriasEquipo = await fetch(`/api/equipo/obtenerVictoriasEquipo/${idEquipo}`).then(r=>r.json());
+            const container =document.getElementById('gridVictories')
+            container.innerHTML='';
+            for(let i=0; i<VictoriasEquipo.length;i++){
+            const victory = VictoriasEquipo[i];
+            const imgCURL = await obtenerImagenWikipedia(victory.nombre_Circuito)
+            const card = document.createElement('div');
+
+            const fecha = new Date(victory.fecha);
+            const day = String(fecha.getDate()).padStart(2, '0');
+            const month = fecha.toLocaleString('es-ES', { month: 'short' });
+            const year = fecha.getFullYear();
+            const newDate = `${day}/${month}/${year}`;
+
+      const imgPiloto = await obtenerFotoPiloto(victory.Winner, year); // O ajusta el nombre según tu modelo de datos
+
+      card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+      card.innerHTML =`                
+      <div class="p-4 flex flex-col items-center text-center relative">
+        <h3 class="text-lg font-bold text-white">${victory.nombre_oficial} ${year}</h3>
+        ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${victory.nombre_Circuito}" class="w-40 h-30 mb-2 border bg-white">` : ''}
+        <p class="text-sm text-neutral-400">${victory.Winner}</p>
+        <p class="text-sm text-neutral-400">${newDate}</p>
+        <div class="victory-content">
+          ${imgPiloto ? `<img src="${imgPiloto}" alt="Piloto ${victory.Winner}" class="w-30 h-30 rounded-full mx-auto mb-2">` : ''}
+          <p class="text-white font-bold">${victory.Winner}</p>
         </div>
       </div>
-    </div>
-    <div id="gridVictories" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
-    </div>
-  </section>
+      `;
+                    container.appendChild(card)
+          };
+        }      
+        catch (err) {
+            console.error('Error cargando victorias', err);
+        }
+        }
 
-  <section class="max-w-screen-xl col-span-1  lg:col-span-3 xl:col-span-2 xl:col-span-4 2xl:col-span-5 border border-neutral-700 rounded-lg shadow-lg overflow-hidden p-6 gap-6 bg-neutral-900">    
-    <div id="infoGridDuplas" class="grid grid-cols-1 gap-6 p-6 items-start">
-      <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
-        <div class="p-4 flex flex-row items-center gap-4">
-          <div class="flex flex-col">
-            <p class="text-2xl max-w-full text-neutral-200 font-semibold">Duplas</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="gridDuplas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
-    </div>
-  </section>
+      async function cargarDuplasPiloto(){
+          try{
+            const duplasPilotos = await fetch(`/api/equipo/obtenerDuplasEquipo/${idEquipo}`).then(r=>r.json());
+            const container =document.getElementById('gridDuplas')
+            container.innerHTML='';
+            for(let i=0; i<duplasPilotos.length;i++){
+            const duplas = duplasPilotos[i];
+            //const imgCURL = await obtenerImagenWikipedia(duplas.nombre_Circuito)
+            const card = document.createElement('div');
 
-</div>
-  <!-- Script para cargar datos -->
-  <script>
+            card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
+            card.innerHTML =`                
+                    <div class="p-4 flex flex-col items-center text-center">
+                    <h3 class="text-lg font-bold text-white">${duplas.Dupla}</h3>
+                    
+                    <p class="text-sm text-neutral-400">${duplas.anio}</p>
+                    </div>
+                    `;
+                    container.appendChild(card)
+          };
+        }      
+        catch (err) {
+            console.error('Error cargando duplas', err);
+        }
+        }
 
-    async function obtenerFotoPiloto(nombrePiloto, anio) {
-  // Normaliza el nombre para que coincida con la carpeta
-  const nombreCarpeta = nombrePiloto.trim();
-  const extensiones = ['png'];
-  for (let ext of extensiones) {
-    const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/${encodeURIComponent(anio)}.${ext}`;
-    try {
-      const res = await fetch(urlLocal, { method: 'HEAD' });
-      if (res.ok) return urlLocal;
-    } catch (e) { /* ignorar */ }
-  }
-  // Si no hay foto local, busca en Wikipedia
-  return await obtenerImagenWikipedia(nombrePiloto);
-}
+      let currentIndex = 0;
+      async function inicializarCarrusel(){
+        const monoplazasAll = await obtenerMonoplazasEquipo();
+        const CurrentYear = new Date().getFullYear();
+        const monoplaza = monoplazasAll.filter(m => m.anio <= CurrentYear);
+        console.log(monoplaza)
+        mostrarMonoplaza(currentIndex, monoplaza)
 
-    async function obtenerFotoEquipo(nombreEquipo) {
-  // Normaliza el nombre para que coincida con la carpeta
-  const nombreImagen = nombreEquipo.trim();
-  const extensiones = ['jpg', 'png', 'jpeg', 'webp', 'avif'];
-  for (let ext of extensiones) {
-    const urlLocal = `/Team_photos/${encodeURIComponent(nombreImagen)}.${ext}`;
-    try {
-      const res = await fetch(urlLocal, { method: 'HEAD' });
-      if (res.ok) return urlLocal;
-    } catch (e) { /* ignorar */ }
-  }
-  // Si no hay foto local, busca en Wikipedia
-  return await obtenerImagenWikipedia(nombreEquipo);
-}
+              // 4. Eventos de los botones
+        document.getElementById("btnPrev")?.addEventListener("click", () => {
+          if (monoplaza.length === 0) return;
+          currentIndex = (currentIndex - 1 + monoplaza.length) % monoplaza.length;
+          mostrarMonoplaza(currentIndex,monoplaza);
+        });
 
-    async function obtenerImagenWikipedia(nombre) {
-      const query = encodeURIComponent(nombre);
-      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const pages = data.query.pages;
-        const page = Object.values(pages)[0];
-        return page.thumbnail ? page.thumbnail.source : null;
-      } catch (err) {
-        console.error('Error obteniendo imagen de', nombre, err);
-        return null;
+        document.getElementById("btnNext")?.addEventListener("click", () => {
+          if (monoplaza.length === 0) return;
+          currentIndex = (currentIndex + 1) % monoplaza.length;
+          mostrarMonoplaza(currentIndex,monoplaza);
+        });
       }
-    }
-
-    // Obtiene el id del piloto desde la URL
-    const params = new URLSearchParams(window.location.search);
-    const idEquipo = params.get("id");
-console.log(idEquipo)
-
-    async function cargarVictoriasPiloto(){
-      try{
-        const VictoriasEquipo = await fetch(`/api/equipo/obtenerVictoriasEquipo/${idEquipo}`).then(r=>r.json());
-        const container =document.getElementById('gridVictories')
-        container.innerHTML='';
-        for(let i=0; i<VictoriasEquipo.length;i++){
-        const victory = VictoriasEquipo[i];
-        const imgCURL = await obtenerImagenWikipedia(victory.nombre_Circuito)
-        const card = document.createElement('div');
-
-        const fecha = new Date(victory.fecha);
-        const day = String(fecha.getDate()).padStart(2, '0');
-        const month = fecha.toLocaleString('es-ES', { month: 'short' });
-        const year = fecha.getFullYear();
-        const newDate = `${day}/${month}/${year}`;
-
-const imgPiloto = await obtenerFotoPiloto(victory.Winner, year); // O ajusta el nombre según tu modelo de datos
-
-card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-card.innerHTML =`                
-  <div class="p-4 flex flex-col items-center text-center relative">
-    <h3 class="text-lg font-bold text-white">${victory.nombre_oficial} ${year}</h3>
-    ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${victory.nombre_Circuito}" class="w-20 h-18 mb-2 border bg-white">` : ''}
-    <p class="text-sm text-neutral-400">${victory.Winner}</p>
-    <p class="text-sm text-neutral-400">${newDate}</p>
-    <div class="victory-content">
-      ${imgPiloto ? `<img src="${imgPiloto}" alt="Piloto ${victory.Winner}" class="w-24 h-24 rounded-full border-2 h-96 border-white mx-auto mb-2">` : ''}
-      <p class="text-white font-bold">${victory.Winner}</p>
-    </div>
-  </div>
-`;
-                container.appendChild(card)
-      };
-    }      
-    catch (err) {
-        console.error('Error cargando victorias', err);
-    }
-    }
-
-        async function cargarDuplasPiloto(){
-      try{
-        const duplasPilotos = await fetch(`/api/equipo/obtenerDuplasEquipo/${idEquipo}`).then(r=>r.json());
-        const container =document.getElementById('gridDuplas')
-        container.innerHTML='';
-        for(let i=0; i<duplasPilotos.length;i++){
-        const duplas = duplasPilotos[i];
-        //const imgCURL = await obtenerImagenWikipedia(duplas.nombre_Circuito)
-        const card = document.createElement('div');
-
-        card.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-        card.innerHTML =`                
-                <div class="p-4 flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-white">${duplas.Dupla}</h3>
-                
-                <p class="text-sm text-neutral-400">${duplas.anio}</p>
-                </div>
-                `;
-                container.appendChild(card)
-      };
-    }      
-    catch (err) {
-        console.error('Error cargando duplas', err);
-    }
-    }
-
- let currentIndex = 0;
-  async function inicializarCarrusel(){
-    const monoplazasAll = await obtenerMonoplazasEquipo();
-    const CurrentYear = new Date().getFullYear();
-    const monoplaza = monoplazasAll.filter(m => m.anio <= CurrentYear);
-    console.log(monoplaza)
-    mostrarMonoplaza(currentIndex, monoplaza)
-
-          // 4. Eventos de los botones
-    document.getElementById("btnPrev")?.addEventListener("click", () => {
-      if (monoplaza.length === 0) return;
-      currentIndex = (currentIndex - 1 + monoplaza.length) % monoplaza.length;
-      mostrarMonoplaza(currentIndex,monoplaza);
-    });
-
-    document.getElementById("btnNext")?.addEventListener("click", () => {
-      if (monoplaza.length === 0) return;
-      currentIndex = (currentIndex + 1) % monoplaza.length;
-      mostrarMonoplaza(currentIndex,monoplaza);
-    });
-  }
-    async function mostrarMonoplaza(idx, monoplaza){
-      const mono = monoplaza[idx];
-      console.log(mono.anio, mono.F1_Car)
-      document.getElementById('nombreMonoplaza').textContent = `${mono.register_name} ${mono.anio} ${mono.F1_Car}`
-      let imgMUrl = await obtenerImagenWikipedia(`${monoplaza[idx].nombre} ${monoplaza[idx].F1_Car}`);
-      if(!imgMUrl){
-        imgMUrl = await obtenerImagenWikipedia(`${monoplaza[idx].register_name} ${monoplaza[idx].F1_Car}`);
-      }
-      const imgElement =document.getElementById("monoplazaImg");
-      
-      if(imgMUrl){
-
-       imgElement.src = imgMUrl;
-      imgElement.alt = mono.F1_Car;
+        
+      async function mostrarMonoplaza(idx, monoplaza){
+        const infoEquipo = await fetch(`/api/equipo/obtenerEquipo/${idEquipo}`).then(r => r.json());
+        const verifiedIndy = infoEquipo.id_Categoria
+        
+        let imgMUrl=null;
+        const mono = monoplaza[idx];
+        console.log(mono.anio, mono.F1_Car)
+        if(verifiedIndy == 1)
+      {    
+        document.getElementById('nombreMonoplaza').textContent = `${mono.register_name} ${mono.anio} ${mono.F1_Car}`
+         imgMUrl = await obtenerImagenWikipedia(`${monoplaza[idx].nombre} ${monoplaza[idx].F1_Car}`);
+        if(!imgMUrl){
+          imgMUrl = await obtenerImagenWikipedia(`${monoplaza[idx].register_name} ${monoplaza[idx].F1_Car}`);
+        }
       }
       else{
-        const div = document.getElementById('gridMonoplaza')
-        div.className=`invisible`
+        imgMUrl = await obtenerFotoMonoplaza(infoEquipo.nombre, mono.F1_Car)
       }
-      const statsEquipo = await obtenerStatsDuplaEquipo(mono.anio);
-      console.log(statsEquipo.length)
-      const contDupla = document.getElementById('duplaEquipo');
-      contDupla.innerHTML='';
-      for(let i = 0; i <statsEquipo.length; i++){
-        const dupla = statsEquipo[i];
-        console.log(dupla)
-        const imgCURL = await obtenerFotoPiloto(dupla.nombre_completo, mono.anio)
-        const cardDriver = document.createElement('div');
+        const imgElement =document.getElementById("monoplazaImg");
+        
+        if(imgMUrl){
 
-        cardDriver.className =`card-driver h-full w-1/2 flex flex-col`
-        cardDriver.innerHTML=`
-        <div>
-          ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${dupla.nombre_completo}" class="w-14 h-14 mb-2 border bg-white">` : ''}
-
+          imgElement.src = imgMUrl;
+        imgElement.alt = mono.F1_Car;
+        }
+        else{
+          const div = document.getElementById('gridMonoplaza')
+          div.className=`invisible`
+        }
+        const statsEquipo = await obtenerStatsDuplaEquipo(mono.anio);
+        console.log(statsEquipo.length)
+        const contDupla = document.getElementById('duplaEquipo');
+        contDupla.innerHTML='';
+        for(let i = 0; i <statsEquipo.length; i++){
+          const dupla = statsEquipo[i];
+          console.log(dupla)
+          const imgCURL = await obtenerFotoPiloto(dupla.nombre_completo, mono.anio)
+          const cardDriver = document.createElement('div');
+          cardDriver.className =`card-driver h-full w-1/3 flex flex-col`
+          cardDriver.innerHTML=`
+          <div>
+            ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${dupla.nombre_completo}" class="w-14 h-14 border bg-white">` : ''}
           </div>
-        <h3 class="text-lg font-bold text-white">${dupla.nombre_completo}</h3>
-        <p  class="mt-4 text-xl font-bold">victorias: ${dupla.victorias}</p>
-        <p class="text-neutral-400">podios: ${dupla.podios}</p>`;
-        contDupla.appendChild(cardDriver)
+          <h3 class="text-lg font-bold text-white">${dupla.nombre_completo}</h3>
+          <p  class="text-xl font-bold">victorias: ${dupla.victorias}</p>
+          <p class="text-neutral-400">podios: ${dupla.podios}</p>`;
+          contDupla.appendChild(cardDriver)
+        }
       }
-      //const VictoriasPiloto = await fetch(`http://localhost:1234/api/piloto/obtenerVictoriasPiloto/${idPiloto}`).then(r=>r.json());
-      /*
-      contDupla.innerHTML =     
-    `<div class="flex-shrink-0 flex flex-col items-center">
-      <span id="fotoPiloto"></span>
-      <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
-      <p id="equipoPiloto" class="text-neutral-400"></p>
-    </div>`*/
-
-    }
 
       async function obtenerStatsDuplaEquipo(anio){
-    try{
-      const res = await fetch(`http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-                "idEquipo": idEquipo,
-                "anio": anio
-        })
-      });
-      if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
-      return data = await res.json();
-      //
+        try{
+          const res = await fetch(`http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                    "idEquipo": idEquipo,
+                    "anio": anio
+            })
+          });
+          if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
+          return data = await res.json();
+          //
 
-      // opcional: recargar la página para mostrar resultados recién guardados
-      //
-    } catch (err) {
-      console.error(err);
-      mostrarMsg('Error buscando monoplaza', 'err');
-      throw err;
-    }
-  }
+          // opcional: recargar la página para mostrar resultados recién guardados
+          //
+        } catch (err) {
+          console.error(err);
+          
+          throw err;
+        }
+      }
 
-  async function obtenerMonoplazasEquipo(){
-    try{
-      const res = await fetch(`http://localhost:1234/api/equipo/obtenerMonoplazaActual`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-                "idEquipo": idEquipo
-        })
-      });
-      if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
-      return data = await res.json();
-      //
+      async function obtenerMonoplazasEquipo(){
+        try{
+          const res = await fetch(`http://localhost:1234/api/equipo/obtenerMonoplazaActual`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                    "idEquipo": idEquipo
+            })
+          });
+          if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
+          return data = await res.json();
+          //
 
-      // opcional: recargar la página para mostrar resultados recién guardados
-      //
-    } catch (err) {
-      console.error(err);
-      mostrarMsg('Error buscando monoplaza', 'err');
-      throw err;
-    }
-  }
+          // opcional: recargar la página para mostrar resultados recién guardados
+          //
+        } catch (err) {
+          console.error(err);
+          
+          throw err;
+        }
+      }
 
-    async function cargarDatosPiloto() {
-      try {
-        // Ejemplo de llamada a tu backend para obtener info
-        const today = new Date()
-        const CurrentYear = today.getFullYear()
-        console.log(CurrentYear)
-        const infoEquipo = await fetch(`/api/equipo/obtenerEquipo/${idEquipo}`).then(r => r.json());
-        const statsEquipo = await fetch(`/api/equipo/obtenerInfoEquipo/${idEquipo}`).then(r=> r.json());
-        var acumPuntos=0
-        var acumPodios=0
-        var acumVictories=0
-        var acumPoles=0
+      async function cargarDatosPiloto() {
+        try {
+          // Ejemplo de llamada a tu backend para obtener info
+          const today = new Date()
+          const CurrentYear = today.getFullYear()
+          console.log(CurrentYear)
+          const infoEquipo = await fetch(`/api/equipo/obtenerEquipo/${idEquipo}`).then(r => r.json());
+          const statsEquipo = await fetch(`/api/equipo/obtenerInfoEquipo/${idEquipo}`).then(r=> r.json());
+          var acumPuntos=0
+          var acumPodios=0
+          var acumVictories=0
+          var acumPoles=0
           for (let i = 0; i < statsEquipo.length; i++) {
-                    const equipo = statsEquipo[i];
-                    acumPuntos += Number(equipo.puntos_totales);
-                    acumPodios += Number(equipo.Podios);
-                    acumVictories += Number(equipo.victorias);
-                    acumPoles += Number(equipo.poles);
+            const equipo = statsEquipo[i];
+            acumPuntos += Number(equipo.puntos_totales);
+            acumPodios += Number(equipo.Podios);
+            acumVictories += Number(equipo.victorias);
+            acumPoles += Number(equipo.poles);
           }
 
           inicializarCarrusel()
-        const imgPUrl = await obtenerFotoEquipo(infoEquipo.nombre);
-        console.log(imgPUrl);
-        document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoEquipo.nombre}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">`
-        document.getElementById("nombrePiloto").textContent = infoEquipo.nombre;
-        document.getElementById("equipoPiloto").textContent = infoEquipo.Motor;
-        document.getElementById("NameTeam").textContent = infoEquipo.nombre;
-        document.getElementById("Motor").textContent = infoEquipo.Motor;
-        document.getElementById("nacionalidadPiloto").textContent = infoEquipo.pais;
-        document.getElementById("puntosTotales").textContent = acumPuntos;
-        document.getElementById("victoriasPiloto").textContent = acumVictories;
-      } catch (error) {
-        console.error("Error cargando datos del equipo:", error);
-      }
-    }
-    
-    cargarDuplasPiloto();
-    cargarVictoriasPiloto();
-    cargarDatosPiloto();
-  </script>
+          const imgPUrl = await obtenerFotoEquipo(infoEquipo.nombre);
+          console.log(imgPUrl);
+          document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoEquipo.nombre}" class="w-40 h-40 rounded-none object-cover">`
+          document.getElementById("nombrePiloto").textContent = infoEquipo.nombre;
+          document.getElementById("equipoPiloto").textContent = infoEquipo.Motor;
+          document.getElementById("NameTeam").textContent = infoEquipo.nombre;
+          document.getElementById("Motor").textContent = infoEquipo.Motor;
+          document.getElementById("nacionalidadPiloto").textContent = infoEquipo.pais;
+          document.getElementById("puntosTotales").textContent = acumPuntos;
+          document.getElementById("victoriasPiloto").textContent = acumVictories;
+          } catch (error) {
+            console.error("Error cargando datos del equipo:", error);
+          }
+        }
+        
+      cargarDuplasPiloto();
+      cargarVictoriasPiloto();
+      cargarDatosPiloto();
 
-</body>
+    </script>
+
+  </body>
 </html>

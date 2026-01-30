@@ -12,15 +12,15 @@ export class TeamSeasonModel {
       return equipostemporadas
     }
 
-    static async obtenerEquiposPorTemporadaPorId (idTemporada) {
-        const [equiposTemporada] = await connectionMySQL.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombre_Equipos", 
+    static async obtenerEquiposPorTemporadaPorId (idCategoria, idTemporada) {
+        const [equiposTemporada] = await connectionMySQL.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombre_Equipos", equipos_temporada.register_name as "register",
             temporada.id_Temporada, temporada.anio as "Temporada anio"
             FROM equipos_temporada 
             JOIN equipo 
             ON equipo.id_Equipo = equipos_temporada.equipo_id 
             JOIN temporada 
             ON temporada.id_Temporada = equipos_temporada.temporada_id 	
-            WHERE equipos_temporada.temporada_id = ?`, [idTemporada])
+            WHERE equipos_temporada.temporada_id = ? AND equipo.id_Categoria = ?`, [idTemporada, idCategoria])
         if (equiposTemporada.length === 0) return false
     
         return equiposTemporada

@@ -70,7 +70,7 @@
               <th class="p-2">Fecha</th>
               <th class="p-2">Pole Position</th>
               <th class="p-2">Vuelta Rapida</th>
-              <th class="p-2">Vueltas</th>
+              
               <th class="p-2" id="btnEdit">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#3498db" viewBox="0 0 16 16">
                   <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
@@ -145,7 +145,7 @@
       </div>
     </section>
 
-    <section class="col-span-1 row-span-3  rounded-lg overflow-hidden shadow-lg relative">
+    <section class="col-span-2 row-span-3  rounded-lg overflow-hidden shadow-lg relative">
         <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
             <div class="p-4 flex flex-row items-center gap-4">
@@ -159,19 +159,6 @@
         </div>
       </section>
 
-          <section class="col-span-1 row-span-3  rounded-lg overflow-hidden shadow-lg relative">
-        <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
-          <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
-            <div class="p-4 flex flex-row items-center gap-4">
-              <div class="flex flex-col">
-                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Last Podium</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="gridLastPodium" class="grid grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
-        </div>
-      </section>
     </div>
 
     <!-- Modal / Panel formulario Resultados de Gran Premio -->
@@ -221,36 +208,45 @@
   // Obtener id_GP desde URL
   const params = new URLSearchParams(window.location.search);
   const idGP = params.get('id');
+  const idCategoria = params.get("categoria");
   const gpTitle = document.getElementById('gpTitle');
+  console.log(gpTitle)
+  console.log(idCategoria)
   const gpIdInModal = document.getElementById('gpIdInModal');
+
 
   if (!idGP) {
     gpTitle.textContent = 'GP no especificado. Añade ?id=... en la URL';
   } else {
     gpTitle.textContent = `GP ID: ${idGP}`;
   }
+  
 
   // Endpoints que puedes ajustar
   const GPPoint = await fetch(`/api/granPremio/obtenerGP/${idGP}`).then(r => r.json());
   console.log(GPPoint[0])
   const idSeason = GPPoint[0].id_Temporada
+  
   const anio = GPPoint[0].anio
   const nombreGP = GPPoint[0].Nombre_GP
   gpTitle.textContent = `Gran Premio: ${nombreGP} ${anio}`
-  
+  document.title = `  ${gpTitle.textContent} | F1 App`;
             // GET -> devuelve array de resultados
-  const endpointAllPilotos = `/api/pilotoTemporada/obtenerPilotosPorTemporada/${idSeason}`;                               // fallback
+  const endpointAllPilotos = `/api/pilotoTemporada/obtenerPilotosPorTemporada/${idCategoria}/${idSeason}`;                               // fallback
   const endpointGuardar = `/api/resultados/crearResultado/`;      // POST -> guarda resultados (ajusta)
 
   // Puntos según posición (1..20)
   const puntosPorPosGP03_09 = [10,8,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0]
   const puntosPorPosGP10_Act = [25,18,15,12,10,8,6,4,2,1,0,0,0,0,0,0,0,0,0,0];
   const puntosPorPosSP = [8,7,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0];
+  const puntosPorPosIndy = [50,40,35,32,30,28,26,24,22,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,5,5,5,5,5,5,5,5];
+  console.log(puntosPorPosIndy.length)
   let puntosPorPos;
   const resultadosSection = document.getElementById('gridResultados');
   const noResultadosSection = document.getElementById('noResultados');
   const resultadosBody = document.getElementById('resultadosBody');
   console.log(GPPoint[0].tipo_carrera === 'GP')
+  if(idCategoria == 1){
   if(GPPoint[0].tipo_carrera == 'GP'){
     if(anio >= 2010){
       puntosPorPos = [...puntosPorPosGP10_Act];
@@ -261,6 +257,9 @@
   else if(GPPoint[0].tipo_carrera =='SP'){
     puntosPorPos = [...puntosPorPosSP];
   }
+}else if(idCategoria == 2){
+    puntosPorPos = [...puntosPorPosIndy];
+}
 
   // Modal y botones
   const modal = document.getElementById('modalForm');
@@ -329,8 +328,15 @@
     // btn abrir
     btnAbrir?.addEventListener('click', () => {
       formRows.innerHTML = '';
+      if(idCategoria == 1){
       for(let i=0;i<20;i++){
-      openForm();}
+      openForm();
+    }
+  }else if(idCategoria==2){
+          for(let i=0;i<27;i++){
+      openForm();
+    }
+  }
       if (modal.parentElement !== document.body) document.body.appendChild(modal);
       modal.classList.remove('hidden'); modal.classList.add('flex');
     });
@@ -400,10 +406,16 @@
   function clearRows() {
   formRows.innerHTML = '';
   filaCount = 0;
-
+    if(idCategoria == 1){
   for(let i=0;i<20;i++){
     openForm()
   }
+}
+else if(idCategoria == 2){
+    for(let i=0;i<27;i++){
+    openForm()
+  }
+}
   }
 
 
@@ -568,7 +580,7 @@
           <td class="p-2 align-top">${row.fecha || '—'}</td>
           <td class="p-2 align-top">${row.Pole_Position || '—'} ${row.tiempo_pole || 'No Time'}</td>
           <td class="p-2 align-top">${row.Vuelta_Rapida || '—'} ${row.tiempo_vuelta_rapida || 'No Time'}</td>
-          <td class="p-2 align-top">${row.puntos || row.puntos_obtenidos || 0}</td>
+          
         `;
         formGP.appendChild(tr);
       });
@@ -790,6 +802,7 @@ console.log()
         console.error('Error cargando campeonatos', err);
       }
     }
+    
     cargarLastWinners();
 })();
 

@@ -7,7 +7,7 @@ export const PilotSeasonRouter = (Modelos) => {
   const pilotSeasonController = new PilotSeasonController(Modelos)
 
   PilotSeasonRouter.get('/',cacheControl(120), pilotSeasonController.obtenerTodosLosPilotosPorTemporadas)
-  PilotSeasonRouter.get('/obtenerPilotosPorTemporada/:id',cacheControl(120), pilotSeasonController.obtenerPilotosPorTemporadaPorId)
+  PilotSeasonRouter.get('/obtenerPilotosPorTemporada/:categoria/:id',cacheControl(120), pilotSeasonController.obtenerPilotosPorTemporadaPorId)
   PilotSeasonRouter.get('/obtenerPilotosPorTemporadaYEquipo', cacheControl(120),pilotSeasonController.obtenerPilotosPorTemporadaYEquipoPorId)
   PilotSeasonRouter.post('/duplaPilotos',cacheControl(120), pilotSeasonController.obtenerDuplaPilotos)
   PilotSeasonRouter.post('/crearPilotoTemporada', pilotSeasonController.crearPilotoTemporada)

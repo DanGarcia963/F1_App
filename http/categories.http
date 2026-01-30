@@ -1,0 +1,2 @@
+### Obtener todos los pilotos
+GET http://localhost:1234/api/categoria/

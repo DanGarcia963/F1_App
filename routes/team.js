@@ -6,7 +6,7 @@ export const TeamRouter = (Modelos) => {
   const TeamRouter = Router()
   const teamController = new TeamController(Modelos)
 
-  TeamRouter.get('/',cacheControl(120), teamController.obtenerTodosLosEquipos)
+  TeamRouter.get('/:id',cacheControl(120), teamController.obtenerTodosLosEquipos)
   TeamRouter.get('/obtenerEquipo/:id', cacheControl(120),teamController.obtenerEquipoPorId)
     TeamRouter.get('/obtenerEquipoNombre/:nombre',cacheControl(120), teamController.obtenerEquipoPorNombre)
     TeamRouter.get('/obtenerVictoriasEquipo/:id', cacheControl(120),teamController.obtenerVictoriasEquipoPorID)

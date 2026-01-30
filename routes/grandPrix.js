@@ -8,9 +8,9 @@ export const GPRouter = (Modelos) => {
 
   GPRouter.get('/', cacheControl(120), gpController.obtenerTodosLosGP)
   GPRouter.get('/obtenerGP/:id', cacheControl(120), gpController.obtenerGPPorId)
-  GPRouter.get('/obtenerGPTemporada/:Anio',cacheControl(120), gpController.obtenerGPTemporadaPorId)
-  GPRouter.get('/obtenerWDCPorAnio/:Anio', cacheControl(120),gpController.obtenerCampeonatoPilotosPorAnio)
-  GPRouter.get('/obtenerWCCPorAnio/:Anio', cacheControl(120), gpController.obtenerCampeonatoConstructoresPorAnio)
+  GPRouter.get('/obtenerGPTemporada/:Categoria/:Anio', cacheControl(120), gpController.obtenerGPTemporadaPorId)
+  GPRouter.get('/obtenerWDCPorAnio/:Categoria/:Anio', cacheControl(120),gpController.obtenerCampeonatoPilotosPorAnio)
+  GPRouter.get('/obtenerWCCPorAnio/:Categoria/:Anio', cacheControl(120), gpController.obtenerCampeonatoConstructoresPorAnio)
   GPRouter.get('/obtenerLastWinners/:nombreOficial', cacheControl(120), gpController.obtenerLastWinnerGP)
   GPRouter.post('/registrarGP', gpController.registrarGP)
   GPRouter.post('/editarGP', gpController.editarGP)

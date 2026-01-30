@@ -6,7 +6,7 @@ export const PilotoRouter = (Modelos) => {
   const PilotoRouter = Router()
   const pilotoController = new PilotoController(Modelos)
 
-  PilotoRouter.get('/', cacheControl(120), pilotoController.obtenerTodosLosPilotos)
+  PilotoRouter.get('/:id', cacheControl(120), pilotoController.obtenerTodosLosPilotos)
   PilotoRouter.get('/obtenerPiloto/:id', cacheControl(120),cacheControl(120), pilotoController.obtenerPilotoPorId)
   PilotoRouter.get('/obtenerInfoPiloto/:id', cacheControl(120),pilotoController.obtenerInfoPilotoPorId)
   PilotoRouter.get('/obtenerVictoriasPiloto/:id', cacheControl(120),pilotoController.obtenerVictoriasPilotoPorID)

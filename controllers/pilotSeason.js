@@ -9,9 +9,9 @@
     }
 
     obtenerPilotosPorTemporadaPorId = async (req, res) => {
-        const { id } = req.params
+        const {categoria, id } = req.params
 
-        const PilotosTemporada = await this.pilotSeasonModel.obtenerPilotosPorTemporadaPorId(id)
+        const PilotosTemporada = await this.pilotSeasonModel.obtenerPilotosPorTemporadaPorId(categoria, id)
 
         if (PilotosTemporada) return res.json(PilotosTemporada)
             res.status(404).json({ message: 'Pilotos por temporada no encontrados' })
