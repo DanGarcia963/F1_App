@@ -2,13 +2,13 @@ import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class PilotModel {
     static async obtenerTodosLosPilotos (idCategoria) {
-      const [pilotos] = await connectionPostgres.query('SELECT id_Piloto, CONCAT(nombre, ' ', apellido) AS "nombre_completo", CONCAT('#', numero, ' - ', codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Categoria = ? ORDER BY nombre_completo;',[idCategoria])
+      const [pilotos] = await connectionPostgres.query(`SELECT id_Piloto, CONCAT(nombre, ' ', apellido) AS "nombre_completo", CONCAT('#', numero, ' - ', codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Categoria = ? ORDER BY nombre_completo;`,[idCategoria])
   
       return pilotos
     }
 
     static async obtenerPilotoPorId (idPiloto) {
-        const [piloto] = await connectionPostgres.query('SELECT CONCAT(nombre, ' ', apellido) AS "nombre_completo", CONCAT('#', numero, ' - ', codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Piloto = ?;', [idPiloto])
+        const [piloto] = await connectionPostgres.query(`SELECT CONCAT(nombre, ' ', apellido) AS "nombre_completo", CONCAT('#', numero, ' - ', codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Piloto = ?;`, [idPiloto])
         if (piloto.length === 0) return false
     
         return piloto[0]

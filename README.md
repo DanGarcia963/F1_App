@@ -27,3 +27,10 @@ Los nueve modelos importan `connectionPostgres` en lugar de mysql2. Se migraron 
 ## Seguridad
 
 Operaciones POST/PUT/PATCH/DELETE requieren encabezado X-Admin-Key (implementación anterior). El navegador pide la clave al administrador y la guarda solo en sessionStorage. Mejorar a cuentas y roles antes de exponer administración ampliamente.
+
+## Estado de la conexion (noviembre de 2026)
+
+Se corrigieron importaciones de PostgreSQL y errores de sintaxis en dos modelos.
+La variable DATABASE_URL pertenece **solo a Railway** y debe obtenerse de Supabase > Connect. Para Node `pg`, usar el URL de Transaction pooler puerto 6543 o Session pooler puerto 5432 (ambos compatibles), y **no** reutilizar la clave de base de datos en mensajes ni en Git.
+La cadena de Transaction pooler puede omitir `?pgbouncer=true`: ese parametro era especifico de configuraciones Prisma y no se requiere con `pg`.
+El proyecto Supabase que la proporciona debe estar enlazado a la cuenta correcta y tener el SQL del esquema ejecutado. La rama no permite comprobar la base real sin una conexion activa.

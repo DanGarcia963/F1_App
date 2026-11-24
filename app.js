@@ -3,7 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
-import { connectionMySQL } from './helpers/connectionMySQL.js';
+import { connectionPostgres } from './helpers/connectionPostgres.js';
 import { requireAdminForWrites } from './middlewares/adminWrites.js';
 
 import { PilotoRouter } from './routes/pilot.js';
@@ -36,10 +36,10 @@ export const crearApp = Modelos => {
 
   app.get('/api/health', async (_req, res) => {
     try {
-      await connectionMySQL.query('SELECT 1 AS ok');
+      await connectionPostgres.query('SELECT 1 AS ok');
       res.json({ status: 'ok', database: 'connected' });
     } catch (error) {
-      console.error('[F1_App] MySQL health check:', error.message);
+      console.error('[F1_App] PostgreSQL health check:', error.message);
       res.status(503).json({ status: 'degraded', database: 'unavailable' });
     }
   });

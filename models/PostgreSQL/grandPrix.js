@@ -182,7 +182,7 @@ static async registrarGP({ entrada }) {
 static async editarGP({ entrada }) {
   // Limpia los valores: si son '' o undefined, pon null
   function limpiar(valor) {
-    return (valor === '' OR valor === undefined) ? null : valor;
+    return (valor === '' || valor === undefined) ? null : valor;
   }
 
   const fecha = limpiar(entrada.fecha);
