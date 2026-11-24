@@ -76,61 +76,41 @@
         return GP
      }
 
-    static async obtenerCampeonatoPilotosPorAnio (Categoria, Anio){
-        const [WDC] = await connectionPostgres.query(`select 
-                t.anio AS "temporada",
-                p.id_Piloto,
-                concat(p.codigo_fia,' ',p.numero) AS "Piloto",
-                concat(p.Nombre, ' ', p.Apellido) AS "nombre_completo",
-                e.nombre AS "Equipo",
-                SUM(rgp.puntos_obtenidos) AS "puntos_totales"
-                from resultados rgp
-                join grandes_premios gp
-                on gp.id_GP = rgp.grand_prix_id
-                JOIN temporada t
-                on t.id_Temporada = gp.temporada_id
-                join piloto p 
-                on p.id_Piloto = rgp.piloto_id
-                join pilotos_temporada pt
-                on pt.temporada_id = t.id_Temporada
-                and pt.piloto_id = p.id_Piloto
-                join equipo e
-                on e.id_Equipo = pt.equipo_id
-                JOIN categoria cat
-                ON cat.id_Categoria = gp.id_Categoria
-                where t.anio = ? AND cat.id_Categoria = ?
-                group by  p.id_Piloto, e.nombre, t.anio  
-                ORDER BY puntos_totales desc
-            `,[Anio,Categoria]);
-        if(WDC === 0) return false
-        return WDC
-    }
-        static async obtenerCampeonatoConstructoresPorAnio (Categoria,Anio){
-        const [WCC] = await connectionPostgres.query(`SELECT 
-            e.id_Equipo,
-            e.nombre AS "equipo",
-            et.register_name AS "register",
-            t.anio AS "temporada",
-            SUM(rgp.puntos_obtenidos) AS "puntos_totales"
-            FROM resultados rgp
-            JOIN grandes_premios gp ON gp.id_GP = rgp.grand_prix_id
-            JOIN temporada t ON t.id_Temporada = gp.temporada_id
-            JOIN piloto p ON p.id_Piloto = rgp.piloto_id
-            JOIN pilotos_temporada pt ON pt.piloto_id = p.id_Piloto 
-            AND pt.temporada_id = t.id_Temporada
-            JOIN equipo e ON e.id_Equipo = pt.equipo_id
-            JOIN equipos_temporada et ON et.equipo_id = e.id_Equipo
-            AND et.temporada_id = t.id_Temporada
-                 JOIN categoria cat
-                ON cat.id_Categoria = gp.id_Categoria
-                where t.anio = ? AND cat.id_Categoria = ?
-            GROUP BY e.id_Equipo, et.register_name, t.anio
-            ORDER BY puntos_totales DESC;
-            `,[Anio,Categoria]);
-        if(WCC === 0) return false
-        return WCC
+    static async obtenerCampeonatoPilotosPorAnio (categoria, anio) {
+      const [rows] = await connectionPostgres.query(`
+        SELECT t.anio AS "temporada", p.id_piloto AS "id_Piloto",
+          CONCAT(p.codigo_fia, ' ', COALESCE(pt.numero,p.numero)) AS "Piloto",
+          CONCAT(p.nombre, ' ', p.apellido) AS nombre_completo,
+          e.nombre AS "Equipo", SUM(r.puntos_obtenidos) AS puntos_totales
+        FROM resultados r
+        JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id
+        JOIN temporada t ON t.id_temporada = gp.temporada_id
+        JOIN piloto p ON p.id_piloto = r.piloto_id
+        LEFT JOIN pilotos_temporada pt ON pt.temporada_id = t.id_temporada AND pt.piloto_id = p.id_piloto
+        LEFT JOIN equipo e ON e.id_equipo = COALESCE(pt.equipo_id,r.equipo_id)
+        WHERE t.anio = ? AND gp.id_categoria = ?
+        GROUP BY t.anio,p.id_piloto,pt.numero,e.id_equipo
+        ORDER BY puntos_totales DESC, nombre_completo ASC`, [anio, categoria]);
+      return rows;
     }
 
+    static async obtenerCampeonatoConstructoresPorAnio (categoria, anio) {
+      // equipo_id por carrera evita contabilizar puntos en un equipo incorrecto tras un traspaso.
+      const [rows] = await connectionPostgres.query(`
+        SELECT e.id_equipo AS "id_Equipo", e.nombre AS equipo,
+          COALESCE(et.register_name,e.nombre) AS "register",
+          t.anio AS temporada, SUM(r.puntos_obtenidos) AS puntos_totales
+        FROM resultados r
+        JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id
+        JOIN temporada t ON t.id_temporada = gp.temporada_id
+        LEFT JOIN pilotos_temporada pt ON pt.piloto_id = r.piloto_id AND pt.temporada_id = t.id_temporada
+        JOIN equipo e ON e.id_equipo = COALESCE(r.equipo_id,pt.equipo_id)
+        LEFT JOIN equipos_temporada et ON et.equipo_id = e.id_equipo AND et.temporada_id = t.id_temporada
+        WHERE t.anio = ? AND gp.id_categoria = ?
+        GROUP BY e.id_equipo,et.register_name,t.anio
+        ORDER BY puntos_totales DESC,e.nombre ASC`, [anio, categoria]);
+      return rows;
+    }
       static async obtenerLastWinnerGP (nombreOficial){
       const [LastWinners] = await connectionPostgres.query(`SELECT 
       gp.id_GP,

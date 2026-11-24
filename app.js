@@ -44,6 +44,25 @@ export const crearApp = Modelos => {
     }
   });
 
+  // Diagnostico seguro: no expone URLs, passwords, claves ni informacion personal.
+  app.get('/api/health/data', async (_req, res) => {
+    try {
+      const [categories] = await connectionPostgres.query('SELECT COUNT(*)::integer AS total FROM categoria');
+      const [pilots] = await connectionPostgres.query('SELECT COUNT(*)::integer AS total FROM piloto');
+      const [teams] = await connectionPostgres.query('SELECT COUNT(*)::integer AS total FROM equipo');
+      const [races] = await connectionPostgres.query('SELECT COUNT(*)::integer AS total FROM grandes_premios');
+      const [results] = await connectionPostgres.query('SELECT COUNT(*)::integer AS total FROM resultados');
+      const [seasons] = await connectionPostgres.query('SELECT MIN(anio) AS primera, MAX(anio) AS ultima FROM temporada');
+      res.json({service:'f1-app-api',database:'connected',
+        categorias:categories[0].total,pilotos:pilots[0].total,equipos:teams[0].total,
+        grandes_premios:races[0].total,resultados:results[0].total,temporadas:seasons[0]});
+    } catch (error) {
+      console.error('[F1_App] Diagnostico de datos:', error.message);
+      res.status(503).json({service:'f1-app-api',database:'unavailable',
+        error:'No se pueden consultar las tablas de F1_App. Revisa los logs de Railway.'});
+    }
+  });
+
   // Solo los metodos que modifican datos requieren la clave privada.
   app.use('/api', requireAdminForWrites);
 

@@ -57,7 +57,7 @@ export class TeamModel {
                 ON pt.temporada_id = t.id_Temporada
                 AND pt.piloto_id = p.id_Piloto
             JOIN equipo e
-                ON e.id_Equipo = pt.equipo_id
+                ON e.id_Equipo = COALESCE(rgp.equipo_id, pt.equipo_id)
             JOIN circuito c
                 ON c.id_Circuito = gp.circuito_id
             WHERE e.id_Equipo = ? AND rgp.posicion_final = 1 AND gp.tipo_carrera = 'GP'
@@ -90,7 +90,7 @@ export class TeamModel {
             FROM pilotos_temporada pt
             JOIN piloto p ON p.id_Piloto = pt.piloto_id
             JOIN temporada t ON t.id_Temporada = pt.temporada_id
-            LEFT JOIN resultados rgp ON rgp.piloto_id = pt.piloto_id
+            LEFT JOIN resultados rgp ON rgp.piloto_id = pt.piloto_id AND (rgp.equipo_id IS NULL OR rgp.equipo_id = pt.equipo_id)
             LEFT JOIN grandes_premios gp ON gp.id_GP = rgp.grand_prix_id
             WHERE pt.equipo_id = ?
             AND t.anio = ?
@@ -120,7 +120,7 @@ export class TeamModel {
           ON pt.temporada_id = t.id_Temporada
           AND pt.piloto_id = p.id_Piloto
       JOIN equipo e
-          ON e.id_Equipo = pt.equipo_id
+          ON e.id_Equipo = COALESCE(rgp.equipo_id, pt.equipo_id)
       WHERE e.id_Equipo = ? AND gp.tipo_carrera = 'GP'
       GROUP BY  e.nombre, t.anio
       ORDER BY puntos_totales DESC;`, [idEquipo])
