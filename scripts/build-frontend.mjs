@@ -30,6 +30,7 @@ for (const folder of ['Driver_photos', 'Team_photos', 'Logos']) {
 }
 fs.cpSync(path.join(root, 'public', 'styles'), path.join(output, 'styles'), { recursive: true });
 fs.copyFileSync(path.join(root, 'scripts', 'admin-fetch.js'), path.join(output, 'admin-fetch.js'));
+fs.copyFileSync(path.join(root, 'scripts', 'f1-ui.js'), path.join(output, 'f1-ui.js'));
 
 const redirects = ['/api/* ' + backendUrl.origin + '/api/:splat 200'];
 const pagesDir = path.join(root, 'pages');
@@ -38,6 +39,10 @@ const pages = fs.readdirSync(pagesDir).filter(name => name.endsWith('.html')).so
 for (const name of pages) {
   let html = fs.readFileSync(path.join(pagesDir, name), 'utf8');
   html = html.replace(/href=(["'])styles\/style\.css\1/g, 'href="/styles/style.css"');
+  // Keep existing script bindings, but add the global responsive Paddock skin.
+  html = html.replaceAll('/Logos/LogoF1.png', '/Logos/F1.png');
+  html = html.replace(/<\/head>/i,
+    '<link rel="stylesheet" href="/styles/f1-premium.css"><script src="/f1-ui.js" defer></script></head>');
   html = html.replace(/<head\b[^>]*>/i, match => match + '\n  <script src="/admin-fetch.js"></script>');
   const targetName = name === 'categories.html' ? 'index.html' : name;
   fs.writeFileSync(path.join(output, targetName), html, 'utf8');

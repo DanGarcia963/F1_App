@@ -149,7 +149,7 @@
   // Intenta obtener miniatura Wikipedia
     async function obtenerImage(nombre) {
   // Normaliza el nombre para que coincida con la carpeta
-  const nombreCarpeta = nombre.trim();
+  const nombreCarpeta = /^(formula\s*1|f1)$/i.test(nombre.trim()) ? 'F1' : nombre.trim();
   const extensiones = ['png'];
   for (let ext of extensiones) {
     const urlLocal = `/Logos/${encodeURIComponent(nombreCarpeta)}.${ext}`;
