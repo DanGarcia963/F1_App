@@ -35,9 +35,18 @@ INSERT INTO public.temporada(anio,finalizada)
 VALUES (2021,1),(2022,1),(2023,1),(2024,1),(2025,1),(2026,0)
 ON CONFLICT(anio) DO UPDATE SET finalizada=excluded.finalizada;
 
-CREATE TEMP TABLE _load_pilotos(codigo text,nombre text,apellido text,nacionalidad text,nacimiento date,numero smallint,fia text) ON COMMIT DROP;
 
-INSERT INTO _load_pilotos VALUES
+
+WITH _load_pilotos AS (
+ SELECT
+  source.codigo::text AS codigo,
+  source.nombre::text AS nombre,
+  source.apellido::text AS apellido,
+  source.nacionalidad::text AS nacionalidad,
+  source.nacimiento::date AS nacimiento,
+  source.numero::smallint AS numero,
+  source.fia::text AS fia
+ FROM (VALUES
 ('alexander-albon','Alexander','Albon','Thailand','1996-03-23',23,'ALB'),
 ('antonio-giovinazzi','Antonio','Giovinazzi','Italy','1993-12-14',99,'GIO'),
 ('arvid-lindblad','Arvid','Lindblad','United Kingdom','2007-08-08',41,'LIN'),
@@ -75,17 +84,25 @@ INSERT INTO _load_pilotos VALUES
 ('sebastian-vettel','Sebastian','Vettel','Germany','1987-07-03',5,'VET'),
 ('sergio-perez','Sergio','Pérez','Mexico','1990-01-26',11,'PER'),
 ('valtteri-bottas','Valtteri','Bottas','Finland','1989-08-28',77,'BOT'),
-('yuki-tsunoda','Yuki','Tsunoda','Japan','2000-05-11',22,'TSU');
-
+('yuki-tsunoda','Yuki','Tsunoda','Japan','2000-05-11',22,'TSU')
+ ) AS source(codigo, nombre, apellido, nacionalidad, nacimiento, numero, fia)
+)
 INSERT INTO public.piloto(codigo_fuente,nombre,apellido,nacionalidad,fecha_nacimiento,numero,codigo_fia,id_categoria)
 SELECT codigo,nombre,apellido,nacionalidad,nacimiento,numero,fia,1 FROM _load_pilotos
+WHERE TRUE
 ON CONFLICT(codigo_fuente) DO UPDATE SET
  nombre=excluded.nombre,apellido=excluded.apellido,nacionalidad=excluded.nacionalidad,
  fecha_nacimiento=excluded.fecha_nacimiento,numero=excluded.numero,codigo_fia=excluded.codigo_fia;
 
-CREATE TEMP TABLE _load_equipos(codigo text,nombre text,motor text,pais text) ON COMMIT DROP;
 
-INSERT INTO _load_equipos VALUES
+
+WITH _load_equipos AS (
+ SELECT
+  source.codigo::text AS codigo,
+  source.nombre::text AS nombre,
+  source.motor::text AS motor,
+  source.pais::text AS pais
+ FROM (VALUES
 ('alfa-romeo','Alfa Romeo','Ferrari','Italy'),
 ('alphatauri','AlphaTauri','Honda Rbpt','Italy'),
 ('alpine','Alpine','Mercedes','France'),
@@ -100,15 +117,25 @@ INSERT INTO _load_equipos VALUES
 ('racing-bulls','Racing Bulls','RED Bull Ford','Italy'),
 ('rb','RB','Honda Rbpt','Italy'),
 ('red-bull','Red Bull','RED Bull Ford','Austria'),
-('williams','Williams','Mercedes','United Kingdom');
-
+('williams','Williams','Mercedes','United Kingdom')
+ ) AS source(codigo, nombre, motor, pais)
+)
 INSERT INTO public.equipo(codigo_fuente,nombre,motor,pais,id_categoria)
 SELECT codigo,nombre,motor,pais,1 FROM _load_equipos
+WHERE TRUE
 ON CONFLICT(codigo_fuente) DO UPDATE SET nombre=excluded.nombre,motor=excluded.motor,pais=excluded.pais;
 
-CREATE TEMP TABLE _load_circuitos(codigo text,nombre text,ciudad text,pais text,longitud numeric(7,3),curvas smallint) ON COMMIT DROP;
 
-INSERT INTO _load_circuitos VALUES
+
+WITH _load_circuitos AS (
+ SELECT
+  source.codigo::text AS codigo,
+  source.nombre::text AS nombre,
+  source.ciudad::text AS ciudad,
+  source.pais::text AS pais,
+  source.longitud::numeric(7,3) AS longitud,
+  source.curvas::smallint AS curvas
+ FROM (VALUES
 ('austin','Americas','Austin','United States of America',5.513,20),
 ('bahrain','Bahrain','Sakhir','Bahrain',5.412,15),
 ('baku','Baku','Baku','Azerbaijan',6.003,20),
@@ -138,16 +165,24 @@ INSERT INTO _load_circuitos VALUES
 ('spielberg','Red Bull Ring','Spielberg','Austria',4.326,10),
 ('suzuka','Suzuka','Suzuka','Japan',5.807,18),
 ('yas-marina','Yas Marina','Abu Dhabi','United Arab Emirates',5.281,16),
-('zandvoort','Zandvoort','Zandvoort','Netherlands',4.259,14);
-
+('zandvoort','Zandvoort','Zandvoort','Netherlands',4.259,14)
+ ) AS source(codigo, nombre, ciudad, pais, longitud, curvas)
+)
 INSERT INTO public.circuito(codigo_fuente,nombre,ciudad,pais,longitud_km,curvas)
 SELECT codigo,nombre,ciudad,pais,longitud,curvas FROM _load_circuitos
+WHERE TRUE
 ON CONFLICT(codigo_fuente) DO UPDATE SET nombre=excluded.nombre,ciudad=excluded.ciudad,
 pais=excluded.pais,longitud_km=excluded.longitud_km,curvas=excluded.curvas;
 
-CREATE TEMP TABLE _load_equipos_temporada(anio smallint,equipo_codigo text,nombre text,monoplaza text) ON COMMIT DROP;
 
-INSERT INTO _load_equipos_temporada VALUES
+
+WITH _load_equipos_temporada AS (
+ SELECT
+  source.anio::smallint AS anio,
+  source.equipo_codigo::text AS equipo_codigo,
+  source.nombre::text AS nombre,
+  source.monoplaza::text AS monoplaza
+ FROM (VALUES
 (2021,'alfa-romeo','Alfa Romeo','C41'),
 (2021,'alphatauri','AlphaTauri','AT02'),
 (2021,'alpine','Alpine','A521'),
@@ -208,19 +243,27 @@ INSERT INTO _load_equipos_temporada VALUES
 (2026,'mercedes','Mercedes','F1 W17'),
 (2026,'racing-bulls','Racing Bulls','VCARB 03'),
 (2026,'red-bull','Red Bull','RB22'),
-(2026,'williams','Williams','FW48');
-
+(2026,'williams','Williams','FW48')
+ ) AS source(anio, equipo_codigo, nombre, monoplaza)
+)
 INSERT INTO public.equipos_temporada(equipo_id,temporada_id,register_name,monoplaza)
 SELECT e.id_equipo,t.id_temporada,s.nombre,NULLIF(s.monoplaza,'')
 FROM _load_equipos_temporada s
 JOIN public.equipo e ON e.codigo_fuente=s.equipo_codigo
 JOIN public.temporada t ON t.anio=s.anio
+WHERE TRUE
 ON CONFLICT(equipo_id,temporada_id) DO UPDATE SET
 register_name=excluded.register_name,monoplaza=excluded.monoplaza;
 
-CREATE TEMP TABLE _load_pilotos_temporada(anio smallint,piloto_codigo text,equipo_codigo text,numero smallint) ON COMMIT DROP;
 
-INSERT INTO _load_pilotos_temporada VALUES
+
+WITH _load_pilotos_temporada AS (
+ SELECT
+  source.anio::smallint AS anio,
+  source.piloto_codigo::text AS piloto_codigo,
+  source.equipo_codigo::text AS equipo_codigo,
+  source.numero::smallint AS numero
+ FROM (VALUES
 (2021,'antonio-giovinazzi','alfa-romeo',99),
 (2021,'carlos-sainz-jr','ferrari',55),
 (2021,'charles-leclerc','ferrari',16),
@@ -355,20 +398,36 @@ INSERT INTO _load_pilotos_temporada VALUES
 (2026,'ryo-hirakawa','haas',50),
 (2026,'sergio-perez','cadillac',11),
 (2026,'valtteri-bottas','cadillac',77),
-(2026,'yuki-tsunoda','racing-bulls',22);
-
+(2026,'yuki-tsunoda','racing-bulls',22)
+ ) AS source(anio, piloto_codigo, equipo_codigo, numero)
+)
 INSERT INTO public.pilotos_temporada(piloto_id,equipo_id,temporada_id,numero)
 SELECT p.id_piloto,e.id_equipo,t.id_temporada,s.numero
 FROM _load_pilotos_temporada s
 JOIN public.piloto p ON p.codigo_fuente=s.piloto_codigo
 JOIN public.equipo e ON e.codigo_fuente=s.equipo_codigo
 JOIN public.temporada t ON t.anio=s.anio
+WHERE TRUE
 ON CONFLICT(piloto_id,temporada_id) DO UPDATE SET
 equipo_id=excluded.equipo_id,numero=excluded.numero;
 
-CREATE TEMP TABLE _load_gp(codigo text,anio smallint,nombre text,fecha date,circuito_codigo text,vueltas smallint,pole_codigo text,pole_tiempo text,vr_codigo text,vr_tiempo text,tipo varchar(12),estado char(1)) ON COMMIT DROP;
 
-INSERT INTO _load_gp VALUES
+
+WITH _load_gp AS (
+ SELECT
+  source.codigo::text AS codigo,
+  source.anio::smallint AS anio,
+  source.nombre::text AS nombre,
+  source.fecha::date AS fecha,
+  source.circuito_codigo::text AS circuito_codigo,
+  source.vueltas::smallint AS vueltas,
+  source.pole_codigo::text AS pole_codigo,
+  source.pole_tiempo::text AS pole_tiempo,
+  source.vr_codigo::text AS vr_codigo,
+  source.vr_tiempo::text AS vr_tiempo,
+  source.tipo::varchar(12) AS tipo,
+  source.estado::char(1) AS estado
+ FROM (VALUES
 ('f1db-1036-gp',2021,'Formula 1 Gulf Air Bahrain Grand Prix 2021','2021-03-28','bahrain',56,'max-verstappen','1:28.997','valtteri-bottas','1:32.090','GP','V'),
 ('f1db-1037-gp',2021,'Formula 1 Pirelli Gran Premio del Made in Italy e dell''Emilia Romagna 2021','2021-04-18','imola',63,'lewis-hamilton','1:14.411','lewis-hamilton','1:16.702','GP','V'),
 ('f1db-1038-gp',2021,'Formula 1 Heineken Grande Prémio de Portugal 2021','2021-05-02','portimao',66,'valtteri-bottas','1:18.348','valtteri-bottas','1:19.865','GP','V'),
@@ -535,8 +594,9 @@ INSERT INTO _load_gp VALUES
 ('f1db-2026-20-gp',2026,'Formula 1 MSC Cruises Grande Prêmio de São Paulo 2026','2026-11-08','interlagos',71,'lando-norris','1:27.470','kimi-antonelli','1:12.689','GP','V'),
 ('f1db-2026-21-gp',2026,'Formula 1 Heineken Las Vegas Grand Prix 2026','2026-11-22','las-vegas',50,'max-verstappen',NULL,'liam-lawson','1:35.591','GP','V'),
 ('f1db-2026-22-gp',2026,'Formula 1 Qatar Airways Qatar Grand Prix 2026','2026-11-29','lusail',57,NULL,NULL,NULL,NULL,'GP','P'),
-('f1db-2026-23-gp',2026,'Formula 1 Etihad Airways Abu Dhabi Grand Prix 2026','2026-12-06','yas-marina',58,NULL,NULL,NULL,NULL,'GP','P');
-
+('f1db-2026-23-gp',2026,'Formula 1 Etihad Airways Abu Dhabi Grand Prix 2026','2026-12-06','yas-marina',58,NULL,NULL,NULL,NULL,'GP','P')
+ ) AS source(codigo, anio, nombre, fecha, circuito_codigo, vueltas, pole_codigo, pole_tiempo, vr_codigo, vr_tiempo, tipo, estado)
+)
 INSERT INTO public.grandes_premios(codigo_fuente,nombre_oficial,fecha,circuito_id,temporada_id,vueltas_totales,
 pole_position_piloto_id,tiempo_pole,vuelta_rapida_piloto_id,tiempo_vuelta_rapida,tipo_carrera,id_categoria,estado_gp)
 SELECT x.codigo,x.nombre,x.fecha,c.id_circuito,t.id_temporada,x.vueltas,pole.id_piloto,x.pole_tiempo,
@@ -546,6 +606,7 @@ JOIN public.temporada t ON t.anio=x.anio
 JOIN public.circuito c ON c.codigo_fuente=x.circuito_codigo
 LEFT JOIN public.piloto pole ON pole.codigo_fuente=x.pole_codigo
 LEFT JOIN public.piloto vr ON vr.codigo_fuente=x.vr_codigo
+WHERE TRUE
 ON CONFLICT(codigo_fuente) DO UPDATE SET
 nombre_oficial=excluded.nombre_oficial,fecha=excluded.fecha,circuito_id=excluded.circuito_id,
 temporada_id=excluded.temporada_id,vueltas_totales=excluded.vueltas_totales,
@@ -553,9 +614,27 @@ pole_position_piloto_id=excluded.pole_position_piloto_id,tiempo_pole=excluded.ti
 vuelta_rapida_piloto_id=excluded.vuelta_rapida_piloto_id,tiempo_vuelta_rapida=excluded.tiempo_vuelta_rapida,
 tipo_carrera=excluded.tipo_carrera,estado_gp=excluded.estado_gp;
 
-CREATE TEMP TABLE _load_resultados(gp_codigo text,piloto_codigo text,equipo_codigo text,final smallint,inicio smallint,vueltas smallint,puntos numeric(7,2),estado varchar(15)) ON COMMIT DROP;
 
-INSERT INTO _load_resultados VALUES
+
+
+
+
+
+
+
+
+
+WITH _load_resultados AS (
+ SELECT
+  source.gp_codigo::text AS gp_codigo,
+  source.piloto_codigo::text AS piloto_codigo,
+  source.equipo_codigo::text AS equipo_codigo,
+  source.final::smallint AS final,
+  source.inicio::smallint AS inicio,
+  source.vueltas::smallint AS vueltas,
+  source.puntos::numeric(7,2) AS puntos,
+  source.estado::varchar(15) AS estado
+ FROM (VALUES
 ('f1db-1036-gp','lewis-hamilton','mercedes',1,2,56,25,'FIN'),
 ('f1db-1036-gp','max-verstappen','red-bull',2,1,56,18,'FIN'),
 ('f1db-1036-gp','valtteri-bottas','mercedes',3,3,56,16,'FIN'),
@@ -935,9 +1014,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-1052-gp','nikita-mazepin','haas',17,17,54,0,'FIN'),
 ('f1db-1052-gp','fernando-alonso','alpine',NULL,19,49,0,'DNF'),
 ('f1db-1052-gp','esteban-ocon','alpine',NULL,11,40,0,'DNF'),
-('f1db-1052-gp','pierre-gasly','alphatauri',NULL,8,14,0,'DNF');
-
-INSERT INTO _load_resultados VALUES
+('f1db-1052-gp','pierre-gasly','alphatauri',NULL,8,14,0,'DNF'),
 ('f1db-1053-gp','max-verstappen','red-bull',1,3,71,25,'FIN'),
 ('f1db-1053-gp','lewis-hamilton','mercedes',2,2,71,18,'FIN'),
 ('f1db-1053-gp','sergio-perez','red-bull',3,4,71,15,'FIN'),
@@ -1317,9 +1394,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-1068-sprint','yuki-tsunoda','alphatauri',17,14,23,0,'FIN'),
 ('f1db-1068-sprint','nicholas-latifi','williams',18,19,23,0,'FIN'),
 ('f1db-1068-sprint','sebastian-vettel','aston-martin',19,20,21,0,'FIN'),
-('f1db-1068-sprint','fernando-alonso','alpine',NULL,NULL,NULL,0,'DNS');
-
-INSERT INTO _load_resultados VALUES
+('f1db-1068-sprint','fernando-alonso','alpine',NULL,NULL,NULL,0,'DNS'),
 ('f1db-1069-gp','max-verstappen','red-bull',1,2,53,25,'FIN'),
 ('f1db-1069-gp','lewis-hamilton','mercedes',2,4,53,18,'FIN'),
 ('f1db-1069-gp','george-russell','mercedes',3,6,53,15,'FIN'),
@@ -1699,9 +1774,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-1085-gp','nico-hulkenberg','haas',17,18,76,0,'FIN'),
 ('f1db-1085-gp','logan-sargeant','williams',18,16,76,0,'FIN'),
 ('f1db-1085-gp','kevin-magnussen','haas',19,17,70,0,'FIN'),
-('f1db-1085-gp','lance-stroll','aston-martin',NULL,14,53,0,'DNF');
-
-INSERT INTO _load_resultados VALUES
+('f1db-1085-gp','lance-stroll','aston-martin',NULL,14,53,0,'DNF'),
 ('f1db-1086-gp','max-verstappen','red-bull',1,1,66,26,'FIN'),
 ('f1db-1086-gp','lewis-hamilton','mercedes',2,4,66,18,'FIN'),
 ('f1db-1086-gp','george-russell','mercedes',3,12,66,15,'FIN'),
@@ -2081,9 +2154,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-1099-sprint','guanyu-zhou','alfa-romeo',17,18,24,0,'FIN'),
 ('f1db-1099-sprint','nico-hulkenberg','haas',18,12,24,0,'FIN'),
 ('f1db-1099-sprint','valtteri-bottas','alfa-romeo',19,14,24,0,'FIN'),
-('f1db-1099-sprint','logan-sargeant','williams',20,20,24,0,'FIN');
-
-INSERT INTO _load_resultados VALUES
+('f1db-1099-sprint','logan-sargeant','williams',20,20,24,0,'FIN'),
 ('f1db-1100-gp','max-verstappen','red-bull',1,2,50,25,'FIN'),
 ('f1db-1100-gp','charles-leclerc','ferrari',2,1,50,18,'FIN'),
 ('f1db-1100-gp','sergio-perez','red-bull',3,11,50,15,'FIN'),
@@ -2463,9 +2534,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-1115-gp','nico-hulkenberg','haas',18,16,44,0,'FIN'),
 ('f1db-1115-gp','guanyu-zhou','kick-sauber',NULL,19,5,0,'DNF'),
 ('f1db-1115-gp','george-russell','mercedes',NULL,6,44,0,'DSQ'),
-('f1db-1116-gp','lando-norris','mclaren',1,1,72,26,'FIN');
-
-INSERT INTO _load_resultados VALUES
+('f1db-1116-gp','lando-norris','mclaren',1,1,72,26,'FIN'),
 ('f1db-1116-gp','max-verstappen','red-bull',2,2,72,18,'FIN'),
 ('f1db-1116-gp','charles-leclerc','ferrari',3,6,72,15,'FIN'),
 ('f1db-1116-gp','oscar-piastri','mclaren',4,3,72,12,'FIN'),
@@ -2845,9 +2914,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-1130-gp','gabriel-bortoleto','kick-sauber',18,20,49,0,'FIN'),
 ('f1db-1130-gp','yuki-tsunoda','red-bull',NULL,8,1,0,'DNF'),
 ('f1db-1130-gp','pierre-gasly','alpine',NULL,9,0,0,'DNF'),
-('f1db-1131-gp','oscar-piastri','mclaren',1,4,57,25,'FIN');
-
-INSERT INTO _load_resultados VALUES
+('f1db-1131-gp','oscar-piastri','mclaren',1,4,57,25,'FIN'),
 ('f1db-1131-gp','lando-norris','mclaren',2,2,57,18,'FIN'),
 ('f1db-1131-gp','george-russell','mercedes',3,5,57,15,'FIN'),
 ('f1db-1131-gp','max-verstappen','red-bull',4,1,57,12,'FIN'),
@@ -3227,9 +3294,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-1146-gp','lewis-hamilton','ferrari',NULL,13,37,0,'DNF'),
 ('f1db-1146-gp','charles-leclerc','ferrari',NULL,3,5,0,'DNF'),
 ('f1db-1146-gp','gabriel-bortoleto','kick-sauber',NULL,18,0,0,'DNF'),
-('f1db-1146-sprint','lando-norris','mclaren',1,1,24,8,'FIN');
-
-INSERT INTO _load_resultados VALUES
+('f1db-1146-sprint','lando-norris','mclaren',1,1,24,8,'FIN'),
 ('f1db-1146-sprint','kimi-antonelli','mercedes',2,2,24,7,'FIN'),
 ('f1db-1146-sprint','george-russell','mercedes',3,4,24,6,'FIN'),
 ('f1db-1146-sprint','max-verstappen','red-bull',4,6,24,5,'FIN'),
@@ -3609,9 +3674,7 @@ INSERT INTO _load_resultados VALUES
 ('f1db-2026-9-sprint','oliver-bearman','haas',14,16,17,0,'FIN'),
 ('f1db-2026-9-sprint','nico-hulkenberg','audi',15,13,17,0,'FIN'),
 ('f1db-2026-9-sprint','esteban-ocon','haas',16,17,17,0,'FIN'),
-('f1db-2026-9-sprint','carlos-sainz-jr','williams',17,15,17,0,'FIN');
-
-INSERT INTO _load_resultados VALUES
+('f1db-2026-9-sprint','carlos-sainz-jr','williams',17,15,17,0,'FIN'),
 ('f1db-2026-9-sprint','alexander-albon','williams',18,NULL,17,0,'FIN'),
 ('f1db-2026-9-sprint','valtteri-bottas','cadillac',19,19,17,0,'FIN'),
 ('f1db-2026-9-sprint','fernando-alonso','aston-martin',20,20,17,0,'FIN'),
@@ -3924,14 +3987,16 @@ INSERT INTO _load_resultados VALUES
 ('f1db-2026-21-gp','fernando-alonso','aston-martin',19,18,49,0,'FIN'),
 ('f1db-2026-21-gp','arvid-lindblad','racing-bulls',NULL,5,19,0,'DNF'),
 ('f1db-2026-21-gp','sergio-perez','cadillac',NULL,16,17,0,'DNF'),
-('f1db-2026-21-gp','alexander-albon','williams',NULL,14,0,0,'DNS');
-
+('f1db-2026-21-gp','alexander-albon','williams',NULL,14,0,0,'DNS')
+ ) AS source(gp_codigo, piloto_codigo, equipo_codigo, final, inicio, vueltas, puntos, estado)
+)
 INSERT INTO public.resultados(grand_prix_id,piloto_id,equipo_id,posicion_final,posicion_inicio,vueltas_completadas,puntos_obtenidos,estado_resultado)
 SELECT gp.id_gp,p.id_piloto,e.id_equipo,r.final,r.inicio,r.vueltas,r.puntos,r.estado
 FROM _load_resultados r
 JOIN public.grandes_premios gp ON gp.codigo_fuente=r.gp_codigo
 JOIN public.piloto p ON p.codigo_fuente=r.piloto_codigo
 JOIN public.equipo e ON e.codigo_fuente=r.equipo_codigo
+WHERE TRUE
 ON CONFLICT(grand_prix_id,piloto_id) DO UPDATE SET
 equipo_id=excluded.equipo_id,posicion_final=excluded.posicion_final,posicion_inicio=excluded.posicion_inicio,
 vueltas_completadas=excluded.vueltas_completadas,puntos_obtenidos=excluded.puntos_obtenidos,estado_resultado=excluded.estado_resultado;
