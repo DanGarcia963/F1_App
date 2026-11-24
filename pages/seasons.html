@@ -89,7 +89,7 @@
   <script>
             // Obtiene el id del piloto desde la URL
     const params = new URLSearchParams(window.location.search);
-    const idCategoria = params.get("id");
+    const idCategoria = params.get("id") || "1";
     console.log(idCategoria)
 
 document.getElementById("mainPage").addEventListener("click",()=>{

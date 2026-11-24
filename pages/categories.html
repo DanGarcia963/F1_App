@@ -54,6 +54,7 @@
       <p class="text-sm text-gray-400 mt-1">F1, F2, F3, IndyCar y más — elige para filtrar contenido en el inicio.</p>
     </section>
 
+    <div id="apiNotice" hidden role="alert"></div>
     <section id="categoriaGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <!-- Cards se inyectan aquí -->
     </section>
@@ -69,87 +70,82 @@
 
 <script>
 
+    const grid = document.getElementById('categoriaGrid');
+    const notice = document.getElementById('apiNotice');
+    const refreshButton = document.getElementById('btnRefresh');
+
+    function showNotice(message, isError = false) {
+      notice.textContent = message;
+      notice.className = 'mb-6 rounded-lg border p-4 text-sm ' +
+        (isError ? 'border-red-600 bg-red-950/40 text-red-100' :
+          'border-amber-600 bg-amber-950/30 text-amber-100');
+      notice.hidden = false;
+    }
+
     async function renderCategories(categorias) {
-      const grid = document.getElementById('categoriaGrid');
-      grid.innerHTML = '';
-      const cacheDuration = 60 * 1000; // 1 min
-      for(let i=0; i<categorias.length; i++) {
-        const c = categorias[i];
-        // intenta obtener imagen por nombre de categoría + "car" para mejor match
-        const imgUrl = await obtenerImage(c.nombre);
-        const cardCategory = document.createElement('div');
-        const categoryCacheKey = `cat_img_${c.id_Categoria}`;
-        const categoryCacheTimeKey = `cat_img_time_${c.id_Categoria}`;
-        const now = Date.now();
-        let categories = null;
-        const cachedImg = localStorage.getItem(categoryCacheKey);
-        const cachedTime = Number(localStorage.getItem(categoryCacheTimeKey));
-
-        if (cachedImg && cachedTime && (now - Number(cachedTime) < cacheDuration)) {
-          categories = JSON.parse(cachedImg);
-        } else {
-            try{
-            categories = await fetch('/api/categoria/').then(r => r.json());
-            localStorage.setItem(categoryCacheKey, JSON.stringify(categories));
-            localStorage.setItem(categoryCacheTimeKey, String(now));}
-            catch(err){
-              categories =[]
-            }
+      grid.replaceChildren();
+      if (!categorias.length) {
+        showNotice('La API respondió correctamente, pero no hay categorías registradas. Verifica la tabla public.categoria en Supabase.');
+        return;
       }
-    if(categories.length > 0){
-        
-        cardCategory.className = 'group relative rounded-xl overflow-hidden shadow-lg border border-neutral-700 bg-neutral-900 text-left p-0 focus:outline-none focus:ring-2 focus:ring-red-600';
-        cardCategory.style = 'flex;flex-direction:column;align-items:stretch;';
-        cardCategory.innerHTML = `
-      
-        <div class="h-40 w-full ${imgUrl ? '' : 'placeholder'} card-img bg-white" style="${imgUrl ? `background-image:url('${imgUrl}')` : ''}">
-        ${!imgUrl ? `<div class="h-full w-full flex items-center justify-center"> ${c.nombre ?? ''} </div>` : ''}
-      </div>
-    
-      <div class="p-4">
-        <h3 class="text-lg font-semibold mb-1">${c.nombre ?? '—'}</h3>
-       
-      </div>
-      <div class="p-3 border-t border-neutral-800 text-sm text-gray-400">
-        <span class="group-hover:text-white">Ver contenido</span>
-      </div>
-    `;
-    }
-    cardCategory.dataset.id = c.id_Categoria;
-    cardCategory.dataset.name = c.nombre;
-    cardCategory.addEventListener('click', () => {
-        const url = `/main?id=${c.id_Categoria}`;
-        console.log('Navigating to:', url);
-        window.location.href = url;
-    });
-    grid.appendChild(cardCategory);
-}
-}
+      notice.hidden = true;
 
-async function cargarCategorias(){
-    const cacheKey = 'categorias_cache';
-    const cacheTimeKey = 'categorias_cache_time';
-    const cacheDuration = 60 * 1000; // 5 minutos
+      for (const category of categorias) {
+        const name = String(category.nombre ?? 'Sin nombre');
+        const id = category.id_Categoria ?? category.id_categoria;
+        if (id == null) continue;
 
-    const now = Date.now();
-    const cached = localStorage.getItem(cacheKey);
-    const cachedTime = Number(localStorage.getItem(cacheTimeKey));
-    if (cached && cachedTime && (now - cachedTime < cacheDuration)) {
-      const categorias = JSON.parse(cached);
-      renderCategories(categorias);
-      return;
+        const card = document.createElement('a');
+        card.href = '/main?id=' + encodeURIComponent(id);
+        card.className = 'block group rounded-xl overflow-hidden shadow-lg border border-neutral-700 bg-neutral-900 text-left hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-600';
+
+        const banner = document.createElement('div');
+        banner.className = 'h-40 bg-gray-800 bg-cover bg-center flex items-center justify-center font-bold';
+        banner.textContent = name;
+
+        const title = document.createElement('div');
+        title.className = 'p-4 text-lg font-semibold';
+        title.textContent = name;
+        card.append(banner, title);
+        grid.append(card);
+
+        // Las tarjetas se muestran aunque la imagen no exista.
+        obtenerImage(name).then(url => {
+          if (url) {
+            banner.style.backgroundImage = 'url("' + url.replaceAll('"','%22') + '")';
+            banner.textContent = '';
+          }
+        }).catch(() => {});
+      }
     }
+
+    async function cargarCategorias() {
+      grid.textContent = 'Consultando categorías...';
+      refreshButton.disabled = true;
       try {
-        const res = await fetch('/api/categoria/').then(r => r.json());
-        localStorage.setItem(cacheKey, JSON.stringify(res));
-        localStorage.setItem(cacheTimeKey, String(now));
-        renderCategories(res);
-
-      } catch (err) {
-        console.warn('Error al cargar categorías desde API, usando ejemplo', err);
+        const response = await fetch('/api/categoria/?v=' + Date.now(), {cache:'no-store'});
+        const contentType = response.headers.get('content-type') || '';
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ' al consultar /api/categoria/');
+        }
+        if (!contentType.includes('json')) {
+          throw new Error('La ruta /api/categoria/ devolvió HTML en vez de JSON. Revisa el proxy Netlify → Railway.');
+        }
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error('La API no devolvió una lista de categorías. Verifica la conexión a Supabase.');
+        }
+        await renderCategories(data);
+      } catch (error) {
+        console.error('[F1_App] Error al cargar categorías:', error);
+        grid.replaceChildren();
+        showNotice('No se pudieron cargar las categorías: ' + error.message + '. Comprueba /api/health y /api/categoria/ en Railway.', true);
+      } finally {
+        refreshButton.disabled = false;
       }
-    
-}
+    }
+    refreshButton.addEventListener('click', cargarCategorias);
+
   // Intenta obtener miniatura Wikipedia
     async function obtenerImage(nombre) {
   // Normaliza el nombre para que coincida con la carpeta

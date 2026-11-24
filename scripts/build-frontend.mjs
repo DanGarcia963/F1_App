@@ -49,5 +49,8 @@ for (const name of pages) {
   }
 }
 
+// Compatibilidad con la ruta original de Express (archivo gran_Premio.html).
+redirects.push('/granPremio /gran_Premio.html 200');
+redirects.push('/granPremio/ /gran_Premio.html 200');
 fs.writeFileSync(path.join(output, '_redirects'), redirects.join('\n') + '\n');
 console.log('Frontend construido: ' + pages.length + ' paginas, recursos multimedia y API proxy -> ' + backendUrl.origin);

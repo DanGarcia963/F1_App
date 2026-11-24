@@ -133,7 +133,7 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const idCategoria = params.get("id");
+    const idCategoria = params.get("id") || "1";
     console.log(idCategoria)
     // endpoints (ajusta si tu API tiene rutas distintas)
     const endpointAllPilotos = `/api/piloto/${idCategoria}`; // devuelve array de pilotos { id_Piloto, nombre_completo }
