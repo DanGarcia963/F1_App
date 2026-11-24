@@ -1,8 +1,8 @@
-import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class TeamSeasonModel {
     static async obtenerTodosLosEquiposPorTemporadas () {
-        const [equipostemporadas] = await connectionMySQL.query(`SELECT equipo.nombre as "Nombres Equipos", temporada.anio as "Temporada anio"
+        const [equipostemporadas] = await connectionPostgres.query(`SELECT equipo.nombre as "Nombres Equipos", temporada.anio as "Temporada anio"
             FROM equipos_temporada 
             JOIN equipo 
             ON equipo.id_Equipo = equipos_temporada.equipo_id 
@@ -13,7 +13,7 @@ export class TeamSeasonModel {
     }
 
     static async obtenerEquiposPorTemporadaPorId (idCategoria, idTemporada) {
-        const [equiposTemporada] = await connectionMySQL.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombre_Equipos", equipos_temporada.register_name as "register",
+        const [equiposTemporada] = await connectionPostgres.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombre_Equipos", equipos_temporada.register_name as "register",
             temporada.id_Temporada, temporada.anio as "Temporada anio"
             FROM equipos_temporada 
             JOIN equipo 
@@ -30,7 +30,7 @@ export class TeamSeasonModel {
         const {
             temporada_id:idTemporada, equipo_id:idEquipo
         }=entrada
-        const [equiposTemporada] = await connectionMySQL.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombres Equipos", 
+        const [equiposTemporada] = await connectionPostgres.query(`SELECT equipo.id_Equipo, equipo.nombre as "Nombres Equipos", 
             temporada.id_Temporada, temporada.anio as "Temporada anio"
             FROM equipos_temporada 
             JOIN equipo 
@@ -53,7 +53,7 @@ export class TeamSeasonModel {
         if (equipoTemporadaExiste !== false) return 'Ya existe un piloto con ese codigo de la FIA'
     
         try {
-            await connectionMySQL.query('insert into equipos_temporada (equipo_id, temporada_id) values(?, ?);', [idEquipo, idTemporada])
+            await connectionPostgres.query('insert into equipos_temporada (equipo_id, temporada_id) values(?, ?);', [idEquipo, idTemporada])
             const equipoTemporadaCreado = await this.obtenerEquiposPorIDYPorTemporadaPorId({entrada})
             return equipoTemporadaCreado
         } catch (error) {
@@ -70,7 +70,7 @@ export class TeamSeasonModel {
         if (existeequipoTemporada) return 'En esta temporada ya existe este equipo y no puede haber repetidos'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE equipos_temporada SET temporada_id = ? WHERE id_Equipo_Temporada = ?',
                 [idTemporada, idEquipoTemporada]
             );
@@ -91,7 +91,7 @@ export class TeamSeasonModel {
         if (existeequipoTemporada) return 'El equipo en esta temporada ya existe y no puede haber repetidos'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE equipos_temporada SET equipo_id = ? WHERE id_Equipo_Temporada = ?',
                 [idEquipo, idEquipoTemporada]
             );

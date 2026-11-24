@@ -1,29 +1,29 @@
-import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class PilotModel {
     static async obtenerTodosLosPilotos (idCategoria) {
-      const [pilotos] = await connectionMySQL.query('SELECT id_Piloto, CONCAT(nombre, " ", apellido) AS "nombre_completo", CONCAT("#", numero, " - ", codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Categoria = ? ORDER BY nombre_completo;',[idCategoria])
+      const [pilotos] = await connectionPostgres.query('SELECT id_Piloto, CONCAT(nombre, ' ', apellido) AS "nombre_completo", CONCAT('#', numero, ' - ', codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Categoria = ? ORDER BY nombre_completo;',[idCategoria])
   
       return pilotos
     }
 
     static async obtenerPilotoPorId (idPiloto) {
-        const [piloto] = await connectionMySQL.query('SELECT CONCAT(nombre, " ", apellido) AS "nombre_completo", CONCAT("#", numero, " - ", codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Piloto = ?;', [idPiloto])
+        const [piloto] = await connectionPostgres.query('SELECT CONCAT(nombre, ' ', apellido) AS "nombre_completo", CONCAT('#', numero, ' - ', codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Piloto = ?;', [idPiloto])
         if (piloto.length === 0) return false
     
         return piloto[0]
     }
 
     static async obtenerInfoPilotoPorId (idPiloto) {
-        const [piloto] = await connectionMySQL.query(`SELECT 
-      GROUP_CONCAT(DISTINCT t.anio) AS temporadas,
-      e.nombre AS Equipo,
-      SUM(rgp.puntos_obtenidos) AS puntos_totales,
-      SUM(CASE WHEN rgp.posicion_inicio = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS poles,
-      SUM(CASE WHEN rgp.posicion_final = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS victorias,
-      SUM(CASE WHEN (rgp.posicion_final = 1 OR rgp.posicion_final = 2 OR rgp.posicion_final = 3) AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS Podios,
-      SUM(CASE WHEN gp.vuelta_rapida_piloto_id = ? AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS FastestLaps,
-      SUM(CASE WHEN rgp.piloto_id = ? AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS Starts
+        const [piloto] = await connectionPostgres.query(`SELECT 
+      STRING_AGG(DISTINCT t.anio::text, ', ') AS "temporadas",
+      e.nombre AS "Equipo",
+      SUM(rgp.puntos_obtenidos) AS "puntos_totales",
+      SUM(CASE WHEN rgp.posicion_inicio = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "poles",
+      SUM(CASE WHEN rgp.posicion_final = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "victorias",
+      SUM(CASE WHEN (rgp.posicion_final = 1 OR rgp.posicion_final = 2 OR rgp.posicion_final = 3) AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "Podios",
+      SUM(CASE WHEN gp.vuelta_rapida_piloto_id = ? AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "FastestLaps",
+      SUM(CASE WHEN rgp.piloto_id = ? AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "Starts"
       FROM resultados rgp
       JOIN grandes_premios gp
           ON gp.id_GP = rgp.grand_prix_id
@@ -45,10 +45,10 @@ export class PilotModel {
     }
 
     static async obtenerVictoriasPilotoPorID(idPiloto){
-        const[victorias]= await connectionMySQL.query(`SELECT 
+        const[victorias]= await connectionPostgres.query(`SELECT 
             gp.nombre_oficial,
             t.anio,
-            c.nombre as nombre_Circuito,
+            c.nombre AS "nombre_Circuito",
             gp.fecha
             FROM resultados rgp
             JOIN grandes_premios gp
@@ -73,11 +73,11 @@ export class PilotModel {
     }
 
         static async obtenerPodiosPilotoPorID(idPiloto){
-        const[podios]= await connectionMySQL.query(`SELECT 
-            gp.nombre_oficial AS Nombre_GP,
-            t.anio AS Temporada,
-            c.nombre AS nombre_Circuito ,
-            gp.fecha AS Fecha
+        const[podios]= await connectionPostgres.query(`SELECT 
+            gp.nombre_oficial AS "Nombre_GP",
+            t.anio AS "Temporada",
+            c.nombre AS "nombre_Circuito" ,
+            gp.fecha AS "Fecha"
             FROM resultados rgp
             JOIN grandes_premios gp
                 ON gp.id_GP = rgp.grand_prix_id
@@ -101,15 +101,15 @@ export class PilotModel {
     }
 
     static async obtenerTrayectoriaPilotoPorID(idPiloto){
-        const[trayectoria]= await connectionMySQL.query(`SELECT 
-                t.anio AS temporadas,
-                concat(p.codigo_fia,' ',pt.numero) AS codigo_FIA,
-                e.nombre AS Equipo,
-                et.register_name AS register,
-                SUM(rgp.puntos_obtenidos) AS puntos_totales,
-                SUM(CASE WHEN rgp.posicion_inicio = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS poles,
-                SUM(CASE WHEN rgp.posicion_final = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS victorias,
-                SUM(CASE WHEN (rgp.posicion_final = 1 || rgp.posicion_final = 2 || rgp.posicion_final = 3)AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS Podios
+        const[trayectoria]= await connectionPostgres.query(`SELECT 
+                t.anio AS "temporadas",
+                concat(p.codigo_fia,' ',pt.numero) AS "codigo_FIA",
+                e.nombre AS "Equipo",
+                et.register_name AS "register",
+                SUM(rgp.puntos_obtenidos) AS "puntos_totales",
+                SUM(CASE WHEN rgp.posicion_inicio = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "poles",
+                SUM(CASE WHEN rgp.posicion_final = 1 AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "victorias",
+                SUM(CASE WHEN (rgp.posicion_final = 1 OR rgp.posicion_final = 2 OR rgp.posicion_final = 3)AND gp.tipo_carrera = 'GP' THEN 1 ELSE 0 END) AS "Podios"
                 FROM resultados rgp
                 JOIN grandes_premios gp
                     ON gp.id_GP = rgp.grand_prix_id
@@ -126,7 +126,7 @@ export class PilotModel {
                     ON et.equipo_id = e.id_Equipo
                     AND et.temporada_id = t.id_Temporada
                 WHERE p.id_Piloto = ?
-                GROUP BY p.id_Piloto, e.nombre, pt.numero, t.anio
+                GROUP BY p.id_Piloto, e.nombre, et.register_name, pt.numero, t.anio
                 ORDER BY t.anio DESC;
             `, [idPiloto])
             if(trayectoria.length === 0) return false 
@@ -144,7 +144,7 @@ export class PilotModel {
     
         const fechaNacimientoConFormato = new Date(FechaNacimiento)
         try {
-            await connectionMySQL.query('insert into piloto (Nombre, Apellido, Nacionalidad, Fecha_Nacimiento, Fecha_Debut, numero, codigo_fia, id_Categoria) values(?, ?, ?, ?, ?, ?, ?, ?);', [Nombre, Apellido, Nacionalidad, fechaNacimientoConFormato, FechaDebut, numero, codigoFIA, idCategoria])
+            await connectionPostgres.query('insert into piloto (Nombre, Apellido, Nacionalidad, Fecha_Nacimiento, Fecha_Debut, numero, codigo_fia, id_Categoria) values(?, ?, ?, ?, ?, ?, ?, ?);', [Nombre, Apellido, Nacionalidad, fechaNacimientoConFormato, FechaDebut, numero, codigoFIA, idCategoria])
             const pilotoCreado = await PilotModel.obtenerPilotoPorId(codigoFIA)
             return pilotoCreado
         } catch (error) {
@@ -161,7 +161,7 @@ export class PilotModel {
         if (!existePiloto) return 'El usuario no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE piloto SET numero = ? WHERE codigo_fia = ?',
                 [numero, codigoFIA]
             );

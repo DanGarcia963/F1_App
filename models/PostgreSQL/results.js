@@ -1,11 +1,11 @@
- import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+ import { connectionPostgres } from '../../helpers/connectionPostgres.js'
  
  export class ResultsModel {
       static async obtenerResultadoPorGPPorId (idGP) {
-        const [GPsTemporada] = await connectionMySQL.query(`
+        const [GPsTemporada] = await connectionPostgres.query(`
         SELECT
-            CONCAT(p.Nombre, ' ', p.Apellido) AS nombre_piloto,
-            e.nombre AS equipo,
+            CONCAT(p.Nombre, ' ', p.Apellido) AS "nombre_piloto",
+            e.nombre AS "equipo",
             rgp.posicion_final,
             rgp.posicion_inicio,
             rgp.puntos_obtenidos,
@@ -34,7 +34,7 @@
   } = entrada;
 
   try {
-    await connectionMySQL.query(
+    await connectionPostgres.query(
       `INSERT INTO resultados
       (piloto_id, grand_prix_id, posicion_final, posicion_inicio, vueltas_completadas, puntos_obtenidos)
       VALUES (?, ?, ?, ?, ?, ?)`,
@@ -42,11 +42,11 @@
     );
 
     // Si quieres devolver el GP recién insertado
-    const [nuevoRGP] = await connectionMySQL.query(
+    const [nuevoRGP] = await connectionPostgres.query(
       'SELECT * FROM resultados WHERE piloto_id = ? AND grand_prix_id = ?',
       [idPiloto, idGP]
     );
-    await connectionMySQL.query(`update grandes_premios set Estado_GP = 'V' WHERE id_GP = ?`,[idGP]);
+    await connectionPostgres.query(`update grandes_premios set Estado_GP = 'V' WHERE id_GP = ?`,[idGP]);
     return nuevoRGP[0];
 
   } catch (error) {

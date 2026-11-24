@@ -1,8 +1,8 @@
-import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class CategoriesModel {
     static async obtenerTodosLasCategorias () {
-      const [categorias] = await connectionMySQL.query('SELECT * FROM categoria;')
+      const [categorias] = await connectionPostgres.query('SELECT * FROM categoria;')
   
       return categorias
     }
@@ -13,7 +13,7 @@ export class CategoriesModel {
         } = entrada
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE categoria SET nombre = ? WHERE id_Categoria = ?',
                 [nombre, idCategoria]
             );

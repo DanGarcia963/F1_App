@@ -1,21 +1,21 @@
-import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class SeasonModel {
     static async obtenerTodasLasTemporadas () {
-      const [temporadas] = await connectionMySQL.query('SELECT * FROM temporada ORDER BY anio DESC;')
+      const [temporadas] = await connectionPostgres.query('SELECT * FROM temporada ORDER BY anio DESC;')
   
       return temporadas
     }
 
     static async obtenerTemporadaPorId (idTemporada) {
-        const [temporada] = await connectionMySQL.query('SELECT * from temporada where id_Temporada = ?;', [idTemporada])
+        const [temporada] = await connectionPostgres.query('SELECT * from temporada where id_Temporada = ?;', [idTemporada])
         if (temporada.length === 0) return false
     
         return temporada[0]
     }
 
     static async obtenerTemporadaPorAnio (Anio) {
-        const [temporada] = await connectionMySQL.query('SELECT * from temporada where anio = ?;', [Anio])
+        const [temporada] = await connectionPostgres.query('SELECT * from temporada where anio = ?;', [Anio])
         if (temporada.length === 0) return false
     
         return temporada[0]
@@ -30,7 +30,7 @@ export class SeasonModel {
         if (temporadaPorID !== false) return 'Ya existe una temporada con ese anio registrada'
     
         try {
-            await connectionMySQL.query('insert into temporada (anio) values(?);', [anio])
+            await connectionPostgres.query('insert into temporada (anio) values(?);', [anio])
             const temporadaCreado = await this.obtenerTemporadaPorAnio(anio)
             return temporadaCreado
         } catch (error) {
@@ -47,7 +47,7 @@ export class SeasonModel {
         if (!existeTemporada) return 'La temporada no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE temporada SET anio = ? WHERE id_Temporada = ?',
                 [anio, idTemporada]
             );
@@ -66,7 +66,7 @@ export class SeasonModel {
         if (!existeTemporada) return 'La temporada no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE temporada SET finalizada = 1 WHERE id_Temporada = ?',
                 [idTemporada]
             );

@@ -1,29 +1,29 @@
-import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class TeamModel {
     static async obtenerTodosLosEquipos (idCategoria) {
-      const [equipos] = await connectionMySQL.query('SELECT * FROM equipo where id_Categoria = ?;',[idCategoria])
+      const [equipos] = await connectionPostgres.query('SELECT * FROM equipo where id_Categoria = ?;',[idCategoria])
   
       return equipos
     }
 
     static async obtenerEquipoPorNombre (Nombre_Equipo) {
-        const [equipo] = await connectionMySQL.query('SELECT * FROM equipo where nombre = ?;', [Nombre_Equipo])
+        const [equipo] = await connectionPostgres.query('SELECT * FROM equipo where nombre = ?;', [Nombre_Equipo])
         if (equipo.length === 0) return false
     
         return equipo[0]
     }
 
     static async obtenerEquipoPorId (id_Equipo) {
-        const [equipo] = await connectionMySQL.query('SELECT * FROM equipo where id_Equipo = ?;', [id_Equipo])
+        const [equipo] = await connectionPostgres.query('SELECT * FROM equipo where id_Equipo = ?;', [id_Equipo])
         if (equipo.length === 0) return false
     
         return equipo[0]
     }
 
         static async obtenerDuplasPilotos (idEquipo) {
-        const [pilotosTemporadaEquipo] = await connectionMySQL.query(`SELECT 
-            GROUP_CONCAT(CONCAT(p.nombre, " ", p.apellido)SEPARATOR ', ')as Dupla, 
+        const [pilotosTemporadaEquipo] = await connectionPostgres.query(`SELECT 
+            STRING_AGG(CONCAT(p.nombre, ' ', p.apellido), ', ')AS "Dupla", 
             t.anio 
             FROM pilotos_temporada pt
             JOIN equipo e
@@ -40,11 +40,11 @@ export class TeamModel {
     }
 
         static async obtenerVictoriasEquipoPorID(idEquipo){
-        const[victorias]= await connectionMySQL.query(`SELECT 
+        const[victorias]= await connectionPostgres.query(`SELECT 
             gp.nombre_oficial,
             t.anio,
-            c.nombre as nombre_Circuito,
-            concat(p.Nombre, ' ',p.Apellido) as Winner,
+            c.nombre AS "nombre_Circuito",
+            concat(p.Nombre, ' ',p.Apellido) AS "Winner",
             gp.fecha
             FROM resultados rgp
             JOIN grandes_premios gp
@@ -72,21 +72,21 @@ export class TeamModel {
         const {
             idEquipo, anio
         }=entrada
-        const [pilotos] = await connectionMySQL.query(`SELECT
+        const [pilotos] = await connectionPostgres.query(`SELECT
             pt.piloto_id,
-            CONCAT(p.Nombre, ' ', p.Apellido) AS nombre_completo,
+            CONCAT(p.Nombre, ' ', p.Apellido) AS "nombre_completo",
             COALESCE(SUM(
                 CASE 
                 WHEN rgp.posicion_final = 1 AND gp.temporada_id = t.id_Temporada AND gp.tipo_carrera='GP' THEN 1 
                 ELSE 0 
                 END
-            ),0) AS victorias,
+            ),0) AS "victorias",
             COALESCE(SUM(
                 CASE 
                 WHEN rgp.posicion_final BETWEEN 1 AND 3 AND gp.temporada_id = t.id_Temporada AND gp.tipo_carrera='GP' THEN 1 
                 ELSE 0 
                 END
-            ),0) AS podios
+            ),0) AS "podios"
             FROM pilotos_temporada pt
             JOIN piloto p ON p.id_Piloto = pt.piloto_id
             JOIN temporada t ON t.id_Temporada = pt.temporada_id
@@ -102,13 +102,13 @@ export class TeamModel {
     }
     
         static async obtenerInfoEquipoPorId (idEquipo) {
-        const [equipo] = await connectionMySQL.query(`SELECT 
+        const [equipo] = await connectionPostgres.query(`SELECT 
       t.anio,
-      e.nombre AS Equipo,
-      SUM(rgp.puntos_obtenidos) AS puntos_totales,
-      SUM(CASE WHEN rgp.posicion_inicio = 1 THEN 1 ELSE 0 END) AS poles,
-      SUM(CASE WHEN rgp.posicion_final = 1 THEN 1 ELSE 0 END) AS victorias,
-      SUM(CASE WHEN rgp.posicion_final = 1 || rgp.posicion_final = 2 || rgp.posicion_final = 3 THEN 1 ELSE 0 END) AS Podios
+      e.nombre AS "Equipo",
+      SUM(rgp.puntos_obtenidos) AS "puntos_totales",
+      SUM(CASE WHEN rgp.posicion_inicio = 1 THEN 1 ELSE 0 END) AS "poles",
+      SUM(CASE WHEN rgp.posicion_final = 1 THEN 1 ELSE 0 END) AS "victorias",
+      SUM(CASE WHEN rgp.posicion_final = 1 OR rgp.posicion_final = 2 OR rgp.posicion_final = 3 THEN 1 ELSE 0 END) AS "Podios"
       FROM resultados rgp
       JOIN grandes_premios gp
           ON gp.id_GP = rgp.grand_prix_id
@@ -133,9 +133,9 @@ export class TeamModel {
         const {
             idEquipo
         }=entrada
-        const [monoplaza] = await connectionMySQL.query(`SELECT 
+        const [monoplaza] = await connectionPostgres.query(`SELECT 
         e.nombre,
-        et.monoplaza as F1_Car,
+        et.monoplaza AS "F1_Car",
         et.register_name,
         t.anio
         from equipo e 
@@ -158,7 +158,7 @@ export class TeamModel {
         if (equipoExiste !== false) return 'Ya existe un equipo con este nombre'
     
         try {
-            await connectionMySQL.query('insert into equipo (nombre, Motor, pais, id_Categoria) values(?, ?, ?, ?);', [nombre, Motor, pais, id_Categoria])
+            await connectionPostgres.query('insert into equipo (nombre, Motor, pais, id_Categoria) values(?, ?, ?, ?);', [nombre, Motor, pais, id_Categoria])
             const equipoCreado = await this.obtenerEquipoPorNombre(nombre)
             return equipoCreado
         } catch (error) {
@@ -175,7 +175,7 @@ export class TeamModel {
         if (!existePiloto) return 'El equipo no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE equipo SET nombre = ? WHERE id_Equipo = ?',
                 [nombre, idEquipo]
             );
@@ -196,7 +196,7 @@ export class TeamModel {
         if (!existePiloto) return 'El equipo no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE equipo SET Motor = ? WHERE id_Equipo = ?',
                 [Motor, idEquipo]
             );

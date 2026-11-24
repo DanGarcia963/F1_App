@@ -1,30 +1,30 @@
-import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class CircuitModel {
     static async obtenerTodosLosCircuitos () {
-      const [pilotos] = await connectionMySQL.query('SELECT * FROM circuito;')
+      const [pilotos] = await connectionPostgres.query('SELECT * FROM circuito;')
   
       return pilotos
     }
 
     static async obtenerCircuitoPorId (idCircuito) {
-        const [circuito] = await connectionMySQL.query('SELECT * FROM circuito where id_Circuito = ?;', [idCircuito])
+        const [circuito] = await connectionPostgres.query('SELECT * FROM circuito where id_Circuito = ?;', [idCircuito])
         if (circuito.length === 0) return false
     
         return circuito[0]
     }
 
     static async obtenerCircuitoPorNombre (nombre) {
-        const [circuito] = await connectionMySQL.query('SELECT * FROM circuito where nombre = ?;', [nombre])
+        const [circuito] = await connectionPostgres.query('SELECT * FROM circuito where nombre = ?;', [nombre])
         if (circuito.length === 0) return false
     
         return circuito
     }
 
     static async obtenerRecordPolePorId (idCircuito) {
-        const [recordPole] = await connectionMySQL.query(
+        const [recordPole] = await connectionPostgres.query(
             `SELECT 
-              CONCAT(pp.Nombre, ' ',pp.Apellido)AS nombre_completo,
+              CONCAT(pp.Nombre, ' ',pp.Apellido)AS "nombre_completo",
               gp.tiempo_pole,
               gp.fecha,
               gp.nombre_oficial
@@ -43,9 +43,9 @@ export class CircuitModel {
     }
 
     static async obtenerRecordVueltaPorId (idCircuito) {
-        const [recordVuelta] = await connectionMySQL.query(
+        const [recordVuelta] = await connectionPostgres.query(
             `SELECT 
-              CONCAT(vr.Nombre, ' ',vr.Apellido)AS nombre_completo,
+              CONCAT(vr.Nombre, ' ',vr.Apellido)AS "nombre_completo",
               gp.tiempo_vuelta_rapida,
               gp.fecha,
               gp.nombre_oficial
@@ -64,10 +64,10 @@ export class CircuitModel {
     }
 
     static async obtenerMaxVencedorPorId (idCircuito) {
-        const [maxVencedor] = await connectionMySQL.query(
+        const [maxVencedor] = await connectionPostgres.query(
             `SELECT 
-              CONCAT(p.Nombre, ' ',p.Apellido)AS nombre_completo,
-              COUNT(r.posicion_final) AS total_victorias
+              CONCAT(p.Nombre, ' ',p.Apellido)AS "nombre_completo",
+              COUNT(r.posicion_final) AS "total_victorias"
               FROM resultados r
               JOIN grandes_premios gp
               ON gp.id_GP = r.grand_prix_id
@@ -93,7 +93,7 @@ export class CircuitModel {
         if (circuitoExiste !== false) return 'Ya existe un circuito con ese nombre'
     
         try {
-            await connectionMySQL.query('insert into circuito (nombre, ciudad, pais, longitud_km, curvas) values(?, ?, ?, ?, ?);', [nombre, ciudad, pais, kmLongitud, curvas])
+            await connectionPostgres.query('insert into circuito (nombre, ciudad, pais, longitud_km, curvas) values(?, ?, ?, ?, ?);', [nombre, ciudad, pais, kmLongitud, curvas])
             const circuitoCreado = await this.obtenerCircuitoPorNombre(nombre)
             return circuitoCreado
         } catch (error) {
@@ -110,7 +110,7 @@ export class CircuitModel {
         if (!existeCircuito) return 'El circuito no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE circuito SET nombre = ? WHERE id_Circuito = ?',
                 [nombre, idCircuito]
             );
@@ -131,7 +131,7 @@ export class CircuitModel {
         if (!existeCircuito) return 'El circuito no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE circuito SET ciudad = ? WHERE id_Circuito = ?',
                 [ciudad, idCircuito]
             );
@@ -152,7 +152,7 @@ export class CircuitModel {
         if (!existeCircuito) return 'El circuito no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE circuito SET curvas = ? WHERE id_Circuito = ?',
                 [curvas, idCircuito]
             );
@@ -173,7 +173,7 @@ export class CircuitModel {
         if (!existeCircuito) return 'El circuito no existe'
     
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE circuito SET longitud_km = ? WHERE id_Circuito = ?',
                 [kmLongitud, idCircuito]
             );

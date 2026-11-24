@@ -1,8 +1,8 @@
- import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+ import { connectionPostgres } from '../../helpers/connectionPostgres.js'
  
  export class GPModel {
     static async obtenerTodosLosGP () {
-    const [GPs] = await connectionMySQL.query(`SELECT 
+    const [GPs] = await connectionPostgres.query(`SELECT 
         nombre_oficial
         FROM grandes_premios t
         WHERE id_GP = (
@@ -15,16 +15,16 @@
      }
  
     static async obtenerGPTemporadaPorId (Categoria, Anio) {
-        const [GPsTemporada] = await connectionMySQL.query(`
+        const [GPsTemporada] = await connectionPostgres.query(`
         SELECT 
             gp.id_GP,
-            gp.nombre_oficial AS Nombre_GP,
-            c.nombre AS Nombre_Circuito,
-            c.pais AS Pais,
+            gp.nombre_oficial AS "Nombre_GP",
+            c.nombre AS "Nombre_Circuito",
+            c.pais AS "Pais",
             gp.fecha,
-            IFNULL(g.codigo_fia, 'Aún no se disputa') AS Ganador,
-            IFNULL(pp.codigo_fia, 'NO TIME') AS Pole_Position,
-            IFNULL(vr.codigo_fia, 'NO TIME') AS Vuelta_Rapida
+            COALESCE(g.codigo_fia, 'Aún no se disputa') AS "Ganador",
+            COALESCE(pp.codigo_fia, 'NO TIME') AS "Pole_Position",
+            COALESCE(vr.codigo_fia, 'NO TIME') AS "Vuelta_Rapida"
         FROM grandes_premios gp
         LEFT JOIN piloto pp
             ON pp.id_Piloto = gp.pole_position_piloto_id
@@ -47,7 +47,7 @@
     }
 
     static async obtenerGPPorId (idGP) {
-        const [GP] = await connectionMySQL.query(`SELECT 
+        const [GP] = await connectionPostgres.query(`SELECT 
             gp.nombre_oficial as "Nombre_GP",
             c.nombre as "Nombre_Circuito",
             t.id_Temporada,
@@ -55,10 +55,10 @@
             gp.fecha,
             gp.tiempo_pole,
             gp.pole_position_piloto_id,
-            pp.codigo_fia AS Pole_Position,
+            pp.codigo_fia AS "Pole_Position",
             gp.tiempo_vuelta_rapida,
             gp.vuelta_rapida_piloto_id,
-            vr.codigo_fia AS Vuelta_Rapida,
+            vr.codigo_fia AS "Vuelta_Rapida",
             gp.tipo_carrera,
             gp.id_Categoria
             FROM
@@ -77,13 +77,13 @@
      }
 
     static async obtenerCampeonatoPilotosPorAnio (Categoria, Anio){
-        const [WDC] = await connectionMySQL.query(`select 
-                t.anio as temporada,
+        const [WDC] = await connectionPostgres.query(`select 
+                t.anio AS "temporada",
                 p.id_Piloto,
-                concat(p.codigo_fia,' ',p.numero) AS Piloto,
-                concat(p.Nombre, ' ', p.Apellido) as nombre_completo,
-                e.nombre as Equipo,
-                SUM(rgp.puntos_obtenidos) AS puntos_totales
+                concat(p.codigo_fia,' ',p.numero) AS "Piloto",
+                concat(p.Nombre, ' ', p.Apellido) AS "nombre_completo",
+                e.nombre AS "Equipo",
+                SUM(rgp.puntos_obtenidos) AS "puntos_totales"
                 from resultados rgp
                 join grandes_premios gp
                 on gp.id_GP = rgp.grand_prix_id
@@ -106,12 +106,12 @@
         return WDC
     }
         static async obtenerCampeonatoConstructoresPorAnio (Categoria,Anio){
-        const [WCC] = await connectionMySQL.query(`SELECT 
+        const [WCC] = await connectionPostgres.query(`SELECT 
             e.id_Equipo,
-            e.nombre AS equipo,
-            et.register_name AS register,
-            t.anio AS temporada,
-            SUM(rgp.puntos_obtenidos) AS puntos_totales
+            e.nombre AS "equipo",
+            et.register_name AS "register",
+            t.anio AS "temporada",
+            SUM(rgp.puntos_obtenidos) AS "puntos_totales"
             FROM resultados rgp
             JOIN grandes_premios gp ON gp.id_GP = rgp.grand_prix_id
             JOIN temporada t ON t.id_Temporada = gp.temporada_id
@@ -124,7 +124,7 @@
                  JOIN categoria cat
                 ON cat.id_Categoria = gp.id_Categoria
                 where t.anio = ? AND cat.id_Categoria = ?
-            GROUP BY e.id_Equipo, t.anio
+            GROUP BY e.id_Equipo, et.register_name, t.anio
             ORDER BY puntos_totales DESC;
             `,[Anio,Categoria]);
         if(WCC === 0) return false
@@ -132,7 +132,7 @@
     }
 
       static async obtenerLastWinnerGP (nombreOficial){
-      const [LastWinners] = await connectionMySQL.query(`SELECT 
+      const [LastWinners] = await connectionPostgres.query(`SELECT 
       gp.id_GP,
       t.anio,
       concat(p.Nombre, ' ',p.Apellido) Winners,
@@ -159,7 +159,7 @@ static async registrarGP({ entrada }) {
   } = entrada;
 
   try {
-    await connectionMySQL.query(
+    await connectionPostgres.query(
       `INSERT INTO grandes_premios
       (nombre_oficial, fecha, circuito_id, temporada_id, vueltas_totales, pole_position_piloto_id, tiempo_pole,vuelta_rapida_piloto_id, tiempo_vuelta_rapida,tipo_carrera, id_Categoria)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
@@ -167,7 +167,7 @@ static async registrarGP({ entrada }) {
     );
 
     // Si quieres devolver el GP recién insertado
-    const [nuevoGP] = await connectionMySQL.query(
+    const [nuevoGP] = await connectionPostgres.query(
       'SELECT * FROM grandes_premios WHERE nombre_oficial = ? AND fecha = ?',
       [nombreGP, fecha]
     );
@@ -182,7 +182,7 @@ static async registrarGP({ entrada }) {
 static async editarGP({ entrada }) {
   // Limpia los valores: si son '' o undefined, pon null
   function limpiar(valor) {
-    return (valor === '' || valor === undefined) ? null : valor;
+    return (valor === '' OR valor === undefined) ? null : valor;
   }
 
   const fecha = limpiar(entrada.fecha);
@@ -192,7 +192,7 @@ static async editarGP({ entrada }) {
   const vueltaRapida = limpiar(entrada.tiempo_vuelta_rapida);
   const idGP = limpiar(entrada.id_GP);
   try {
-    await connectionMySQL.query(
+    await connectionPostgres.query(
       `UPDATE grandes_premios
         SET 
         fecha = ?, 
@@ -205,7 +205,7 @@ static async editarGP({ entrada }) {
     );
 
     // Si quieres devolver el GP recién insertado
-    const [nuevoGP] = await connectionMySQL.query(
+    const [nuevoGP] = await connectionPostgres.query(
       'SELECT * FROM grandes_premios WHERE id_GP = ? AND fecha = ?',
       [idGP, fecha]
     );

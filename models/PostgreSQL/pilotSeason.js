@@ -1,13 +1,13 @@
-import { connectionMySQL } from '../../helpers/connectionMySQL.js'
+import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 
 export class PilotSeasonModel {
     static async obtenerTodosLosPilotosPorTemporadas () {
-      const [pilotosTemporadas] = await connectionMySQL.query(`SELECT
+      const [pilotosTemporadas] = await connectionPostgres.query(`SELECT
         p.id_Piloto,
-        CONCAT(p.nombre, ' ', p.apellido) AS nombre_completo,
+        CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo",
         e.id_Equipo,
-        e.nombre AS equipo,
-        GROUP_CONCAT(t.anio ORDER BY t.anio SEPARATOR ', ') AS temporadas
+        e.nombre AS "equipo",
+        STRING_AGG(t.anio::text, ', ' ORDER BY t.anio) AS "temporadas"
         FROM pilotos_temporada pt
         JOIN equipo e
         ON e.id_Equipo = pt.equipo_id
@@ -26,9 +26,9 @@ export class PilotSeasonModel {
     }
 
     static async obtenerPilotosPorTemporadaPorId (idCategoria, idTemporada) {
-        const [pilotosTemporada] = await connectionMySQL.query(`SELECT 
+        const [pilotosTemporada] = await connectionPostgres.query(`SELECT 
             p.id_Piloto,
-            CONCAT(p.nombre, " ", p.apellido) AS "nombre_completo"
+            CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo"
             FROM pilotos_temporada pt
             JOIN equipo e
             ON e.id_Equipo = pt.equipo_id
@@ -43,9 +43,9 @@ export class PilotSeasonModel {
     }
 
         static async obtenerPilotosPorTemporadaYEquipoPorId (idTemporada, idPiloto) {
-        const [pilotosTemporadaEquipo] = await connectionMySQL.query(`SELECT 
+        const [pilotosTemporadaEquipo] = await connectionPostgres.query(`SELECT 
             e.nombre, 
-            CONCAT(p.nombre, " ", p.apellido) AS "nombre_completo", 
+            CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo", 
             t.anio 
             FROM pilotos_temporada pt
             JOIN equipo e
@@ -60,9 +60,9 @@ export class PilotSeasonModel {
     }
     
         static async obtenerDuplaPilotos (idTemporada, idEquipo) {
-        const [pilotosTemporadaEquipo] = await connectionMySQL.query(`SELECT 
+        const [pilotosTemporadaEquipo] = await connectionPostgres.query(`SELECT 
             e.nombre, 
-            CONCAT(p.nombre, " ", p.apellido) AS "nombre_completo", 
+            CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo", 
             t.anio 
             FROM pilotos_temporada pt
             JOIN equipo e
@@ -88,7 +88,7 @@ export class PilotSeasonModel {
 
     
         try {
-            await connectionMySQL.query('insert into pilotos_temporada (piloto_id, equipo_id, temporada_id, numero) values(?, ?, ?, ?);', [idPiloto, idEquipo, idTemporada, numero])
+            await connectionPostgres.query('insert into pilotos_temporada (piloto_id, equipo_id, temporada_id, numero) values(?, ?, ?, ?);', [idPiloto, idEquipo, idTemporada, numero])
             const pilotoTemporadaCreado = await this.obtenerPilotosPorTemporadaYEquipoPorId(idTemporada, idPiloto)
             return pilotoTemporadaCreado
         } catch (error) {
@@ -110,7 +110,7 @@ export class PilotSeasonModel {
         if (existePilotoTemporada === false) {return 'Ya existe este piloto en esta temporada'}
 
         try {
-            await connectionMySQL.query(
+            await connectionPostgres.query(
                 'UPDATE pilotos_temporada SET piloto_id = ?, equipo_id = ?, numero =? WHERE id_Piloto_Temporada = ?',
                 [idPiloto, idEquipo, numero, idPilotoTemporada]
             );

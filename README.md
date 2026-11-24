@@ -1,36 +1,29 @@
-# F1_App - backend Railway
+# F1_App - backend Supabase PostgreSQL (preparación)
 
-Rama de despliegue: **backend-deploy**. Contiene Express, API REST, rutas, controladores y modelos MySQL. No incluye paginas HTML ni archivos de imagen.
-
-## Desplegar en Railway
-
-1. Crea un proyecto Railway desde el repositorio DanGarcia963/F1_App, con rama **backend-deploy**.
-2. Define Root Directory como raiz (sin subdirectorio), Build Command como npm ci y Start Command como npm start.
-3. Crea un servicio MySQL en ese mismo proyecto (o usa otra instancia MySQL remota).
-4. En las variables del servicio Express, crea DATABASE_URL con una referencia Railway al MYSQL_URL de MySQL (por ejemplo: ${{MySQL.MYSQL_URL}}).
-5. Configura ADMIN_API_KEY como secreto largo y aleatorio; sin esa variable todas las escrituras POST/PUT/PATCH/DELETE quedan deshabilitadas.
-6. Genera el dominio HTTPS publico en Networking. Utiliza ese origen, sin /api, como BACKEND_URL en Netlify.
-
-El backend utiliza el puerto PORT provisto por Railway.
-
-## Health checks
-
-- GET /api/health/live: indica que Express responde, aunque MySQL este desconectado. Railway usa este endpoint para el health check.
-- GET /api/health: consulta realmente la base de datos, devuelve 503 si no puede conectar.
-- GET /api/categoria/: datos de categorias; una base vacia devolvera [].
+Esta rama, `backend-supabase`, es una **propuesta de migración sin conexión a una base real**. No reemplaza `backend-deploy` (MySQL) hasta validar el nuevo proyecto.
 
 ## Base de datos
 
-La base MySQL historica NO estaba en GitHub. Debes importar el esquema reconstruido y la informacion real/semillas en el servicio MySQL. No usar PostgreSQL sin adaptar los modelos.
+Crea un **proyecto nuevo en Supabase** (no usar `siu` ni `ollin-db`) e importa el archivo `F1_App_Supabase_PostgreSQL.sql` suministrado por ChatGPT desde el SQL Editor. Contiene nueve tablas, llaves foráneas, indices y una categoría inicial F1. El repositorio no tenía dump de datos históricos.
 
-## Seguridad de escritura
+Se activa RLS en las tablas; no se incluyen políticas públicas y se revocan privilegios de tablas a anon/authenticated porque el frontend solo habla con la API Express de Railway. No colocar DATABASE_URL ni claves de servidor en Netlify.
 
-Las paginas de Netlify envian X-Admin-Key para solicitudes que modifican informacion. Esta clave no se publica en el frontend: el navegador se la pide al administrador y la mantiene temporalmente en sessionStorage. Es un control administrativo sencillo, no reemplaza un login multiusuario con roles.
+## Railway
 
-CORS_ORIGIN admite uno o varios origenes separados por comas, por ejemplo: https://tu-app.netlify.app,http://localhost:8888. Para navegar usando el proxy /api/* de Netlify no es necesario CORS.
+1. Crear un servicio desde el repositorio `DanGarcia963/F1_App` con branch `backend-supabase` (en paralelo al backend MySQL de producción).
+2. Build: `npm install --omit=dev` (este branch todavía no tiene package-lock).
+3. Start: `npm start`.
+4. `DATABASE_URL`: cadena PostgreSQL **Session pooler** de Supabase, puerto 5432; copiarla desde Connect, sin inventar hostname. Reemplazar contraseña y URL-encode de caracteres reservados.
+5. `ADMIN_API_KEY`: secreto largo y aleatorio.
+6. `CORS_ORIGIN`: origen publico exacto de Netlify si se accede directamente a la API.
+7. Comprobar `/api/health/live`, `/api/health` y `/api/categoria/`. Validar consultas y formularios antes de cambiar `BACKEND_URL` en Netlify.
 
-## Notas heredadas
+## Compatibilidad
 
-- Las pantallas y SQL actuales pueden necesitar datos iniciales para no mostrar vistas vacias.
-- Algunas rutas antiguas de resultados invocan metodos no implementados en los modelos originales. Se mantienen por compatibilidad y requieren una correccion funcional separada.
-- El package.json y el lockfile mantienen las dependencias originales para que npm ci siga siendo reproducible; los metadatos heredados pueden limpiarse en una actualizacion posterior.
+Los nueve modelos importan `connectionPostgres` en lugar de mysql2. Se migraron los parámetros a formato PostgreSQL y expresiones `IFNULL`, `GROUP_CONCAT`, `||` y alias. La API REST conserva sus rutas existentes.
+
+**Pendiente de prueba real:** consultas SELECT agregadas/joins; las tablas están vacías salvo una categoría F1. Hay métodos heredados de `ResultsModel` que originalmente ya faltaban. No hacer el cambio de tráfico sin probar.
+
+## Seguridad
+
+Operaciones POST/PUT/PATCH/DELETE requieren encabezado X-Admin-Key (implementación anterior). El navegador pide la clave al administrador y la guarda solo en sessionStorage. Mejorar a cuentas y roles antes de exponer administración ampliamente.
