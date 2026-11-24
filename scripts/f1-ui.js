@@ -129,6 +129,9 @@
       refresh.classList.add('f1-refresh');
       refresh.textContent = '↻ Actualizar';
       navigation.append(refresh);
+      if (page === 'categories' && typeof window.cargarCategorias === 'function') {
+        refresh.addEventListener('click', window.cargarCategorias);
+      }
     }
     const gpHeading = document.getElementById('gpTitle');
     if (gpHeading) {

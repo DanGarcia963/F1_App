@@ -634,3 +634,12 @@ body[data-f1-page="main"] .f1-hero-content {padding-right:280px;max-width:1040px
  .f1-next-gp{margin:0 22px 22px;}
  body #gpTitle.f1-gp-header-title{max-width:110px;font-size:10px!important;}
 }
+
+/* Team detail uses a flex body in the legacy markup: keep shell full-width. */
+body[data-f1-page="team"] > header,
+body[data-f1-page="team"] > .f1-hero { width: 100%; }
+body[data-f1-page="team"] > .f1-hero { width: min(1540px,calc(100% - 32px)); }
+body[data-f1-page="team"] > footer {width:100%;}
+@media (max-width:850px) {
+  body[data-f1-page="team"] > .f1-hero {width:calc(100% - 28px);}
+}
