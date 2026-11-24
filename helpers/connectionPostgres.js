@@ -11,12 +11,47 @@ if (!['postgres:', 'postgresql:'].includes(url.protocol)) {
   throw new Error('DATABASE_URL debe iniciar con postgresql:// (no mysql://).');
 }
 
+// Los parametros sslmode/sslrootcert/sslcert/sslkey de la URL pueden
+// sobrescribir la opcion ssl explicita del driver pg. Se eliminan y se
+// aplica una sola politica TLS de manera predecible.
+for (const key of ['sslmode', 'sslrootcert', 'sslcert', 'sslkey', 'uselibpqcompat', 'pgbouncer']) {
+  url.searchParams.delete(key);
+}
+
+// verify-full: valida certificado y hostname (recomendado).
+// require: cifra el trafico sin validar el certificado (solo contingencia).
+const tlsMode = (process.env.PGSSL_MODE || 'verify-full').trim().toLowerCase();
+const caRaw = process.env.SUPABASE_CA_CERT || '';
+const ca = caRaw.trim().replace(/\\n/g, '\n');
+let ssl;
+
+if (tlsMode === 'verify-full') {
+  if (ca && !ca.includes('-----BEGIN CERTIFICATE-----')) {
+    throw new Error('SUPABASE_CA_CERT no contiene un certificado PEM valido.');
+  }
+  ssl = {
+    rejectUnauthorized: true,
+    ...(ca ? { ca } : {})
+  };
+} else if (tlsMode === 'require') {
+  ssl = { rejectUnauthorized: false };
+  console.warn('[F1_App] TLS cifrado SIN validacion del certificado. Configura SUPABASE_CA_CERT y PGSSL_MODE=verify-full cuanto antes.');
+} else if (
+  tlsMode === 'disable' &&
+  process.env.NODE_ENV !== 'production' &&
+  ['localhost', '127.0.0.1', '::1'].includes(url.hostname)
+) {
+  ssl = false;
+} else {
+  throw new Error('PGSSL_MODE invalido. Usa verify-full o require; disable solo en desarrollo local.');
+}
+
 const pool = new pg.Pool({
-  connectionString,
+  connectionString: url.toString(),
   max: Number(process.env.PG_POOL_SIZE || 5),
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
-  ssl: process.env.PGSSL === 'disable' ? false : { rejectUnauthorized: true }
+  ssl
 });
 
 pool.on('error', error => {

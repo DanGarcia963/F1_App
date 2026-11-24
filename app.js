@@ -63,23 +63,53 @@ export const crearApp = Modelos => {
     }
   });
 
+  // Express 4 no captura automaticamente promesas rechazadas por manejadores
+  // async. Un fallo de PostgreSQL no debe terminar el proceso de Node.
+  const handleAsyncErrors = router => {
+    for (const layer of router.stack || []) {
+      if (!layer.route) continue;
+      for (const handler of layer.route.stack || []) {
+        const original = handler.handle;
+        handler.handle = (req, res, next) => {
+          try {
+            const result = original(req, res, next);
+            if (result && typeof result.then === 'function') {
+              result.catch(next);
+            }
+          } catch (error) {
+            next(error);
+          }
+        };
+      }
+    }
+    return router;
+  };
+
   // Solo los metodos que modifican datos requieren la clave privada.
   app.use('/api', requireAdminForWrites);
 
-  app.use('/api/piloto', PilotoRouter(Modelos));
-  app.use('/api/temporada', SeasonRouter(Modelos));
-  app.use('/api/equipo', TeamRouter(Modelos));
-  app.use('/api/circuito', CircuitRouter(Modelos));
-  app.use('/api/equipoTemporada', TeamSeasonRouter(Modelos));
-  app.use('/api/granPremio', GPRouter(Modelos));
-  app.use('/api/pilotoTemporada', PilotSeasonRouter(Modelos));
-  app.use('/api/resultados', ResultsRouter(Modelos));
-  app.use('/api/categoria', CategoriesRouter(Modelos));
+  app.use('/api/piloto', handleAsyncErrors(PilotoRouter(Modelos)));
+  app.use('/api/temporada', handleAsyncErrors(SeasonRouter(Modelos)));
+  app.use('/api/equipo', handleAsyncErrors(TeamRouter(Modelos)));
+  app.use('/api/circuito', handleAsyncErrors(CircuitRouter(Modelos)));
+  app.use('/api/equipoTemporada', handleAsyncErrors(TeamSeasonRouter(Modelos)));
+  app.use('/api/granPremio', handleAsyncErrors(GPRouter(Modelos)));
+  app.use('/api/pilotoTemporada', handleAsyncErrors(PilotSeasonRouter(Modelos)));
+  app.use('/api/resultados', handleAsyncErrors(ResultsRouter(Modelos)));
+  app.use('/api/categoria', handleAsyncErrors(CategoriesRouter(Modelos)));
 
   app.use((_req, res) => res.status(404).json({ message: 'Ruta no encontrada' }));
   app.use((error, _req, res, _next) => {
-    console.error('[F1_App] Error:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
+    console.error('[F1_App] Error en API:', error?.code || 'ERROR', error?.message || '');
+    const isDatabaseError = new Set([
+      'SELF_SIGNED_CERT_IN_CHAIN', 'UNABLE_TO_VERIFY_LEAF_SIGNATURE',
+      'CERT_HAS_EXPIRED', 'ERR_TLS_CERT_ALTNAME_INVALID',
+      'ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND',
+      '28P01', '3D000', '42P01'
+    ]).has(error?.code);
+    res.status(isDatabaseError ? 503 : 500).json({
+      message: isDatabaseError ? 'No se pudo consultar PostgreSQL' : 'Error interno del servidor'
+    });
   });
 
   const port = Number(process.env.PORT || 1234);
