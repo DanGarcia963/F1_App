@@ -111,7 +111,7 @@ export class PilotSeasonModel {
 
         try {
             await connectionMySQL.query(
-                'UPDATE pilotos_Temporada SET piloto_id = ?, equipo_id = ?, numero =? WHERE id_Piloto_Temporada = ?',
+                'UPDATE pilotos_temporada SET piloto_id = ?, equipo_id = ?, numero =? WHERE id_Piloto_Temporada = ?',
                 [idPiloto, idEquipo, numero, idPilotoTemporada]
             );
             const PilotoTemporadaEditado = await this.obtenerPilotosPorTemporadaPorId(idTemporada, idPiloto)
