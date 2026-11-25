@@ -204,7 +204,7 @@
   // Obtener id_GP desde URL
   const params = new URLSearchParams(window.location.search);
   const idGP = params.get('id');
-  const idCategoria = params.get("categoria") || sessionStorage.getItem("f1_categoria") || "1";
+  let idCategoria = params.get("categoria") || sessionStorage.getItem("f1_categoria") || "1";
   const gpTitle = document.getElementById('gpTitle');
   console.log(gpTitle)
   console.log(idCategoria)
@@ -237,6 +237,8 @@
     }
     return;
   }
+  // Categoria del evento: evita arrastrar la categoría de otra pestaña.
+  idCategoria = String(GPPoint[0].id_Categoria ?? idCategoria);
   const idSeason = GPPoint[0].id_Temporada
   
   const anio = GPPoint[0].anio
@@ -294,13 +296,17 @@
 
   // 1) Intentar obtener resultados
   let resultados;
+  let resultadosError = null;
   try {
     const r = await fetch(`/api/resultados/obtenerResultadoGP/${idGP}`);
-    if (!r.ok) throw new Error('No OK');
-    resultados = await r.json();
+    if (r.status === 404) resultados = [];
+    else {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      resultados = await r.json();
+    }
   } catch (e) {
-    // Si falla la petición, consideramos como no hay resultados
     resultados = null;
+    resultadosError = e;
   }
 
   const dateLabel = raw => {
@@ -352,8 +358,10 @@
     root.hidden=false;
     root.append(createElement('p','gp-podium-eyebrow','LOS TRES PRIMEROS'));
     const stage=createElement('div','gp-podium-stage');
+    if(top.length<3)stage.style.gridTemplateColumns='repeat('+top.length+', minmax(0,1fr))';
     for(const position of [2,1,3]){
       const driver=top.find(r=>Number(r.posicion_final)===position);
+      if(!driver)continue;
       const card=createElement('article','gp-podium-card gp-podium-card--'+position);
       card.append(createElement('span','gp-podium-rank','P'+position));
       const photoBox=createElement('div','gp-podium-portrait');
@@ -373,7 +381,7 @@
         card.setAttribute('aria-label','Ver perfil de '+driver.nombre_piloto);
         const open=()=>location.assign('/piloto?id='+encodeURIComponent(driver.id_Piloto)+'&categoria='+encodeURIComponent(idCategoria));
         card.addEventListener('click',open);
-        card.addEventListener('keydown',evt=>{if(evt.key==='Enter')open();});
+        card.addEventListener('keydown',evt=>{if(evt.key==='Enter'||evt.key===' '){evt.preventDefault();open();}});
       }
       stage.append(card);
     }
@@ -394,7 +402,15 @@
         numberValue(entry.vueltas_completadas),
         pointValue(entry.puntos_obtenidos)
       ];
-      for(const value of cells)tr.append(createElement('td','p-2 align-top',value));
+      for(let i=0;i<cells.length;i++){
+        const td=createElement('td','p-2 align-top gp-results-cell'+(i===1?' gp-results-driver':''));
+        if(i===1 && entry.id_Piloto){
+          const link=createElement('a','gp-driver-link',cells[i]);
+          link.href='/piloto?id='+encodeURIComponent(entry.id_Piloto)+'&categoria='+encodeURIComponent(idCategoria);
+          td.append(link);
+        }else td.textContent=String(cells[i]);
+        tr.append(td);
+      }
       resultadosBody.append(tr);
     }
   }
@@ -411,14 +427,21 @@
     // No hay resultados -> mostrar botón para abrir formulario
     resultadosSection.classList.add('hidden');
     noResultadosSection.classList.remove('hidden');
+    if(resultadosError){
+      noResultadosSection.querySelector('h2').textContent='Resultados no disponibles';
+      noResultadosSection.querySelector('p').textContent='No fue posible consultar la API. Comprueba la conexión con Railway.';
+      btnAbrir.disabled=true;
+      btnAbrir.hidden=true;
+    }
       // fallback a endpoint general de pilotos
       try {
         const resp2 = await fetch(endpointAllPilotos);
         pilotosList = await resp2.json();
       } catch (e2) {
-        console.error('Error cargando pilotos', err);
-            alert('No se pudieron cargar pilotos. Revisa la conexión.');
-            return;
+        console.error('Error cargando pilotos', e2);
+        // Un fallo del selector de pilotos no debe bloquear el historial de ganadores.
+        btnAbrir.disabled=true;
+        btnAbrir.title='La lista de pilotos no está disponible';
       }
     
 
@@ -589,27 +612,21 @@ else if(idCategoria == 2){
   btnAddRow?.addEventListener('click',() => openForm())
   btnClearRows?.addEventListener('click',()=>clearRows())
   btnGuardar?.addEventListener('click',async ()=>{
-    const { ok, payload, msg } = onSave();
-      if (!ok) {
-        alert(msg);
-        return;
-      }
-      if (!confirm(`Se agregarán ${payload.length} resultados. ¿Continuar?`)) return;
-        try {
-          payload.forEach(async(resultadosGP)=>{
-          console.log(resultadosGP)
-          await fetchGuardarResultadoGP(resultadosGP);
-
-          closeModal();
-            // refrescar strip y WDC/WCC
-            
-            })
-                      alert('Resultados agregados correctamente');
-                      setTimeout(()=> location.reload(), 800);
- 
-          } catch (err) {
-            alert('Error guardando resultados. Revisa la consola.');
-          }
+    const {ok,payload,msg}=onSave();
+    if(!ok){alert(msg);return;}
+    if(!confirm('Se agregarán '+payload.length+' resultados. ¿Continuar?'))return;
+    btnGuardar.disabled=true;
+    try{
+      for(const resultado of payload)await fetchGuardarResultadoGP(resultado);
+      closeModal();
+      mostrarMsg('Resultados guardados correctamente','ok');
+      location.reload();
+    }catch(err){
+      console.error('[F1_App] Error al guardar resultados',err);
+      mostrarMsg('Se interrumpió el guardado. Revisa los resultados antes de reintentar','err');
+    }finally{
+      btnGuardar.disabled=false;
+    }
   });
 
     function loadGP(data = {}) {
@@ -710,7 +727,7 @@ console.log()
         const resp3 = await fetch(endpointAllPilotos);
         pilotosList = await resp3.json();
       } catch (e2) {
-        console.error('Error cargando pilotos', err);
+        console.error('Error cargando pilotos', e2);
             alert('No se pudieron cargar pilotos. Revisa la conexión.');
             return;
       }
@@ -808,28 +825,22 @@ console.log()
 
   btnCancelarGP?.addEventListener('click',closeModalGP);
 
-  btnGuardarGP?.addEventListener('click', ()=>{
-    const { ok, payload, msg } = onChange();
-      if (!ok) {
-        alert(msg);
-        return;
-      }
-      if (!confirm(`Se agregarán los cambios del Gran Premio. ¿Continuar?`)) return;
-        try {
-          payload.forEach(async(cambiosGP)=>{
-          console.log(cambiosGP)
-          await fetchEditarGP(cambiosGP);
-
-          closeModal();
-            // refrescar strip y WDC/WCC
-            
-            })
-                      alert('Cambios actualizados correctamente');
-                      setTimeout(()=> location.reload(), 800);
- 
-          } catch (err) {
-            alert('Error guardando los cambios. Revisa la consola.');
-          }
+  btnGuardarGP?.addEventListener('click',async ()=>{
+    const {ok,payload,msg}=onChange();
+    if(!ok){alert(msg);return;}
+    if(!confirm('¿Guardar los cambios de este Gran Premio?'))return;
+    btnGuardarGP.disabled=true;
+    try{
+      for(const cambio of payload)await fetchEditarGP(cambio);
+      closeModalGP();
+      mostrarMsg('Gran Premio actualizado','ok');
+      location.reload();
+    }catch(err){
+      console.error('[F1_App] Error al editar el Gran Premio',err);
+      mostrarMsg('No se pudieron guardar todos los cambios','err');
+    }finally{
+      btnGuardarGP.disabled=false;
+    }
   });
 
     async function obtenerFotoPiloto(nombrePiloto, anio) {
