@@ -33,20 +33,20 @@
     
     obtenerRecordPolePorId = async (req, res) => {
         const { id } = req.params
-        const recordPole = await this.circuitModel.obtenerRecordPolePorId(id)
+        const recordPole = await this.circuitModel.obtenerRecordPolePorId(id,Number(req.query?.categoria)||1)
 
         return res.json((recordPole || null));
     }
 
     obtenerRecordVueltaPorId = async (req, res) => {
         const { id } = req.params
-        const recordVuelta = await this.circuitModel.obtenerRecordVueltaPorId(id)
+        const recordVuelta = await this.circuitModel.obtenerRecordVueltaPorId(id,Number(req.query?.categoria)||1)
         return res.json((recordVuelta || null));
     }
 
     obtenerMaxVencedorPorId = async (req, res) => {
         const { id } = req.params
-        const maxVencedor = await this.circuitModel.obtenerMaxVencedorPorId(id)
+        const maxVencedor = await this.circuitModel.obtenerMaxVencedorPorId(id,Number(req.query?.categoria)||1)
         return res.json((maxVencedor || null));
     }
 

@@ -24,13 +24,14 @@ export class CategoriesModel {
 
     static async obtenerTemporadaActual(idCategoria) {
       const [rows] = await connectionPostgres.query(`
-        SELECT t.id_temporada AS "id_Temporada", t.anio, t.finalizada,
+        SELECT t.id_temporada AS "id_Temporada", t.anio, COALESCE(tc.finalizada::integer,t.finalizada) AS finalizada,
                COUNT(DISTINCT gp.id_gp)::integer AS grandes_premios
         FROM temporada t
         JOIN grandes_premios gp ON gp.temporada_id = t.id_temporada
+        LEFT JOIN temporadas_categoria tc ON tc.temporada_id=t.id_temporada AND tc.id_categoria=gp.id_categoria
         WHERE gp.id_categoria = ?
           AND t.anio <= EXTRACT(YEAR FROM CURRENT_DATE)
-        GROUP BY t.id_temporada, t.anio, t.finalizada
+        GROUP BY t.id_temporada, t.anio, t.finalizada,tc.finalizada
         ORDER BY t.anio DESC
         LIMIT 1`, [idCategoria]);
       return rows[0] || null;

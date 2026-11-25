@@ -8,7 +8,7 @@ export class PilotSeasonModel {
         e.id_Equipo,
         e.nombre AS "equipo",
         STRING_AGG(t.anio::text, ', ' ORDER BY t.anio) AS "temporadas"
-        FROM pilotos_temporada pt
+        FROM v_pilotos_temporada_categoria pt
         JOIN equipo e
         ON e.id_Equipo = pt.equipo_id
         JOIN piloto p
@@ -29,14 +29,14 @@ export class PilotSeasonModel {
         const [pilotosTemporada] = await connectionPostgres.query(`SELECT 
             p.id_Piloto,
             CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo"
-            FROM pilotos_temporada pt
+            FROM v_pilotos_temporada_categoria pt
             JOIN equipo e
             ON e.id_Equipo = pt.equipo_id
             JOIN piloto p
             ON p.id_Piloto = pt.piloto_id
             JOIN temporada t
             ON t.id_Temporada = pt.temporada_id
-            WHERE pt.temporada_id = ? AND p.id_Categoria = ?
+            WHERE pt.temporada_id = ? AND pt.id_categoria = ?
             ORDER BY e.nombre;`, [idTemporada, idCategoria])
         if (pilotosTemporada.length === 0) return false 
         return pilotosTemporada
@@ -47,7 +47,7 @@ export class PilotSeasonModel {
             e.nombre, 
             CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo", 
             t.anio 
-            FROM pilotos_temporada pt
+            FROM v_pilotos_temporada_categoria pt
             JOIN equipo e
             ON e.id_Equipo = pt.equipo_id
             JOIN piloto p
@@ -64,7 +64,7 @@ export class PilotSeasonModel {
             e.nombre, 
             CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo", 
             t.anio 
-            FROM pilotos_temporada pt
+            FROM v_pilotos_temporada_categoria pt
             JOIN equipo e
             ON e.id_Equipo = pt.equipo_id
             JOIN piloto p

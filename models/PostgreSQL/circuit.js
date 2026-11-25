@@ -21,7 +21,7 @@ export class CircuitModel {
         return circuito
     }
 
-    static async obtenerRecordPolePorId (idCircuito) {
+    static async obtenerRecordPolePorId (idCircuito,categoria=1) {
         const [recordPole] = await connectionPostgres.query(
             `SELECT 
               CONCAT(pp.Nombre, ' ',pp.Apellido)AS "nombre_completo",
@@ -33,16 +33,16 @@ export class CircuitModel {
               ON c.id_Circuito = gp.circuito_id
               JOIN piloto pp
               ON pp.id_Piloto = gp.pole_position_piloto_id
-              WHERE c.id_Circuito = ?
+              WHERE c.id_Circuito = ? AND gp.id_categoria=?
               AND gp.tiempo_pole IS NOT NULL
               ORDER BY gp.tiempo_pole ASC;
-              `, [idCircuito]
+              `, [idCircuito,categoria]
         )
         if (recordPole.length === 0) return false
         return recordPole[0]
     }
 
-    static async obtenerRecordVueltaPorId (idCircuito) {
+    static async obtenerRecordVueltaPorId (idCircuito,categoria=1) {
         const [recordVuelta] = await connectionPostgres.query(
             `SELECT 
               CONCAT(vr.Nombre, ' ',vr.Apellido)AS "nombre_completo",
@@ -54,16 +54,16 @@ export class CircuitModel {
               ON c.id_Circuito = gp.circuito_id
               JOIN piloto vr
               ON vr.id_Piloto = gp.vuelta_rapida_piloto_id
-              WHERE c.id_Circuito = ?
+              WHERE c.id_Circuito = ? AND gp.id_categoria=?
               AND gp.tiempo_vuelta_rapida IS NOT NULL
               ORDER BY gp.tiempo_vuelta_rapida ASC
-              `, [idCircuito]
+              `, [idCircuito,categoria]
         )
         if (recordVuelta.length === 0) return false
         return recordVuelta[0]
     }
 
-    static async obtenerMaxVencedorPorId (idCircuito) {
+    static async obtenerMaxVencedorPorId (idCircuito,categoria=1) {
         const [maxVencedor] = await connectionPostgres.query(
             `SELECT 
               CONCAT(p.Nombre, ' ',p.Apellido)AS "nombre_completo",
@@ -75,10 +75,10 @@ export class CircuitModel {
               ON c.id_Circuito = gp.circuito_id
               JOIN piloto p
               ON p.id_Piloto = r.piloto_id
-              WHERE c.id_Circuito = ? AND r.posicion_final = 1 AND gp.tipo_carrera = 'GP'
+              WHERE c.id_Circuito = ? AND gp.id_categoria=? AND r.posicion_final = 1 AND (gp.tipo_carrera = 'GP' OR gp.id_categoria=2)
               GROUP BY p.id_Piloto
               ORDER BY total_victorias DESC
-              LIMIT 1`, [idCircuito]
+              LIMIT 1`, [idCircuito,categoria]
         )
         if (maxVencedor.length === 0) return false
         return maxVencedor[0]

@@ -21,7 +21,7 @@
             gp.nombre_oficial AS "Nombre_GP",
             c.nombre AS "Nombre_Circuito",
             c.pais AS "Pais",
-            gp.fecha,
+            gp.fecha,gp.tipo_carrera,
             COALESCE(g.codigo_fia, 'Aún no se disputa') AS "Ganador",
             COALESCE(pp.codigo_fia, 'NO TIME') AS "Pole_Position",
             COALESCE(vr.codigo_fia, 'NO TIME') AS "Vuelta_Rapida"
@@ -40,7 +40,7 @@
             ON cat.id_Categoria = gp.id_Categoria
         JOIN circuito c
             ON c.id_Circuito = gp.circuito_id
-        WHERE t.anio = ? AND cat.id_Categoria = ? AND gp.tipo_carrera = 'GP'
+        WHERE t.anio = ? AND cat.id_Categoria = ? AND (gp.tipo_carrera = 'GP' OR cat.id_categoria=2)
         ORDER BY gp.fecha ASC, gp.id_gp ASC;`, [Anio, Categoria])
         if (GPsTemporada.length === 0) return false 
         return GPsTemporada
@@ -77,6 +77,21 @@
      }
 
     static async obtenerCampeonatoPilotosPorAnio (categoria, anio) {
+      if(Number(categoria)===2){
+        const [official]=await connectionPostgres.query(`
+          SELECT t.anio AS temporada,p.id_piloto AS "id_Piloto",
+            CONCAT(p.codigo_fia,' ',COALESCE(pt.numero,p.numero)) AS "Piloto",
+            CONCAT(p.nombre,' ',p.apellido) AS nombre_completo,e.nombre AS "Equipo",c.puntos AS puntos_totales,c.posicion
+          FROM clasificacion_pilotos_oficial c
+          JOIN temporadas_categoria tc USING(id_categoria,temporada_id)
+          JOIN temporada t ON t.id_temporada=c.temporada_id
+          JOIN piloto p ON p.id_piloto=c.piloto_id
+          LEFT JOIN v_pilotos_temporada_categoria pt ON pt.piloto_id=c.piloto_id AND pt.temporada_id=c.temporada_id AND pt.id_categoria=c.id_categoria
+          LEFT JOIN equipo e ON e.id_equipo=pt.equipo_id
+          WHERE c.id_categoria=? AND t.anio=? AND tc.clasificacion_verificada
+          ORDER BY c.posicion`,[categoria,anio]);
+        return official;
+      }
       const [rows] = await connectionPostgres.query(`
         SELECT t.anio AS "temporada", p.id_piloto AS "id_Piloto",
           CONCAT(p.codigo_fia, ' ', COALESCE(pt.numero,p.numero)) AS "Piloto",
@@ -86,7 +101,7 @@
         JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id
         JOIN temporada t ON t.id_temporada = gp.temporada_id
         JOIN piloto p ON p.id_piloto = r.piloto_id
-        LEFT JOIN pilotos_temporada pt ON pt.temporada_id = t.id_temporada AND pt.piloto_id = p.id_piloto
+        LEFT JOIN v_pilotos_temporada_categoria pt ON pt.temporada_id = t.id_temporada AND pt.piloto_id = p.id_piloto AND pt.id_categoria=gp.id_categoria
         LEFT JOIN equipo e ON e.id_equipo = COALESCE(pt.equipo_id,r.equipo_id)
         WHERE t.anio = ? AND gp.id_categoria = ?
         GROUP BY t.anio,p.id_piloto,pt.numero,e.id_equipo
@@ -95,6 +110,17 @@
     }
 
     static async obtenerCampeonatoConstructoresPorAnio (categoria, anio) {
+      if(Number(categoria)===2){
+        const [official]=await connectionPostgres.query(`
+          SELECT e.id_equipo AS "id_Equipo",e.nombre AS equipo,COALESCE(et.register_name,e.nombre) AS "register",
+             t.anio AS temporada,c.puntos AS puntos_totales,c.posicion
+          FROM clasificacion_equipos_oficial c JOIN temporadas_categoria tc USING(id_categoria,temporada_id)
+          JOIN temporada t ON t.id_temporada=c.temporada_id JOIN equipo e ON e.id_equipo=c.equipo_id
+          LEFT JOIN equipos_temporada et ON et.equipo_id=c.equipo_id AND et.temporada_id=c.temporada_id
+          WHERE c.id_categoria=? AND t.anio=? AND tc.clasificacion_verificada
+          ORDER BY c.posicion`,[categoria,anio]);
+        return official;
+      }
       // equipo_id por carrera evita contabilizar puntos en un equipo incorrecto tras un traspaso.
       const [rows] = await connectionPostgres.query(`
         SELECT e.id_equipo AS "id_Equipo", e.nombre AS equipo,
@@ -103,7 +129,7 @@
         FROM resultados r
         JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id
         JOIN temporada t ON t.id_temporada = gp.temporada_id
-        LEFT JOIN pilotos_temporada pt ON pt.piloto_id = r.piloto_id AND pt.temporada_id = t.id_temporada
+        LEFT JOIN v_pilotos_temporada_categoria pt ON pt.piloto_id = r.piloto_id AND pt.temporada_id = t.id_temporada AND pt.id_categoria=gp.id_categoria
         JOIN equipo e ON e.id_equipo = COALESCE(r.equipo_id,pt.equipo_id)
         LEFT JOIN equipos_temporada et ON et.equipo_id = e.id_equipo AND et.temporada_id = t.id_temporada
         WHERE t.anio = ? AND gp.id_categoria = ?

@@ -21,8 +21,8 @@ export class ResultsModel {
       FROM resultados r
       JOIN piloto p ON p.id_piloto = r.piloto_id
       JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id
-      LEFT JOIN pilotos_temporada pt ON pt.piloto_id = r.piloto_id
-         AND pt.temporada_id = gp.temporada_id
+      LEFT JOIN v_pilotos_temporada_categoria pt ON pt.piloto_id = r.piloto_id
+         AND pt.temporada_id = gp.temporada_id AND pt.id_categoria=gp.id_categoria
       LEFT JOIN equipo e ON e.id_equipo = COALESCE(r.equipo_id, pt.equipo_id)
       WHERE gp.id_gp = ? AND gp.estado_gp = 'V'
       ORDER BY r.posicion_final ASC NULLS LAST, r.id_resultado ASC`, [idGP]);
@@ -33,11 +33,11 @@ export class ResultsModel {
     const {piloto_id,grand_prix_id,posicion_final,posicion_inicio,
            vueltas_completadas,puntos_obtenidos}=entrada;
     const [gp] = await connectionPostgres.query(
-       'SELECT temporada_id FROM grandes_premios WHERE id_gp = ?', [grand_prix_id]);
+       'SELECT temporada_id,id_categoria FROM grandes_premios WHERE id_gp = ?', [grand_prix_id]);
     if (!gp.length) throw new Error('Gran Premio no encontrado');
     const [pt] = await connectionPostgres.query(
-       'SELECT equipo_id FROM pilotos_temporada WHERE piloto_id = ? AND temporada_id = ?',
-       [piloto_id,gp[0].temporada_id]);
+       'SELECT equipo_id FROM v_pilotos_temporada_categoria WHERE piloto_id = ? AND temporada_id = ? AND id_categoria=?',
+       [piloto_id,gp[0].temporada_id,gp[0].id_categoria]);
     const [r] = await connectionPostgres.query(`
       INSERT INTO resultados
        (piloto_id,grand_prix_id,equipo_id,posicion_final,posicion_inicio,vueltas_completadas,puntos_obtenidos)

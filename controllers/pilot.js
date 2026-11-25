@@ -12,7 +12,7 @@ export class PilotoController {
     obtenerPilotoPorId = async (req, res) => {
         const { id } = req.params
 
-        const piloto = await this.pilotModel.obtenerPilotoPorId(id)
+        const piloto = await this.pilotModel.obtenerPilotoPorId(id,Number(req.query?.categoria)||1)
 
         if (piloto) return res.json(piloto)
             res.status(404).json({ message: 'piloto no encontrado' })
@@ -21,7 +21,7 @@ export class PilotoController {
     obtenerInfoPilotoPorId = async (req, res) => {
         const { id } = req.params
 
-        const piloto = await this.pilotModel.obtenerInfoPilotoPorId(id)
+        const piloto = await this.pilotModel.obtenerInfoPilotoPorId(id,Number(req.query?.categoria)||1)
 
         return res.json((Array.isArray(piloto) ? piloto : []));
     }
@@ -29,7 +29,7 @@ export class PilotoController {
     obtenerVictoriasPilotoPorID = async (req, res) => {
         const { id } = req.params
 
-        const piloto = await this.pilotModel.obtenerVictoriasPilotoPorID(id)
+        const piloto = await this.pilotModel.obtenerVictoriasPilotoPorID(id,Number(req.query?.categoria)||1)
 
         return res.json((Array.isArray(piloto) ? piloto : []));
     }
@@ -37,7 +37,7 @@ export class PilotoController {
     obtenerPodiosPilotoPorID = async (req, res) => {
         const { id } = req.params
 
-        const piloto = await this.pilotModel.obtenerPodiosPilotoPorID(id)
+        const piloto = await this.pilotModel.obtenerPodiosPilotoPorID(id,Number(req.query?.categoria)||1)
 
         return res.json((Array.isArray(piloto) ? piloto : []));
     }
@@ -45,7 +45,7 @@ export class PilotoController {
     obtenerTrayectoriaPilotoPorID = async (req, res) => {
         const { id } = req.params
 
-        const piloto = await this.pilotModel.obtenerTrayectoriaPilotoPorID(id)
+        const piloto = await this.pilotModel.obtenerTrayectoriaPilotoPorID(id,Number(req.query?.categoria)||1)
 
         return res.json((Array.isArray(piloto) ? piloto : []));
     }

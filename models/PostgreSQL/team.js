@@ -25,7 +25,7 @@ export class TeamModel {
         const [pilotosTemporadaEquipo] = await connectionPostgres.query(`SELECT 
             STRING_AGG(CONCAT(p.nombre, ' ', p.apellido), ', ')AS "Dupla", 
             t.anio 
-            FROM pilotos_temporada pt
+            FROM v_pilotos_temporada_categoria pt
             JOIN equipo e
             ON e.id_Equipo = pt.equipo_id
             JOIN piloto p
@@ -53,14 +53,14 @@ export class TeamModel {
                 ON t.id_Temporada = gp.temporada_id
             JOIN piloto p 
                 ON p.id_Piloto = rgp.piloto_id
-            JOIN pilotos_temporada pt
+            LEFT JOIN v_pilotos_temporada_categoria pt
                 ON pt.temporada_id = t.id_Temporada
-                AND pt.piloto_id = p.id_Piloto
+                AND pt.piloto_id = p.id_Piloto AND pt.id_categoria=gp.id_categoria
             JOIN equipo e
                 ON e.id_Equipo = COALESCE(rgp.equipo_id, pt.equipo_id)
             JOIN circuito c
                 ON c.id_Circuito = gp.circuito_id
-            WHERE e.id_Equipo = ? AND rgp.posicion_final = 1 AND gp.tipo_carrera = 'GP'
+            WHERE e.id_Equipo = ? AND rgp.posicion_final = 1 AND (gp.tipo_carrera = 'GP' OR gp.id_categoria=2)
             ORDER BY gp.fecha DESC;
             `, [idEquipo])
             if(victorias.length === 0) return false 
@@ -75,7 +75,7 @@ export class TeamModel {
           CONCAT(p.nombre, ' ', p.apellido) AS nombre_completo,
           COALESCE(stats.victorias, 0)::integer AS victorias,
           COALESCE(stats.podios, 0)::integer AS podios
-        FROM pilotos_temporada pt
+        FROM v_pilotos_temporada_categoria pt
         JOIN piloto p ON p.id_piloto = pt.piloto_id
         JOIN temporada t ON t.id_temporada = pt.temporada_id
         LEFT JOIN LATERAL (
@@ -85,8 +85,8 @@ export class TeamModel {
           FROM resultados r
           JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id
           WHERE r.piloto_id = pt.piloto_id
-            AND gp.temporada_id = t.id_temporada
-            AND gp.tipo_carrera = 'GP'
+            AND gp.temporada_id = t.id_temporada AND gp.id_categoria=pt.id_categoria
+            AND (gp.tipo_carrera = 'GP' OR gp.id_categoria=2)
             AND COALESCE(r.equipo_id, pt.equipo_id) = pt.equipo_id
         ) stats ON TRUE
         WHERE pt.equipo_id = ? AND t.anio = ?
@@ -99,7 +99,7 @@ export class TeamModel {
       t.anio,
       e.nombre AS "Equipo",
       SUM(rgp.puntos_obtenidos) AS "puntos_totales",
-      SUM(CASE WHEN rgp.posicion_inicio = 1 THEN 1 ELSE 0 END) AS "poles",
+      SUM(CASE WHEN gp.tipo_carrera='GP' AND gp.pole_position_piloto_id=rgp.piloto_id THEN 1 ELSE 0 END) AS "poles",
       SUM(CASE WHEN rgp.posicion_final = 1 THEN 1 ELSE 0 END) AS "victorias",
       SUM(CASE WHEN rgp.posicion_final = 1 OR rgp.posicion_final = 2 OR rgp.posicion_final = 3 THEN 1 ELSE 0 END) AS "Podios"
       FROM resultados rgp
@@ -109,12 +109,12 @@ export class TeamModel {
           ON t.id_Temporada = gp.temporada_id
       JOIN piloto p 
           ON p.id_Piloto = rgp.piloto_id
-      JOIN pilotos_temporada pt
+      LEFT JOIN v_pilotos_temporada_categoria pt
           ON pt.temporada_id = t.id_Temporada
-          AND pt.piloto_id = p.id_Piloto
+          AND pt.piloto_id = p.id_Piloto AND pt.id_categoria=gp.id_categoria
       JOIN equipo e
           ON e.id_Equipo = COALESCE(rgp.equipo_id, pt.equipo_id)
-      WHERE e.id_Equipo = ? AND gp.tipo_carrera = 'GP'
+      WHERE e.id_Equipo = ? AND (gp.tipo_carrera = 'GP' OR gp.id_categoria=2)
       GROUP BY  e.nombre, t.anio
       ORDER BY puntos_totales DESC;`, [idEquipo])
         if (equipo.length === 0) return false
