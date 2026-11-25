@@ -58,32 +58,26 @@
 
   <main class="min-w-md max-w-full mx-auto px-4 py-8">
     <!-- Contenedor de resultados (se muestra si hay datos) -->
-     <div class="grid grid-flow-row-dense grid-cols-4 grid-rows-4">
-    <section id="gridGrandPrixEdit" class="col-span-2 row-span-1 bg-neutral-900 border border-neutral-700 rounded-lg p-4 shadow">
-      <h2 class="text-xl font-semibold mb-4">Gran Premio</h2>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-          <thead>
-            <tr class="text-left text-gray-400">
-              <th class="p-2">Nombre</th>
-              <th class="p-2">Circuito</th>
-              <th class="p-2">Fecha</th>
-              <th class="p-2">Pole Position</th>
-              <th class="p-2">Vuelta Rapida</th>
-              
-              <th class="p-2" id="btnEdit">
-                <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#3498db" viewBox="0 0 16 16">
-                  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                </svg>
-              </th>
-            </tr>
+     <div class="gp-layout">
+    <section id="gridGrandPrixEdit" class="gp-summary-card">
+      <div class="gp-summary-heading">
+        <div>
+          <p class="gp-summary-kicker">RACE DETAILS</p>
+          <h2>Datos del Gran Premio</h2>
+        </div>
+        <button id="btnEdit" type="button" class="gp-summary-edit" aria-label="Editar datos del Gran Premio">✎ Editar</button>
+      </div>
+      <div class="gp-summary-fields">
+        <table class="gp-info-table">
+          <thead class="sr-only">
+            <tr><th>Nombre</th><th>Circuito</th><th>Fecha</th><th>Pole position</th><th>Vuelta rápida</th></tr>
           </thead>
-          <tbody id="EditGrandPrix" class="divide-y divide-neutral-800"></tbody>
+          <tbody id="EditGrandPrix"></tbody>
         </table>
       </div>
     </section>
 
-        <!-- Modal / Panel formulario Resultados de Gran Premio -->
+    <!-- Modal / Panel formulario Resultados de Gran Premio -->
     <div id="modalFormGP" class="fixed inset-0 hidden items-center justify-center bg-black/60 z-50 p-4">
       <div class="bg-neutral-900 w-full max-w-4xl rounded-lg shadow-lg overflow-auto max-h-[90vh]">
         <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
@@ -119,7 +113,9 @@
 
     <section id="gridResultados" class="col-span-2 row-span-4 hidden bg-neutral-900 border border-neutral-700 rounded-lg p-4 shadow">
       <h2 class="text-xl font-semibold mb-4">Resultados del Gran Premio</h2>
-      <div class="overflow-x-auto">
+      <div id="podiumSection" class="gp-podium" aria-label="Podio de la carrera"></div>
+      <div id="restResultsContainer" class="gp-results-table overflow-x-auto">
+        <p class="gp-results-kicker">CLASIFICACIÓN · RESTO DE LA PARRILLA</p>
         <table class="min-w-full text-sm">
           <thead>
             <tr class="text-left text-gray-400">
@@ -145,17 +141,17 @@
       </div>
     </section>
 
-    <section class="col-span-2 row-span-3  rounded-lg overflow-hidden shadow-lg relative">
+    <section class="gp-history-section">
         <div id="infoGridWCC" class="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-1 2xl:grid-cols-1 p-6 items-start">
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
             <div class="p-4 flex flex-row items-center gap-4">
               <div class="flex flex-col">
-                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Last Winners</p>
+                <p class="text-2xl max-w-full text-neutral-200 font-semibold">Ganadores anteriores</p>
               </div>
             </div>
           </div>
         </div>
-        <div id="gridLastWinner" class="grid grid-cols-1 gap-6 p-6 items-start overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default">
+        <div id="gridLastWinner" class="gp-last-winners">
         </div>
       </section>
 
@@ -245,7 +241,7 @@
   
   const anio = GPPoint[0].anio
   const nombreGP = GPPoint[0].Nombre_GP
-  gpTitle.textContent = `Gran Premio: ${nombreGP} ${anio}`
+  gpTitle.textContent = `Gran Premio: ${nombreGP}`
   document.title = `  ${gpTitle.textContent} | F1 App`;
             // GET -> devuelve array de resultados
   const endpointAllPilotos = `/api/pilotoTemporada/obtenerPilotosPorTemporada/${idCategoria}/${idSeason}`;                               // fallback
@@ -307,25 +303,110 @@
     resultados = null;
   }
 
+  const dateLabel = raw => {
+    const match=String(raw||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(!match)return 'Fecha no registrada';
+    const stamp=new Date(match[1]+'-'+match[2]+'-'+match[3]+'T12:00:00Z');
+    return new Intl.DateTimeFormat('es-MX',
+      {day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(stamp);
+  };
+  const createElement = (tag,cls,text) => {
+    const node=document.createElement(tag);
+    if(cls)node.className=cls;
+    if(text!==undefined&&text!==null)node.textContent=String(text);
+    return node;
+  };
+  const numberValue = (value,fallback='—') => value===null||value===undefined||value===''?fallback:String(value);
+  const pointValue = value => {
+    const n=Number(value??0);
+    return Number.isFinite(n)?n.toLocaleString('es-MX',{maximumFractionDigits:2})+' pts':'0 pts';
+  };
+  const folderName = name => {
+    const text=String(name||'').trim();
+    const aliases={'Kimi Antonelli':'Andrea Kimi Antonelli',
+      'Carlos Sainz Jr.':'Carlos Sainz Jr','Alexander Albon':'Alex Albon'};
+    return aliases[text]||text;
+  };
+  function portrait(name,year,cssClass='gp-podium-photo'){
+    const picture=createElement('img',cssClass);
+    const folder=encodeURIComponent(folderName(name));
+    const base='/Driver_photos/'+folder+'/';
+    const candidates=[year+'.png','2025.png','driver.webp','driver.jpg','driver.jpeg']
+      .map(file=>base+file);
+    let index=0;
+    picture.alt='Retrato de '+name;
+    picture.loading='lazy';
+    picture.decoding='async';
+    picture.onerror=()=>{
+      if(++index<candidates.length)picture.src=candidates[index];
+      else picture.remove();
+    };
+    picture.src=candidates[0];
+    return picture;
+  }
+  function renderPodium(data){
+    const root=document.getElementById('podiumSection');
+    root.replaceChildren();
+    const top=data.filter(r=>[1,2,3].includes(Number(r.posicion_final)));
+    if(!top.length){root.hidden=true;return;}
+    root.hidden=false;
+    root.append(createElement('p','gp-podium-eyebrow','LOS TRES PRIMEROS'));
+    const stage=createElement('div','gp-podium-stage');
+    for(const position of [2,1,3]){
+      const driver=top.find(r=>Number(r.posicion_final)===position);
+      const card=createElement('article','gp-podium-card gp-podium-card--'+position);
+      card.append(createElement('span','gp-podium-rank','P'+position));
+      const photoBox=createElement('div','gp-podium-portrait');
+      const initials=(driver?.nombre_piloto||'?').split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase();
+      photoBox.append(createElement('span','gp-podium-initials',initials));
+      if(driver)photoBox.append(portrait(driver.nombre_piloto,driver.anio||anio));
+      card.append(photoBox);
+      card.append(createElement('strong','gp-podium-name',driver?.nombre_piloto||'Sin clasificar'));
+      card.append(createElement('span','gp-podium-team',driver?.equipo||'—'));
+      card.append(createElement('span','gp-podium-points',pointValue(driver?.puntos_obtenidos)));
+      const step=createElement('div','gp-podium-step','0'+position);
+      card.append(step);
+      if(driver?.id_Piloto){
+        card.style.cursor='pointer';
+        card.tabIndex=0;
+        card.setAttribute('role','link');
+        card.setAttribute('aria-label','Ver perfil de '+driver.nombre_piloto);
+        const open=()=>location.assign('/piloto?id='+encodeURIComponent(driver.id_Piloto)+'&categoria='+encodeURIComponent(idCategoria));
+        card.addEventListener('click',open);
+        card.addEventListener('keydown',evt=>{if(evt.key==='Enter')open();});
+      }
+      stage.append(card);
+    }
+    root.append(stage);
+  }
+  function renderOtherResults(data){
+    const remaining=data.filter(r=>![1,2,3].includes(Number(r.posicion_final)));
+    const table=document.getElementById('restResultsContainer');
+    table.hidden=remaining.length===0;
+    resultadosBody.replaceChildren();
+    for(const entry of remaining){
+      const tr=document.createElement('tr');
+      const cells=[
+        numberValue(entry.posicion_final,'NC'),
+        entry.nombre_piloto||'Piloto sin identificar',
+        entry.equipo||'—',
+        numberValue(entry.posicion_inicio),
+        numberValue(entry.vueltas_completadas),
+        pointValue(entry.puntos_obtenidos)
+      ];
+      for(const value of cells)tr.append(createElement('td','p-2 align-top',value));
+      resultadosBody.append(tr);
+    }
+  }
   if (Array.isArray(resultados) && resultados.length > 0) {
-    // Mostrar tabla de resultados
     resultadosSection.classList.remove('hidden');
     noResultadosSection.classList.add('hidden');
-    console.log(resultados)
-    // Rellenar tabla
-    resultadosBody.innerHTML = '';
-    resultados.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-2 align-top">${row.posicion_final}</td>
-          <td class="p-2 align-top">${row.nombre_piloto || row.piloto_nombre || row.piloto || '—'}</td>
-          <td class="p-2 align-top">${row.equipo || '—'}</td>
-          <td class="p-2 align-top">${row.posicion_inicio || '—'}</td>
-          <td class="p-2 align-top">${row.vueltas_completadas || '—'}</td>
-          <td class="p-2 align-top">${row.puntos || row.puntos_obtenidos || 0}</td>
-        `;
-        resultadosBody.appendChild(tr);
-      });
+    const ordered=[...resultados].sort((a,b)=>{
+      const pos=r=>r.posicion_final==null?Number.MAX_SAFE_INTEGER:Number(r.posicion_final);
+      return pos(a)-pos(b);
+    });
+    renderPodium(ordered);
+    renderOtherResults(ordered);
   } else {
     // No hay resultados -> mostrar botón para abrir formulario
     resultadosSection.classList.add('hidden');
@@ -593,7 +674,7 @@ else if(idCategoria == 2){
         tr.innerHTML = `
           <td class="p-2 align-top">${row.Nombre_GP || '—'}</td>
           <td class="p-2 align-top">${row.Nombre_Circuito ||'—'}</td>
-          <td class="p-2 align-top">${row.fecha || '—'}</td>
+          <td class="p-2 align-top">${dateLabel(row.fecha)}</td>
           <td class="p-2 align-top">${row.Pole_Position || '—'} ${row.tiempo_pole || 'No Time'}</td>
           <td class="p-2 align-top">${row.Vuelta_Rapida || '—'} ${row.tiempo_vuelta_rapida || 'No Time'}</td>
           
@@ -615,11 +696,8 @@ else if(idCategoria == 2){
     filaCount++;
     const tr = document.createElement('tr');
     tr.dataset.row = filaCount;
-  const fecha = new Date(data.fecha);
-  const day = String(fecha.getDate()).padStart(2, '0');
-  const month = String(fecha.getMonth() + 1).padStart(2, '0');
-  const year = fecha.getFullYear();
-  const fechaVal = `${year}-${month}-${day}`;
+  // Conservar el día UTC exacto, sin desplazar la fecha por el huso horario.
+  const fechaVal = String(data.fecha || '').slice(0,10);
 
   const PilotoPPVal = Number(data.pole_position_piloto_id) ?? '';
   const PilotoVRVal = data.vuelta_rapida_piloto_id ?? '';
@@ -785,40 +863,43 @@ console.log()
       }
     }
 
-      async function cargarLastWinners() {
-      try {
-          const Winners = await fetch(`/api/granPremio/obtenerLastWinners/${nombreGP}`).then(r => r.json());
-          console.log(Winners)
-
-        const lastWinner = document.getElementById('gridLastWinner');
-        lastWinner.innerHTML = '';
-          for (let i = 0; i < Winners.length; i++) {
-          const p = Winners[i];
-        const imgUrl = await obtenerFotoPiloto(p.Winners, p.anio);
-        const cardDriver = document.createElement('div');
-
-        cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
-        cardDriver.innerHTML = `
-                <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
-                <p class="text-sm text-neutral-400 w-3 text-center">${p.anio}</p>
-                <div class="p-4 gap-4">
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.Winners}" class="w-14 h-14 bg-white rounded-full mb-2 gap-4 border">` : ''}
-                </div>
-                <p class="text-sm text-neutral-400 w-5 text-center">${p.Winners}</p>
-                </div>
-        `;
-        cardDriver.dataset.IdGP = p.id_GP
-        cardDriver.addEventListener('click', () => {
-        window.location.href = `/granPremio?id=${p.id_GP}`; // ejemplo de redirección con query
-        });
-        lastWinner.appendChild(cardDriver)
-
-        };
-      } catch (err) {
-        console.error('Error cargando campeonatos', err);
+  async function cargarLastWinners(){
+    const container=document.getElementById('gridLastWinner');
+    container.replaceChildren(createElement('p','gp-list-message','Consultando ganadores históricos...'));
+    try {
+      // Se consulta por id del GP: patrocinadores y años no alteran la coincidencia.
+      const route='/api/granPremio/obtenerLastWinnersPorGp/'+encodeURIComponent(idGP);
+      const response=await fetch(route);
+      if(!response.ok)throw new Error('HTTP '+response.status+' consultando '+route);
+      const winners=await response.json();
+      if(!Array.isArray(winners))throw new Error('Respuesta de ganadores inválida');
+      container.replaceChildren();
+      if(!winners.length){
+        container.append(createElement('p','gp-list-message',
+          'No hay ganadores anteriores registrados para este circuito y categoría.'));
+        return;
       }
+      for(const item of winners){
+        const winnerName=String(item.Winners||'Piloto');
+        const card=createElement('a','gp-winner-card');
+        card.href='/granPremio?id='+encodeURIComponent(item.id_GP)+'&categoria='+encodeURIComponent(idCategoria);
+        const portraitBox=createElement('div','gp-winner-portrait');
+        portraitBox.append(createElement('span','gp-winner-initials',winnerName.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()));
+        portraitBox.append(portrait(winnerName,item.anio,'gp-winner-photo'));
+        const info=createElement('div','gp-winner-info');
+        info.append(createElement('span','gp-winner-year','TEMPORADA '+item.anio));
+        info.append(createElement('strong','gp-winner-name',winnerName));
+        info.append(createElement('span','gp-winner-event',item.nombre_oficial||item.Circuito||'GP histórico'));
+        card.append(portraitBox,info,createElement('span','gp-winner-arrow','↗'));
+        container.append(card);
+      }
+    } catch(err) {
+      console.error('[F1_App] Fallo la consulta de ganadores anteriores',err);
+      container.replaceChildren(createElement('p','gp-list-message',
+        'No se pudo cargar el historial de ganadores. Comprueba el despliegue de Railway.'));
     }
-    
+  }
+
     cargarLastWinners();
 })();
 

@@ -643,3 +643,441 @@ body[data-f1-page="team"] > footer {width:100%;}
 @media (max-width:850px) {
   body[data-f1-page="team"] > .f1-hero {width:calc(100% - 28px);}
 }
+
+
+/* === 2026 visual QA: prevent overflow, consistent cards, responsive components === */
+*,*::before,*::after { box-sizing:border-box; }
+:is(.gp-layout,.driver-page-grid,.season-cards,.gp-podium-stage) * { min-width:0; }
+:is(.gp-layout,.driver-page-grid,.season-cards) :is(h2,h3,p,strong,span,td) {
+  overflow-wrap:break-word;
+}
+.f1-title,.f1-desc{max-width:100%;}
+/* Full-size season tiles. "TEMPORADA" is now a small eyebrow, year a distinct metric. */
+#gridSeasons.season-cards {
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,206px),1fr))!important;
+  gap:16px!important;
+  overflow:visible!important;
+  max-height:none!important;
+  align-items:stretch!important;
+  padding:18px 0!important;
+  width:100%;
+}
+#gridSeasons .season-card {
+  position:relative;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  flex-direction:column;
+  gap:15px;
+  width:100%;
+  min-height:205px!important;
+  padding:23px 20px!important;
+  text-align:left;
+  text-decoration:none;
+  border:1px solid rgba(235,244,255,.12)!important;
+  border-radius:19px!important;
+  background:linear-gradient(145deg,#202b3b,#121a27)!important;
+}
+#gridSeasons .season-card::after {opacity:0;}
+#gridSeasons .season-card .season-card-label{
+  font:800 10px/1.3 var(--f1-body)!important;
+  letter-spacing:.19em;color:var(--f1-gold);text-transform:uppercase;
+}
+#gridSeasons .season-card .season-card-year {
+  font:900 clamp(37px,4vw,57px)/.9 var(--f1-display)!important;
+  letter-spacing:.015em;color:#fff!important;
+  width:100%;display:block;
+}
+#gridSeasons .season-card .season-card-champion{
+  font:600 12px/1.45 var(--f1-body)!important;
+  color:#c5cfdb!important;
+  overflow-wrap:anywhere;
+  max-width:95%;
+  text-wrap:pretty;
+}
+#gridSeasons .season-card .season-card-arrow{
+  position:absolute;right:17px;top:17px;
+  font:700 20px/1 var(--f1-body);color:var(--f1-red);
+}
+
+/* Driver profile: six metrics within their own fluid cards, never inline with a percentage. */
+body[data-f1-page="piloto"] > .driver-page-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;
+  grid-auto-rows:min-content;
+  gap:20px!important;
+  width:min(100%,1540px)!important;
+  max-width:1540px!important;
+  margin:0 auto 80px!important;
+  padding:0 clamp(16px,3vw,48px)!important;
+  overflow:visible!important;
+}
+.driver-page-grid > .driver-panel{
+  min-width:0;
+  max-width:none!important;
+  width:100%;
+  margin:0!important;
+  padding:clamp(18px,2.3vw,30px)!important;
+  background:linear-gradient(150deg,#182130,#0e1520)!important;
+  border:1px solid var(--f1-line)!important;
+  border-radius:22px!important;
+  box-shadow:0 15px 35px rgba(0,0,0,.22)!important;
+  overflow:hidden;
+}
+.driver-profile-panel{grid-column:1;grid-row:1;}
+.driver-victories-panel{grid-column:2;grid-row:1;}
+.driver-career-panel{grid-column:1;grid-row:2;}
+.driver-podiums-panel{grid-column:2;grid-row:2;}
+.driver-profile-panel #nombrePiloto{
+  display:block;max-width:100%;padding:0 8px;
+  font:900 clamp(31px,3.5vw,48px)/.96 var(--f1-display)!important;
+  letter-spacing:.01em;text-align:center;overflow-wrap:anywhere;
+}
+.driver-profile-panel #equipoPiloto{
+  font-size:13px;color:#c5cedd;text-align:center;margin-top:8px;
+}
+.driver-profile-panel #fotoPiloto{display:block;max-width:100%;}
+.driver-profile-panel #fotoPiloto img{max-width:100%!important;height:230px!important;object-fit:contain!important;}
+.driver-overview{margin-top:23px;}
+.driver-section-heading{padding:0!important;margin-bottom:15px;border-bottom:1px solid var(--f1-line);}
+.driver-section-heading h2{
+  margin:0 0 13px;font:800 25px/1 var(--f1-display);
+  text-transform:uppercase;
+}
+.driver-meta-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;margin:0 0 26px;
+}
+.driver-meta-grid >div{
+  display:flex;flex-direction:column;gap:7px;min-width:0;
+  padding:14px 12px;border-radius:12px;
+  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);
+}
+.driver-meta-grid dt{
+  font:800 10px/1.4 var(--f1-body);letter-spacing:.08em;
+  color:#a6b6ca;text-transform:uppercase;
+}
+.driver-meta-grid dd{
+  margin:0;font:700 13px/1.45 var(--f1-body);color:#f3f6fb;
+  overflow-wrap:anywhere;
+}
+.driver-stats-heading{
+  font:800 24px/1 var(--f1-display);margin:0 0 14px;
+  text-transform:uppercase;
+}
+.driver-stats-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+}
+.driver-stat-card{
+  display:flex;flex-direction:column;align-items:flex-start;
+  justify-content:center;gap:9px;
+  min-height:127px;padding:15px 16px;
+  border:1px solid rgba(207,221,238,.12);
+  border-radius:13px;background:linear-gradient(145deg,#242e3d,#171f2c);
+}
+.driver-stat-card--primary{
+  background:linear-gradient(135deg,rgba(159,27,46,.35),rgba(27,34,47,.95))!important;
+  border-color:rgba(246,55,67,.27)!important;
+}
+.driver-stat-label{
+  font:800 11px/1.35 var(--f1-body);letter-spacing:.07em;
+  text-transform:uppercase;color:#b7c3d3;
+}
+.driver-stat-card .driver-stat-value,
+body[data-f1-page="piloto"] #puntosTotales,
+body[data-f1-page="piloto"] #startsPiloto,
+body[data-f1-page="piloto"] #victoriasPiloto,
+body[data-f1-page="piloto"] #podiosPiloto,
+body[data-f1-page="piloto"] #polesPiloto,
+body[data-f1-page="piloto"] #fastLapsPiloto {
+  display:block;
+  width:100%;
+  font:900 clamp(31px,3vw,43px)/.95 var(--f1-display)!important;
+  letter-spacing:.005em;color:#fff!important;
+  font-variant-numeric:tabular-nums;
+  white-space:normal!important;
+  overflow-wrap:anywhere;
+  min-width:0;
+}
+.driver-stat-card .driver-stat-note{
+  color:#a8b7ca;font:600 11px/1.3 var(--f1-body);text-wrap:balance;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) {
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,185px),1fr))!important;
+  align-content:start;align-items:stretch!important;
+  gap:12px!important;padding:10px 0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  max-height:650px;min-width:0;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) > *{
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:auto!important;align-self:start;overflow:hidden!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) > * > div{
+  width:100%;max-width:100%;padding:15px!important;
+  min-width:0!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) h3{
+  font:800 clamp(17px,1.9vw,22px)/1.16 var(--f1-display)!important;
+  max-width:100%;overflow-wrap:anywhere;hyphens:auto;
+  margin:0 0 12px!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) img{
+  width:100%;max-width:100%;height:112px!important;
+  object-fit:cover;border-radius:11px!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) p{
+  color:#b3c0d1;font-size:11px!important;line-height:1.45;
+  max-width:100%;
+}
+
+/* Grand Prix: no fixed four-by-four grid, no empty stretched quadrants. */
+body[data-f1-page="granpremio"] main{
+  width:100%;max-width:1540px!important;
+}
+body[data-f1-page="granpremio"] .gp-layout{
+  display:grid!important;
+  grid-template-columns:minmax(0,.84fr) minmax(0,1.42fr)!important;
+  grid-template-areas:"summary results" "history results";
+  grid-template-rows:auto 1fr;
+  align-items:start;
+  gap:20px!important;
+  width:100%;min-width:0;
+}
+body[data-f1-page="granpremio"] .gp-layout > section{
+  max-width:100%;min-width:0!important;margin:0!important;
+  border-radius:20px!important;
+  background:linear-gradient(155deg,#172131,#0f1723)!important;
+  border:1px solid var(--f1-line)!important;
+}
+#gridGrandPrixEdit{grid-area:summary;padding:25px!important;}
+#gridResultados,#noResultados{grid-area:results;padding:clamp(16px,2vw,26px)!important;}
+.gp-history-section{
+  grid-area:history;
+  padding:14px 18px 20px!important;
+  overflow:hidden!important;
+}
+.gp-history-section #infoGridWCC{padding:0!important;display:block!important;}
+.gp-history-section #infoGridWCC > div{border:0!important;background:transparent!important;box-shadow:none!important;}
+.gp-history-section #infoGridWCC p{
+  font:800 clamp(23px,2.6vw,31px)/1.07 var(--f1-display)!important;
+  text-transform:uppercase;
+}
+.gp-summary-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px;}
+.gp-summary-heading h2{
+  font:800 clamp(22px,2.4vw,30px)/1 var(--f1-display)!important;
+  margin:6px 0 0!important;text-transform:uppercase;
+}
+.gp-summary-kicker{
+  margin:0;font:800 10px/1.35 var(--f1-body)!important;
+  color:var(--f1-gold);letter-spacing:.15em;
+}
+.gp-summary-edit{
+  flex:none;display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;padding:8px 11px!important;border:1px solid rgba(218,232,249,.17)!important;
+  border-radius:9px!important;background:#273242!important;color:#f0f5ff;
+  font:700 11px/1 var(--f1-body);
+}
+.gp-summary-fields{min-width:0;width:100%;}
+.gp-info-table,.gp-info-table tbody,.gp-info-table tr{display:block!important;width:100%;}
+.gp-info-table thead.sr-only{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden;}
+.gp-info-table tbody tr{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px!important;padding:0!important;
+}
+.gp-info-table tbody td{
+  display:flex;flex-direction:column;gap:7px;
+  padding:12px!important;border:1px solid rgba(213,225,242,.11)!important;
+  border-radius:11px!important;background:#1b2534;
+  font:700 12px/1.5 var(--f1-body);
+  word-break:normal;overflow-wrap:anywhere;
+}
+.gp-info-table tbody td:first-child{
+  grid-column:1/-1;color:#fff!important;
+  font:800 clamp(16px,1.7vw,21px)/1.22 var(--f1-display)!important;
+}
+.gp-info-table tbody td::before{
+  font:800 10px/1.2 var(--f1-body);color:#aebed1;
+  letter-spacing:.1em;
+}
+.gp-info-table td:nth-child(1)::before{content:"GRAN PREMIO";}
+.gp-info-table td:nth-child(2)::before{content:"CIRCUITO";}
+.gp-info-table td:nth-child(3)::before{content:"FECHA";}
+.gp-info-table td:nth-child(4)::before{content:"POLE POSITION";}
+.gp-info-table td:nth-child(5)::before{content:"VUELTA RÁPIDA";}
+#gridResultados > h2{
+  font:800 clamp(23px,2.7vw,34px)/1 var(--f1-display)!important;
+  text-transform:uppercase;letter-spacing:.03em;
+  margin:0 0 22px;
+}
+#gridResultados .gp-podium{margin:0 0 28px;}
+.gp-podium-eyebrow,.gp-results-kicker{
+  color:var(--f1-gold);font:800 10px/1.3 var(--f1-body);
+  letter-spacing:.16em;margin:0 0 15px;text-transform:uppercase;
+}
+.gp-results-kicker{margin-top:12px;color:#b9c9db;}
+.gp-podium-stage{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);
+  align-items:end;gap:12px;
+}
+.gp-podium-card{
+  display:flex;flex-direction:column;align-items:center;
+  min-width:0;padding:15px 12px 0;
+  border-radius:16px 16px 10px 10px;
+  background:linear-gradient(180deg,#232e3f,#141b29);
+  border:1px solid rgba(225,236,250,.14);
+  text-align:center;position:relative;overflow:hidden;
+  box-shadow:0 9px 25px rgba(0,0,0,.18);
+  transition:transform .2s ease,border-color .2s ease;
+}
+.gp-podium-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.32);}
+.gp-podium-card--1{
+  background:linear-gradient(180deg,rgba(154,106,31,.29),#1c2532 64%,#111823);
+  border-color:rgba(255,205,109,.38);
+}
+.gp-podium-card--2{background:linear-gradient(180deg,rgba(144,161,187,.14),#192333);}
+.gp-podium-card--3{background:linear-gradient(180deg,rgba(165,99,64,.2),#192230);}
+.gp-podium-rank{
+  align-self:center;font:900 22px/1 var(--f1-display);
+  letter-spacing:.05em;color:#cbd9e9;
+}
+.gp-podium-card--1 .gp-podium-rank{color:#ffd27a;}
+.gp-podium-card--3 .gp-podium-rank{color:#dfaa86;}
+.gp-podium-portrait{
+  position:relative;display:grid;place-items:center;overflow:hidden;
+  margin:11px auto 13px;width:min(100%,118px);aspect-ratio:1;
+  border-radius:15px 15px 7px 15px;
+  border:1px solid rgba(255,255,255,.13);
+  background:radial-gradient(circle at 50% 0%,#3a4c63,#1a2534 85%);
+}
+.gp-podium-card--1 .gp-podium-portrait{width:min(100%,145px);}
+.gp-podium-initials{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font:900 39px/1 var(--f1-display);color:rgba(255,255,255,.3);
+}
+.gp-podium-photo{
+  position:relative;object-fit:cover;object-position:center 20%;
+  width:100%;height:100%;border:0!important;border-radius:0!important;
+  background:transparent;z-index:1;
+}
+.gp-podium-name{
+  color:white;font:900 clamp(17px,1.8vw,24px)/1.07 var(--f1-display);
+  min-height:42px;max-width:100%;text-wrap:balance;overflow-wrap:anywhere;
+}
+.gp-podium-team{
+  color:#bfcbd9;font:700 11px/1.35 var(--f1-body);margin-top:6px;
+  overflow-wrap:anywhere;
+}
+.gp-podium-points{
+  color:#fff;font:900 17px/1 var(--f1-display);margin:13px 0 15px;
+}
+.gp-podium-step{
+  display:grid;place-items:center;
+  width:calc(100% + 24px);
+  margin:auto -12px 0;
+  font:900 clamp(28px,3vw,43px)/1 var(--f1-display);
+  color:rgba(255,255,255,.6);
+  background:#75859c;height:43px;
+}
+.gp-podium-card--1 .gp-podium-step{
+  background:linear-gradient(100deg,#a67221,#f0c875);
+  color:#3c2d13;height:68px;
+}
+.gp-podium-card--3 .gp-podium-step{
+  background:linear-gradient(100deg,#815039,#c48668);height:33px;
+}
+.gp-results-table[hidden],.gp-podium[hidden]{display:none!important;}
+.gp-results-table{max-width:100%;overflow-x:auto;}
+.gp-results-table table{min-width:565px;}
+.gp-results-table th{white-space:nowrap;vertical-align:middle;}
+.gp-results-table tbody td:first-child{
+  font:900 19px/1 var(--f1-display);color:#f0f4f9!important;
+}
+.gp-results-table tbody td:last-child{
+  font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+#gridLastWinner.gp-last-winners{
+  display:flex!important;flex-direction:column!important;
+  gap:10px!important;padding:8px 0 0!important;
+  max-height:650px!important;overflow-x:hidden!important;overflow-y:auto!important;
+}
+.gp-winner-card{
+  display:flex;align-items:center;gap:12px;min-width:0;
+  width:100%;padding:10px 12px;
+  border-radius:12px;background:rgba(255,255,255,.036);
+  border:1px solid rgba(232,241,255,.09);
+  text-decoration:none;
+}
+.gp-winner-card:hover{background:rgba(246,55,67,.075);border-color:rgba(246,55,67,.34);}
+.gp-winner-portrait{
+  position:relative;display:grid;place-items:center;flex:none;
+  width:54px;height:58px;overflow:hidden;
+  background:#202b3a;border-radius:10px;
+}
+.gp-winner-photo{position:relative;width:100%;height:100%;object-fit:cover;object-position:center 20%;z-index:1;}
+.gp-winner-initials{position:absolute;color:#657a94;font:900 21px/1 var(--f1-display);}
+.gp-winner-info{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;}
+.gp-winner-year{color:var(--f1-gold);font:800 9px/1.1 var(--f1-body);letter-spacing:.1em;}
+.gp-winner-name{font:800 19px/1.03 var(--f1-display);color:#fff;overflow-wrap:anywhere;}
+.gp-winner-event{font:600 10px/1.3 var(--f1-body);color:#aebcd0;overflow-wrap:anywhere;}
+.gp-winner-arrow{font-size:19px;color:var(--f1-red);}
+.gp-list-message{margin:0;padding:18px;color:#aebdd0;font-size:12px;line-height:1.5;}
+/* Compact GP and season archive tiles: prevent massive overlong race names. */
+#gridGPs > *{min-width:0!important;max-width:100%;overflow:hidden;}
+#gridGPs h3,#gridVictories h3,#gridPodios h3{
+  max-width:100%;
+  font:800 clamp(17px,1.6vw,21px)/1.16 var(--f1-display)!important;
+  text-wrap:pretty;overflow-wrap:anywhere;
+}
+#gridGPs > * img{max-width:100%;object-fit:cover;border-radius:10px;}
+/* Tablet and phone: retain podio order and readable metrics. */
+@media(max-width:1100px){
+  body[data-f1-page="granpremio"] .gp-layout{
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-areas:"summary" "results" "history";
+    grid-template-rows:auto;
+  }
+  body[data-f1-page="piloto"] > .driver-page-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .driver-profile-panel,.driver-victories-panel,.driver-career-panel,.driver-podiums-panel{
+    grid-column:1!important;grid-row:auto!important;
+  }
+}
+@media(max-width:650px){
+  #gridSeasons.season-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
+  #gridSeasons .season-card{min-height:175px!important;padding:16px 13px!important;gap:10px;}
+  #gridSeasons .season-card .season-card-year{font-size:40px!important;}
+  #gridSeasons .season-card .season-card-champion{font-size:11px!important;}
+  .driver-meta-grid{grid-template-columns:1fr 1fr;}
+  .driver-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .driver-stat-card{padding:12px 11px;min-height:112px;}
+  .gp-podium-stage{
+    display:flex;flex-direction:column;align-items:stretch;gap:11px;
+  }
+  .gp-podium-card{display:grid;grid-template-columns:48px 68px minmax(0,1fr);grid-template-rows:auto auto auto;
+    gap:2px 10px;min-height:100px;padding:13px!important;text-align:left;align-items:center;}
+  .gp-podium-card--1{order:1}.gp-podium-card--2{order:2}.gp-podium-card--3{order:3}
+  .gp-podium-rank{grid-column:1;grid-row:1/4;justify-self:center;align-self:center;font-size:27px;}
+  .gp-podium-portrait,.gp-podium-card--1 .gp-podium-portrait{
+    grid-column:2;grid-row:1/4;width:65px;height:72px;margin:0;
+    border-radius:10px;align-self:center;
+  }
+  .gp-podium-name{grid-column:3;grid-row:1;min-height:0!important;font-size:20px;}
+  .gp-podium-team{grid-column:3;grid-row:2;margin:0;}
+  .gp-podium-points{grid-column:3;grid-row:3;margin:0;font-size:16px;}
+  .gp-podium-step{display:none;}
+  .gp-info-table tbody tr{grid-template-columns:1fr 1fr!important;}
+  #gridLastWinner.gp-last-winners{max-height:none!important;}
+}
+@media(max-width:390px){
+  #gridSeasons.season-cards{grid-template-columns:1fr!important;}
+  .driver-meta-grid{grid-template-columns:1fr;}
+  .driver-stats-grid{grid-template-columns:1fr 1fr;}
+  .gp-info-table tbody tr{grid-template-columns:1fr!important;}
+  .gp-info-table tbody td:first-child{grid-column:1;}
+}

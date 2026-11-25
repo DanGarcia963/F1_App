@@ -97,57 +97,63 @@
   </style>
 </head>
 <body class="bg-neutral-950 text-white min-h-screen items-center p-6">
-  <div class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 rounded-lg overflow-hidden shadow-lg relative">
+  <div class="driver-page-grid">
   
     <!-- Contenedor principal -->
-  <section class="bg-neutral-900 col-span-1 lg:col-span-2 xl:col-span-3 2xl:col-span-3 2xl:col-start-1 border border-neutral-700 rounded-lg overflow-hidden shadow-lg max-w-[950px] p-4">
+  <section class="driver-panel driver-profile-panel">
     <!-- Foto del piloto -->
     <div class="flex-shrink-0 flex flex-col items-center">
       <span id="fotoPiloto"></span>
       <p id="nombrePiloto" class="mt-4 text-xl font-bold"></p>
       <p id="equipoPiloto" class="text-neutral-400"></p>
     </div>
-    <!-- Datos del piloto -->
-    <div id="infoGridDetalles" class="grid grid-cols-1 p-4 items-start">
-        <h2 class="text-2xl font-semibold mb-4 border-b border-neutral-700 pb-2">Detalles</h2>
-
-    </div>
-
-    <div class="flex flex-row lg:flex-row gap-4 items-stretch">
-      <div class="flex flex-col items-start">
-          <span class="font-semibold">Nacionalidad: </span> <span id="nacionalidadPiloto"></span>
-          <span class="font-semibold">Fecha de nacimiento: </span> <span id="fechaNacimiento"></span>
-          <span class="font-semibold">Número: </span> <span id="numeroPiloto"></span>
-          <span class="font-semibold">Puntos totales: </span> <span id="puntosTotales"></span>
-        <div class="flex flex-row items-start space-y-2">
-          <img src="/Logos/races.png" alt="Starts" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/>
-          <span class="font-semibold">Starts:</span> <span id="startsPiloto"></span>
+    <!-- Informacion y rendimiento en tarjetas de anchura adaptable -->
+    <div class="driver-overview">
+      <div id="infoGridDetalles" class="driver-section-heading">
+        <h2>Datos del piloto</h2>
+      </div>
+      <dl class="driver-meta-grid">
+        <div><dt>Nacionalidad</dt><dd id="nacionalidadPiloto">—</dd></div>
+        <div><dt>Nacimiento</dt><dd id="fechaNacimiento">—</dd></div>
+        <div><dt>Dorsal / Código FIA</dt><dd id="numeroPiloto">—</dd></div>
+      </dl>
+      <h3 class="driver-stats-heading">Estadísticas de carrera</h3>
+      <div class="driver-stats-grid">
+        <div class="driver-stat-card driver-stat-card--primary">
+          <span class="driver-stat-label">Puntos acumulados</span>
+          <strong id="puntosTotales" class="driver-stat-value">0</strong>
+          <span id="puntosPromedio" class="driver-stat-note">0 pts / carrera</span>
+        </div>
+        <div class="driver-stat-card">
+          <span class="driver-stat-label">Grandes Premios</span>
+          <strong id="startsPiloto" class="driver-stat-value">0</strong>
+          <span class="driver-stat-note">Participaciones</span>
+        </div>
+        <div class="driver-stat-card">
+          <span class="driver-stat-label">Victorias</span>
+          <strong id="victoriasPiloto" class="driver-stat-value">0</strong>
+          <span id="victoriasPct" class="driver-stat-note">0%</span>
+        </div>
+        <div class="driver-stat-card">
+          <span class="driver-stat-label">Podios</span>
+          <strong id="podiosPiloto" class="driver-stat-value">0</strong>
+          <span id="podiosPct" class="driver-stat-note">0%</span>
+        </div>
+        <div class="driver-stat-card">
+          <span class="driver-stat-label">Pole positions</span>
+          <strong id="polesPiloto" class="driver-stat-value">0</strong>
+          <span id="polesPct" class="driver-stat-note">0%</span>
+        </div>
+        <div class="driver-stat-card">
+          <span class="driver-stat-label">Vueltas rápidas</span>
+          <strong id="fastLapsPiloto" class="driver-stat-value">0</strong>
+          <span id="fastLapsPct" class="driver-stat-note">0%</span>
         </div>
       </div>
-
-      <div class="flex flex-col items-end justify-end">
-        <div class="flex flex-row items-start space-y-2">
-          <img src="/Logos/victories.png" alt="Victorias" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/>
-          <span class="font-semibold">Victories: </span> <span id="victoriasPiloto"></span>
-        </div>
-        <div class="flex flex-row items-start space-y-2">
-          <img src="/Logos/podium.png" alt="Podios" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/>
-          <span class="font-semibold">Podiums: </span> <span id="podiosPiloto"></span>
-        </div>
-        <div class="flex flex-row items-start space-y-2">
-          <img src="/Logos/grid.png" alt="Poles" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/>
-          <span class="font-semibold">Poles: </span> <span id="polesPiloto"></span>
-        </div>
-        <div class="flex flex-row items-start space-y-2">
-          <img src="/Logos/clock.png" alt="Fastest Laps" class="w-10 h-10 object-contain" style="min-width:50px;min-height:50px;max-width:80px;max-height:80px;"/>
-          <span class="font-semibold">Fastest Laps: </span> <span id="fastLapsPiloto"></span>
-        </div>
-      </div>
-
     </div>
   </section>
 
-  <section class="bg-neutral-900 col-span-1 lg:col-span-3 xl:col-span-3 2xl:col-span-4 2xl:col-start-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg max-w-[950px] p-4">
+  <section class="driver-panel driver-victories-panel">
     <div id="infoGridVictorias" class="grid grid-cols-1 gap-4 p-4 items-start">
       <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
         <div class="p-4 flex flex-row items-center gap-4">
@@ -165,7 +171,7 @@
     </div>
   </section>
 
-  <section class="flex-none col-span-1 lg:col-span-2 xl:col-span-3 2xl:col-span-3 2xl:col-start-1 border border-neutral-700 rounded-lg overflow-hidden shadow-lg max-w-[950px] p-4">
+  <section class="driver-panel driver-career-panel">
     <div id="infoGridTrayectoria" class="grid grid-cols-1 gap-4 p-4 items-start">
       <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
         <div class="p-4 flex flex-row items-center gap-4">
@@ -183,7 +189,7 @@
     </div>
   </section>
 
-  <section class="bg-neutral-900 col-span-1 lg:col-span-3 xl:col-span-3 2xl:col-span-4 2xl:col-span-4 border border-neutral-700 rounded-lg overflow-hidden shadow-lg max-w-[950px] p-4">
+  <section class="driver-panel driver-podiums-panel">
     <div id="infoGridPodios" class="grid grid-cols-1 gap-4 p-4 items-start">
       <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
         <div class="p-4 flex flex-row items-center gap-4">
@@ -255,6 +261,29 @@
     const idPiloto = params.get("id");
     console.log(idPiloto)
 
+    const formatHistoricDate = value => {
+      const match=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if(!match)return 'Fecha no registrada';
+      return new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',
+        year:'numeric',timeZone:'UTC'})
+        .format(new Date(match[1]+'-'+match[2]+'-'+match[3]+'T12:00:00Z'));
+    };
+    const circuitPhotoCache=new Map();
+    function loadCircuitPhoto(name,card){
+      if(!name)return;
+      if(!circuitPhotoCache.has(name))
+        circuitPhotoCache.set(name,obtenerImagenWikipedia(name).catch(()=>null));
+      circuitPhotoCache.get(name).then(url=>{
+        if(!url)return;
+        const img=document.createElement('img');
+        img.src=url;img.alt='Circuito '+name;
+        img.loading='lazy';img.decoding='async';img.className='driver-race-thumb';
+        img.onerror=()=>img.remove();
+        const content=card.firstElementChild;
+        if(content)content.insertBefore(img,content.querySelector('p'));
+      });
+    }
+
     async function cargarVictoriasPiloto(){
       try{
         const VictoriasPiloto = await fetch(`/api/piloto/obtenerVictoriasPiloto/${idPiloto}`).then(r=>r.json());
@@ -262,24 +291,21 @@
         container.innerHTML='';
         for(let i=0; i<VictoriasPiloto.length;i++){
         const victory = VictoriasPiloto[i];
-        const imgCURL = await obtenerImagenWikipedia(victory.nombre_Circuito)
+        const imgCURL = null; // Foto opcional y asíncrona.
         const card = document.createElement('div');
 
-        const fecha = new Date(victory.fecha);
-        const day = String(fecha.getDate()).padStart(2, '0');
-        const month = fecha.toLocaleString('es-ES', { month: 'short' });
-        const year = fecha.getFullYear();
-        const newDate = Number.isFinite(fecha.getTime()) ? `${day}/${month}/${year}` : 'No registrada';
+        const newDate = formatHistoricDate(victory.fecha);
 
         card.className = 'group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative flex items-center justify-between';
         card.innerHTML =`                
                 <div class="p-4 flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-white">${victory.nombre_oficial} ${year}</h3>
+                <h3 class="text-lg font-bold text-white">${victory.nombre_oficial}</h3>
                 ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${victory.nombre_Circuito}" class="w-40 h-35 mb-2 border bg-white">` : ''}
                 <p class="text-sm text-neutral-400">${newDate}</p>
                 </div>
                 `;
                 container.appendChild(card)
+                loadCircuitPhoto(victory.nombre_Circuito,card)
       };
     }      
     catch (err) {
@@ -294,24 +320,21 @@
         container.innerHTML='';
         for(let i=0; i<PodiosPiloto.length;i++){
         const podios = PodiosPiloto[i];
-        const imgCURL = await obtenerImagenWikipedia(podios.nombre_Circuito)
+        const imgCURL = null; // Foto opcional y asíncrona.
         const card = document.createElement('div');
 
-        const fecha = new Date(podios.Fecha);
-        const day = String(fecha.getDate()).padStart(2, '0');
-        const month = fecha.toLocaleString('es-ES', { month: 'short' });
-        const year = fecha.getFullYear();
-        const newDate = `${day}/${month}/${year}`;
+        const newDate = formatHistoricDate(podios.Fecha);
 
         card.className = 'group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative flex items-center justify-between';
         card.innerHTML =`                
                 <div class="p-4 flex flex-col items-center text-center">
-                <h3 class="text-lg font-bold text-white">${podios.Nombre_GP} ${year}</h3>
+                <h3 class="text-lg font-bold text-white">${podios.Nombre_GP}</h3>
                 ${imgCURL ? `<img src="${imgCURL}" alt="Bandera ${podios.nombre_Circuito}" class="w-40 h-35 mb-2 border bg-white">` : ''}
                 <p class="text-sm text-neutral-400">${newDate}</p>
                 </div>
                 `;
                 container.appendChild(card)
+                loadCircuitPhoto(podios.nombre_Circuito,card)
       };
     }      
     catch (err) {
@@ -375,12 +398,7 @@
                     acumStarts += Number(piloto.Starts);
                     acumFastLaps += Number(piloto.FastestLaps);
           }
-        const fecha = infoPiloto.fecha_nacimiento ? new Date(infoPiloto.fecha_nacimiento) : new Date(NaN);
-        const day = String(fecha.getDate()).padStart(2, '0');
-        const month = fecha.toLocaleString('es-ES', { month: 'short' });
-        const year = fecha.getFullYear();
-
-        const newDate = `${day}/${month}/${year}`;
+        const newDate = formatHistoricDate(infoPiloto.fecha_nacimiento);
         const imgPUrl = await obtenerFotoPiloto(infoPiloto.nombre_completo);
         document.getElementById("fotoPiloto").innerHTML = imgPUrl ? `<img src="${imgPUrl}" alt="Piloto ${infoPiloto.nombre_completo}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">` : '';
         document.getElementById("equipoPiloto").textContent = infoPiloto.equipo || "Sin equipo registrado";
@@ -388,12 +406,17 @@
         document.getElementById("nacionalidadPiloto").textContent = infoPiloto.nacionalidad;
         document.getElementById("fechaNacimiento").textContent = newDate;
         document.getElementById("numeroPiloto").textContent = infoPiloto.identificador;
-        document.getElementById("startsPiloto").textContent = ` ${acumStarts}`;
-        document.getElementById("victoriasPiloto").textContent = ` ${acumVictories} (${(acumStarts>0 ? (acumVictories/acumStarts*100) : 0).toFixed(2)}%)`;
-        document.getElementById("podiosPiloto").textContent = ` ${acumPodios} (${(acumStarts>0 ? (acumPodios/acumStarts*100) : 0).toFixed(2)}%)`;
-        document.getElementById("polesPiloto").textContent = ` ${acumPoles} (${(acumStarts>0 ? (acumPoles/acumStarts*100) : 0).toFixed(2)}%)`;
-        document.getElementById("fastLapsPiloto").textContent = ` ${acumFastLaps} (${(acumStarts>0 ? (acumFastLaps/acumStarts*100) : 0).toFixed(2)}%)`;
-        document.getElementById("puntosTotales").textContent =` ${acumPuntos} (${(acumStarts>0 ? acumPuntos/acumStarts : 0).toFixed(2)} pts/start)`;
+        document.getElementById("startsPiloto").textContent = acumStarts.toLocaleString("es-MX");
+        document.getElementById("victoriasPiloto").textContent = acumVictories;
+        document.getElementById("victoriasPct").textContent = `${(acumStarts>0?acumVictories/acumStarts*100:0).toFixed(1)}% de carreras`;
+        document.getElementById("podiosPiloto").textContent = acumPodios;
+        document.getElementById("podiosPct").textContent = `${(acumStarts>0?acumPodios/acumStarts*100:0).toFixed(1)}% de carreras`;
+        document.getElementById("polesPiloto").textContent = acumPoles;
+        document.getElementById("polesPct").textContent = `${(acumStarts>0?acumPoles/acumStarts*100:0).toFixed(1)}% de carreras`;
+        document.getElementById("fastLapsPiloto").textContent = acumFastLaps;
+        document.getElementById("fastLapsPct").textContent = `${(acumStarts>0?acumFastLaps/acumStarts*100:0).toFixed(1)}% de carreras`;
+        document.getElementById("puntosTotales").textContent = acumPuntos.toLocaleString("es-MX",{maximumFractionDigits:2});
+        document.getElementById("puntosPromedio").textContent = `${(acumStarts>0?acumPuntos/acumStarts:0).toFixed(2)} pts / carrera`;
         document.title = `  ${infoPiloto.nombre_completo} | F1 Stats`;
         
         

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-frontend.mjs",
-    "test:flow": "node --test tests/flow.test.mjs"
+    "test:flow": "node --test tests/flow.test.mjs",
+    "test:ui": "node --test tests/presentation.test.mjs"
   },
   "engines": {
     "node": ">=20"

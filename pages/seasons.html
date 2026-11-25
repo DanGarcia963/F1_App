@@ -75,7 +75,7 @@
             </div>
           </div>
         </div>
-        <div id="gridSeasons" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-6 p-6 items-start overflow-y-auto max-h-[1000px] scroll-smooth scrollbar-thin scrollbar-thumb-red-700 scrollbar-track-red-900 scrollbar-hide hover:scrollbar-default w-full">
+        <div id="gridSeasons" class="season-cards">
 
         </div>
       </section>
@@ -108,59 +108,57 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
 })
     
     async function renderSeasons(temporadas) {
-
-      const containerSeasons = document.getElementById('gridSeasons');
-      containerSeasons.innerHTML = '';
-      const cacheDuration = 60 * 1000;
-      for (let i = 0; i < temporadas.length; i++) {
-        const season = temporadas[i];
-        const cardSeason = document.createElement('div');
-        // --- Cache para campeones de cada temporada ---
-        const pilotosCacheKey = `wdc_${idCategoria}_${season.anio}`;
-        const pilotosCacheTimeKey = `wdc_time_${idCategoria}_${season.anio}`;
-        const now = Date.now();
-        let pilotos = null;
-        const cachedPilotos = localStorage.getItem(pilotosCacheKey);
-        const cachedPilotosTime = Number(localStorage.getItem(pilotosCacheTimeKey));
-        if (cachedPilotos && cachedPilotosTime && (now - cachedPilotosTime < cacheDuration)) {
-          pilotos = JSON.parse(cachedPilotos);
-        } else {
-          try {
-            const response = await fetch(`/api/granPremio/obtenerWDCPorAnio/${idCategoria}/${season.anio}`); if(!response.ok) throw new Error('HTTP '+response.status); pilotos = await response.json(); if(!Array.isArray(pilotos)) pilotos = [];
-            localStorage.setItem(pilotosCacheKey, JSON.stringify(pilotos));
-            localStorage.setItem(pilotosCacheTimeKey, String(now));
-          } catch (err) {
-            pilotos = [];
-          }
-        }
-        if (pilotos.length > 0) {
-          const campeon = pilotos[0];
-          cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-          cardSeason.innerHTML = `
-            <div class="p-4 flex flex-col items-center text-center">
-            <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
-            <p class="text-sm text-neutral-400">${Number(season.finalizada) === 1 ? 'Campeón' : 'Líder'}: ${campeon.nombre_completo}</p>
-            </div>
-          `;
-        } else {
-          cardSeason.className = 'group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-          cardSeason.innerHTML = `
-            <div class="p-4 flex flex-col items-center text-center">
-            <h3 class="text-lg font-bold text-white">Temporada: ${season.anio}</h3>
-            <p class="text-sm text-neutral-400">Campeón: Desconocido</p>
-            </div>
-          `;
-        }
-        cardSeason.dataset.IdSeason = season.id_Temporada;
-        cardSeason.dataset.Anio = season.anio;
-        console.log(`Categoria: ${idCategoria}`)
-        cardSeason.addEventListener('click', () => {
-          const url = `/season?id=${encodeURIComponent(season.id_Temporada)}&anio=${encodeURIComponent(season.anio)}&categoria=${encodeURIComponent(idCategoria)}`;
-          console.log("Redirigiendo a:", url);
-          window.location.href = url;
-        });
-        containerSeasons.appendChild(cardSeason);
+      const root=document.getElementById('gridSeasons');
+      root.replaceChildren();
+      const seasons=Array.isArray(temporadas)?temporadas:[];
+      if(!seasons.length){
+        const empty=document.createElement('p');
+        empty.className='f1-empty-message';
+        empty.textContent='No hay temporadas registradas para esta categoría.';
+        root.append(empty);
+        return;
       }
+      const rankings=await Promise.allSettled(seasons.map(async season=>{
+        const key='wdc_'+idCategoria+'_'+season.anio;
+        const time='wdc_time_'+idCategoria+'_'+season.anio;
+        const stored=localStorage.getItem(key);
+        if(stored && (Date.now()-Number(localStorage.getItem(time))<60000)){
+          try{return JSON.parse(stored)}catch(_){}
+        }
+        const res=await fetch('/api/granPremio/obtenerWDCPorAnio/'
+          +encodeURIComponent(idCategoria)+'/'+encodeURIComponent(season.anio));
+        if(!res.ok)throw new Error('HTTP '+res.status);
+        const data=await res.json();
+        const rows=Array.isArray(data)?data:[];
+        localStorage.setItem(key,JSON.stringify(rows));
+        localStorage.setItem(time,String(Date.now()));
+        return rows;
+      }));
+      seasons.forEach((season,i)=>{
+        const rows=rankings[i].status==='fulfilled'?rankings[i].value:[];
+        const leader=Array.isArray(rows)?rows[0]:null;
+        const card=document.createElement('a');
+        card.className='season-card';
+        card.href='/season?id='+encodeURIComponent(season.id_Temporada)
+          +'&anio='+encodeURIComponent(season.anio)
+          +'&categoria='+encodeURIComponent(idCategoria);
+        card.dataset.IdSeason=season.id_Temporada;
+        card.dataset.Anio=season.anio;
+        const text=(cls,content)=>{
+          const node=document.createElement('span');
+          node.className=cls;
+          node.textContent=String(content);
+          return node;
+        };
+        const status=Number(season.finalizada)===1?'Campeón':'Líder';
+        card.append(
+          text('season-card-label','TEMPORADA'),
+          text('season-card-year',season.anio),
+          text('season-card-champion',status+': '+(leader?.nombre_completo||'Sin clasificación')),
+          text('season-card-arrow','↗')
+        );
+        root.append(card);
+      });
     }
 
     async function cargarTemporadas(){
