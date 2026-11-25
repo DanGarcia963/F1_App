@@ -53,6 +53,15 @@ obtenerGPTemporadaPorId = async (req, res) => {
             res.status(404).json({ message: 'last Winners no encontrados' })
     }
 
+    obtenerLastWinnersPorGp = async (req, res) => {
+        const idGP = Number(req.params.id);
+        if (!Number.isSafeInteger(idGP) || idGP <= 0) {
+            return res.status(400).json({ message: 'Identificador de Gran Premio inválido' });
+        }
+        const winners = await this.gpModel.obtenerLastWinnersPorGp(idGP);
+        return res.json(winners);
+    }
+
     registrarGP = async (req, res) => {
         const nuevoGP = await this.gpModel.registrarGP({ entrada: req.body })
         res.send(nuevoGP)
