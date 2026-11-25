@@ -1165,3 +1165,49 @@ body #gpTitle.f1-gp-header-title{
   #gridGPs > * h3{font-size:17px!important;}
   #gridLastWinner.gp-last-winners{scrollbar-gutter:auto;}
 }
+
+/* Championship panels: stable widths, compact rows and readable names. */
+.f1-championship-layout {
+ display:grid!important;grid-template-columns:minmax(260px,1fr) minmax(0,2.15fr) minmax(260px,1fr)!important;
+ grid-template-areas:"constructors races drivers";gap:16px!important;align-items:start!important;width:100%;min-width:0;
+}
+.f1-championship-layout > section {grid-column:auto!important;grid-row:auto!important;min-width:0!important;width:100%;padding:16px!important;}
+.f1-championship-layout > #WCCSection {grid-area:constructors!important;}
+.f1-championship-layout > #WDCSection {grid-area:drivers!important;}
+.f1-championship-layout > #GPSection {grid-area:races!important;}
+.f1-championship-layout :is(#infoGridWDC,#infoGridWCC){padding:0 0 14px!important;display:block!important;}
+.f1-championship-layout :is(#infoGridWDC,#infoGridWCC) > div {border:0!important;background:transparent!important;box-shadow:none!important;}
+.f1-championship-layout :is(#infoGridWDC,#infoGridWCC) > div > div {padding:0!important;}
+.f1-championship-heading {font-size:clamp(16px,1.35vw,20px)!important;line-height:1.25!important;font-weight:750;display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:0!important;}
+.f1-championship-heading span {font-size:10px;letter-spacing:.09em;color:#aebbc9;border:1px solid #ffffff25;padding:3px 5px;border-radius:4px;}
+.f1-championship-layout :is(#gridWDC,#gridWCC){padding:3px!important;gap:9px!important;grid-auto-rows:auto;max-height:620px!important;scrollbar-width:thin;align-items:stretch!important;scroll-snap-type:none!important;}
+.f1-championship-layout :is(#gridWDC,#gridWCC) > :is(a,div) {width:100%!important;min-width:0!important;height:auto!important;}
+.f1-championship-layout :is(#gridWDC,#gridWCC) > :is(a,div) > div.flex {
+ display:grid!important;grid-template-columns:22px 46px minmax(0,1fr)!important;
+ align-items:center!important;gap:9px!important;padding:10px!important;min-height:70px;width:100%;min-width:0;
+}
+.f1-championship-layout :is(#gridWDC,#gridWCC) > :is(a,div) > div.flex:not(:has(> img, > .f1-list-photo)) {grid-template-columns:22px minmax(0,1fr)!important;}
+.f1-championship-layout :is(#gridWDC,#gridWCC) > :is(a,div) > div.flex > :first-child {width:auto!important;margin:0!important;text-align:center;white-space:nowrap;}
+.f1-championship-layout :is(#gridWDC,#gridWCC) > :is(a,div) > div.flex > :is(img,.f1-list-photo) {
+ width:46px!important;height:46px!important;min-width:0!important;max-width:100%!important;margin:0!important;object-fit:contain!important;
+}
+.f1-championship-layout :is(#gridWDC,#gridWCC) .f1-list-photo img {width:100%!important;height:100%!important;object-fit:contain!important;}
+.f1-championship-layout :is(#gridWDC,#gridWCC) > :is(a,div) > div.flex > div:last-child {width:100%!important;min-width:0!important;gap:3px!important;margin:0!important;padding:0!important;}
+.f1-championship-layout :is(#gridWDC,#gridWCC) > :is(a,div) > div.flex > div:last-child > :is(p,strong,span) {
+ margin:0!important;padding:0!important;font-size:13px!important;line-height:1.35!important;word-break:normal!important;overflow-wrap:break-word!important;hyphens:none!important;white-space:normal!important;
+}
+.f1-championship-layout #GPSection > div > div {padding:0!important;box-shadow:none!important;background:transparent!important;}
+.f1-championship-layout #GPSection h2 {margin:0 0 13px!important;line-height:1.2!important;}
+.f1-championship-layout #gridGPs {grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))!important;padding:3px!important;align-items:stretch!important;gap:10px!important;max-height:620px!important;scrollbar-width:thin;}
+.f1-championship-layout #gridGPs > * {height:100%!important;align-self:stretch!important;}
+.f1-championship-layout #gridGPs > * > div {padding:12px!important;height:100%;min-width:0;}
+.f1-championship-layout #gridGPs h3 {font-family:inherit!important;font-size:14px!important;line-height:1.35!important;font-weight:750!important;hyphens:none!important;word-break:normal!important;overflow-wrap:break-word!important;}
+@media(max-width:1150px){
+ .f1-championship-layout {grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-areas:"races races" "constructors drivers";}
+ .f1-championship-layout #gridGPs {grid-template-columns:repeat(auto-fit,minmax(min(100%,195px),1fr))!important;}
+}
+@media(max-width:600px){
+ .f1-championship-layout {grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"races" "drivers" "constructors";}
+ .f1-championship-layout > section {padding:13px!important;}
+ .f1-championship-layout #gridGPs {grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr))!important;}
+}
