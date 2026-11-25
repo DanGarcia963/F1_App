@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagnóstico de conexión | F1 Paddock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles/style.css">
+  <style>
+    .diag-shell{max-width:1060px;margin:0 auto;padding:28px 18px 84px}
+    .diag-intro{font-size:15px;color:#bdc7d5;margin:0 0 22px;line-height:1.65}
+    .diag-table{width:100%;border-collapse:collapse;text-align:left}
+    .diag-table th,.diag-table td{padding:13px 14px;border-bottom:1px solid #2c3543;vertical-align:top}
+    .diag-table th{color:#aeb9ca;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+    .diag-row{font-weight:700;color:#f2f5f9}
+    .diag-detail{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;overflow-wrap:anywhere;color:#adbbce}
+    .diag-ok{color:#9bf0c1}.diag-error{color:#ff8893}.diag-pending{color:#ffd17c}
+    .diag-actions{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0 24px}
+    .diag-btn{padding:10px 17px;border-radius:11px;color:#fff;background:#db2738;border:1px solid #fc4e5b;font-weight:800}
+    .diag-card{background:#151c28;border:1px solid #303a49;border-radius:17px;overflow:hidden}
+    .diag-summary{color:#a8b9ca;margin:18px 0;font-size:13px}
+    .diag-note{margin-top:22px;padding:15px 17px;color:#b8c6d9;border-left:3px solid #f13846;background:#111a29;border-radius:9px;font-size:13px}
+    @media(max-width:700px){.diag-table thead{display:none}.diag-table tr{display:block;padding:14px}.diag-table td{display:block;border:0;padding:4px 0}}
+  </style>
+</head>
+<body class="bg-gray-900 text-white">
+  <main class="diag-shell">
+    <p class="diag-intro">Esta pantalla comprueba si Netlify está enviando las consultas al Railway correcto y si el backend publicado contiene las rutas recientes. Solo realiza consultas públicas de lectura: no modifica la base de datos.</p>
+    <div class="diag-actions">
+      <button class="diag-btn" id="diagRun" type="button">Repetir comprobación</button>
+      <button class="diag-btn" id="diagCopy" type="button">Copiar informe</button>
+    </div>
+    <p class="diag-summary" id="diagSummary" role="status">Preparando comprobación...</p>
+    <div class="diag-card">
+      <table class="diag-table">
+        <thead><tr><th>Comprobación</th><th>Estado</th><th>Respuesta</th></tr></thead>
+        <tbody id="diagResults"></tbody>
+      </table>
+    </div>
+    <div class="diag-note">
+      <strong>Cómo leer el resultado:</strong> si Railway directo muestra <code>200</code> y Netlify muestra <code>404</code>, comprueba las reglas <code>_redirects</code> y <code>BACKEND_URL</code> de Netlify. Si <code>/api/meta</code> devuelve <code>404</code> también directamente desde Railway, está sirviendo una versión antigua del backend. Si una ruta devuelve <code>404</code> con <code>Ruta no encontrada</code>, Express no reconoce esa URL; no indica que se hayan perdido los datos de Supabase.
+    </div>
+  </main>
+  <script>
+  (() => {
+    const backendOrigin = '__F1_BACKEND_ORIGIN__';
+    const report = [];
+    const targets = [
+      ['Netlify → Railway · health','/api/health/live'],
+      ['Netlify → Railway · versión','/api/meta'],
+      ['Netlify → Railway · categorías','/api/categoria/'],
+      ['Netlify → Railway · temporada','/api/categoria/1/temporada-actual'],
+      ['Netlify → Railway · pilotos','/api/granPremio/obtenerWDCPorAnio/1/2026'],
+      ['Railway directo · health', backendOrigin+'/api/health/live'],
+      ['Railway directo · versión', backendOrigin+'/api/meta'],
+      ['Railway directo · temporada',backendOrigin+'/api/categoria/1/temporada-actual']
+    ];
+    const $ = id => document.getElementById(id);
+    const create = tag => document.createElement(tag);
+    async function check(label,route) {
+      const controller = new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),9500);
+      try {
+        const response = await fetch(route,{method:'GET',cache:'no-store',
+          headers:{Accept:'application/json'},signal:controller.signal});
+        const body=(await response.text()).slice(0,260);
+        const revision=response.headers.get('x-f1-app-revision') || 'sin cabecera';
+        return {label,route,http:response.status,revision,body};
+      } catch(error) {
+        return {label,route,http:null,revision:'no disponible',
+          body:(error?.name==='AbortError'?'Tiempo de espera agotado':
+            'No se pudo contactar o CORS impidió leer la respuesta')};
+      } finally{clearTimeout(timeout)}
+    }
+    function show(r) {
+      const tr=create('tr');
+      const name=create('td');name.className='diag-row';name.textContent=r.label;
+      const status=create('td');
+      status.className=r.http===200?'diag-ok':r.http===null?'diag-pending':'diag-error';
+      status.textContent=r.http===null?'Sin respuesta':String(r.http);
+      const detail=create('td');detail.className='diag-detail';
+      detail.textContent='Ruta: '+r.route+' · Revisión: '+r.revision+' · '+r.body;
+      tr.append(name,status,detail);
+      $('diagResults').append(tr);
+    }
+    async function run() {
+      $('diagRun').disabled=true;
+      $('diagResults').replaceChildren();
+      report.length=0;
+      $('diagSummary').textContent='Consultando Netlify y Railway...';
+      const results=await Promise.all(targets.map(([label,route])=>check(label,route)));
+      for(const value of results){report.push(value);show(value)}
+      const failed=results.filter(x=>x.http!==200);
+      $('diagSummary').textContent=failed.length
+        ? 'Se encontraron '+failed.length+' comprobaciones sin HTTP 200.'
+        : 'Todas las rutas comprobadas respondieron HTTP 200.';
+      $('diagRun').disabled=false;
+    }
+    $('diagRun').addEventListener('click',run);
+    $('diagCopy').addEventListener('click',async()=>{
+      const info=['F1_App · diagnóstico de rutas', 'URL del sitio: '+location.origin,
+        'Railway público configurado: '+backendOrigin,
+        ...report.map(x=>x.label+' | HTTP '+(x.http??'SIN RESPUESTA')+
+          ' | '+x.route+' | '+x.revision+' | '+x.body)].join('\n');
+      try {await navigator.clipboard.writeText(info);
+        $('diagSummary').textContent='Informe copiado. Puedes pegarlo en el chat.';
+      } catch (_) { $('diagSummary').textContent='No se pudo copiar automáticamente. Selecciona el texto de la tabla.'; }
+    });
+    run();
+  })();
+  </script>
+</body>
+</html>

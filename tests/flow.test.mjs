@@ -41,6 +41,9 @@ async function scenario({category=1,year=2026,fail=null}={}) {
  const fetch=async path=>{
   requested.push(path);
   if(fail==='temporada')return {ok:false,status:503};
+  if(fail==='missing-new-route' && path.endsWith('/temporada-actual'))return {ok:false,status:404,json:async()=>({message:'Ruta no encontrada'})};
+  if(fail==='all404')return {ok:false,status:404,json:async()=>({message:'Ruta no encontrada'})};
+  if(path==='/api/temporada/')return {ok:true,json:async()=>[{anio:2026,id_Temporada:6},{anio:2025,id_Temporada:5}]};
   if(path.endsWith('/temporada-actual')){
     return {ok:true,json:async()=>({anio:year,id_Temporada:1,id_Categoria:category})};
   }
@@ -61,7 +64,7 @@ async function scenario({category=1,year=2026,fail=null}={}) {
   throw Error('Ruta no simulada: '+path);
  };
  runInNewContext(script,{window,document,sessionStorage,fetch,URLSearchParams,
-   console:{error(){}},Intl,Date,setTimeout,clearTimeout});
+   console:{error(){},warn(){}},Intl,Date,setTimeout,clearTimeout});
  assert.ok(window.load,'No se registró el controlador DOMContentLoaded');
  await window.load();
  return {nodes,requested,values,window,live};
@@ -93,6 +96,18 @@ test('un fallo al consultar Supabase muestra aviso en lugar de página vacía',a
  assert.equal(a.nodes.anio.textContent,'—');
  assert.equal(a.requested.length,1);
  assert.match(a.nodes.gridGPs.children[0].textContent,/HTTP 503/);
+});
+test('404 al consultar temporada-actual usa rutas historicas',async()=>{
+ const a=await scenario({fail:'missing-new-route'});
+ assert.equal(a.nodes.anio.textContent,'2026');
+ assert.ok(a.requested.includes('/api/temporada/'));
+ assert.equal(a.nodes.gridGPs.children.length,2);
+});
+test('404 del proxy muestra error visible',async()=>{
+ const a=await scenario({fail:'all404'});
+ assert.equal(a.nodes.anio.textContent,'—');
+ assert.ok(a.requested.includes('/api/temporada/'));
+ assert.match(a.nodes.gridGPs.children[0].textContent,/HTTP 404/);
 });
 test('navegación y fichas nunca consumen localhost en producción',()=>{
  for(const name of ['main','team','pilotos','teams','circuitos','season','seasons']) {

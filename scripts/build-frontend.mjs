@@ -44,6 +44,10 @@ for (const name of pages) {
   html = html.replace(/<\/head>/i,
     '<link rel="stylesheet" href="/styles/f1-premium.css"><script src="/f1-ui.js" defer></script></head>');
   html = html.replace(/<head\b[^>]*>/i, match => match + '\n  <script src="/admin-fetch.js"></script>');
+  // Only the diagnostic page receives the public backend origin (no secrets).
+  if (name === 'diagnostico.html') {
+    html = html.replaceAll('__F1_BACKEND_ORIGIN__', backendUrl.origin);
+  }
   const targetName = name === 'categories.html' ? 'index.html' : name;
   fs.writeFileSync(path.join(output, targetName), html, 'utf8');
 

@@ -156,13 +156,49 @@
     return e;
   };
   async function getJSON(path) {
-    const response = await fetch(path, { headers: { Accept:'application/json' },cache:'no-store' });
+    const response = await fetch(path, {headers:{Accept:'application/json'},cache:'no-store'});
     if (!response.ok) {
-      throw new Error('HTTP '+response.status+' en '+path);
+      let serverMessage = '';
+      try {
+        const body = await response.json();
+        serverMessage = typeof body?.message === 'string' ? body.message : '';
+      } catch (_) { /* Netlify may return an HTML 404 page */ }
+      const error = new Error('HTTP '+response.status+' en '+path+(serverMessage ? ': '+serverMessage : ''));
+      error.httpStatus = response.status;
+      error.requestPath = path;
+      throw error;
     }
     const data = await response.json();
     if (data && !Array.isArray(data) && data.message && !data.anio) throw new Error(data.message);
     return data;
+  }
+  // Fallback de compatibilidad: el despliegue anterior no tenia temporada-actual.
+  // No se usa el año del navegador como dato: se buscan carreras reales por categoria.
+  async function getSeasonForCategory() {
+    const url = '/api/categoria/'+encodeURIComponent(idCategoria)+'/temporada-actual';
+    try {
+      const season = await getJSON(url);
+      if (season && Number.isInteger(Number(season.anio))) return season;
+      throw new Error('La API no devolvio el año de la temporada');
+    } catch (error) {
+      if (error.httpStatus !== 404) throw error;
+      console.warn('[F1_APP] La ruta nueva aun no existe en Railway. Usando consulta historica.',url);
+    }
+    const data = await getJSON('/api/temporada/');
+    if (!Array.isArray(data)) throw new Error('El listado de temporadas no tiene el formato esperado');
+    const candidates = data
+      .filter(s => Number.isInteger(Number(s.anio)) && Number(s.anio) <= new Date().getFullYear())
+      .sort((x,y) => Number(y.anio)-Number(x.anio));
+    for (const candidate of candidates) {
+      const gpPath = '/api/granPremio/obtenerGPTemporada/'+encodeURIComponent(idCategoria)+'/'+candidate.anio;
+      try {
+        const gp = await getJSON(gpPath);
+        if (Array.isArray(gp) && gp.length) return { ...candidate, __calendar:gp, __fallback:true };
+      } catch (error) {
+        if (error.httpStatus !== 404) throw error;
+      }
+    }
+    throw new Error('No existen carreras asociadas con esta categoria en las temporadas consultadas.');
   }
   const list = (value,name) => {
     if (!Array.isArray(value)) throw new Error('Formato de datos inesperado para '+name);
@@ -177,7 +213,7 @@
   }
   function errorIn(section,text) {
     const target = $(section);
-    message(target,'No se pudieron cargar '+text+'. Comprueba la API de Railway y vuelve a intentarlo.',true);
+    message(target,'No se pudieron cargar '+text+'. Comprueba Railway en /diagnostico.',true);
   }
   const dateKey = raw => String(raw||'').slice(0,10);
   const prettyDate = raw => {
@@ -291,12 +327,17 @@
     message($('gridWCC'),'Consultando clasificación...');
     let actual;
     try {
-      actual=await getJSON('/api/categoria/'+idCategoria+'/temporada-actual');
+      actual=await getSeasonForCategory();
       if (!actual || !Number.isInteger(Number(actual.anio))) throw new Error('Temporada no disponible');
     } catch (error) {
       console.error('[F1_APP] No se pudo determinar la temporada de la categoría',idCategoria,error);
       for(const id of ['gridGPs','gridWDC','gridWCC']) {
         message($(id),'No se pudo consultar la temporada de esta categoría. '+error.message,true);
+        const diag=document.createElement('a');
+        diag.href='/diagnostico';
+        diag.textContent='Abrir diagnóstico de rutas y despliegues';
+        diag.className='inline-block mt-2 underline text-red-300';
+        $(id)?.append(diag);
       }
       const badge=$('anio');if(badge)badge.textContent='—';
       return;
@@ -310,7 +351,8 @@
       '/api/granPremio/obtenerWDCPorAnio/'+idCategoria+'/'+currentYear,
       '/api/granPremio/obtenerWCCPorAnio/'+idCategoria+'/'+currentYear
     ];
-    const outcomes=await Promise.allSettled(paths.map(getJSON));
+    const outcomes=await Promise.allSettled(paths.map((path,index)=>
+      index === 0 && actual.__calendar ? Promise.resolve(actual.__calendar) : getJSON(path)));
     const [g,d,c]=outcomes;
     if(g.status==='fulfilled'){
       try{const gps=list(g.value,'grandes premios');renderGPs(gps);renderNextGP(gps);}
