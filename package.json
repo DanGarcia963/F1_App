@@ -8,7 +8,7 @@
     "dev": "node --watch servidor-local.js",
     "check": "node --check app.js && node --check servidor-local.js && node --check helpers/connectionPostgres.js",
     "test:flow": "node --test tests/flow.test.mjs",
-    "test:api": "node --test tests/flow.test.mjs tests/optionalReads.test.mjs"
+    "test:api": "node --test tests/flow.test.mjs tests/optionalReads.test.mjs tests/winnerHistory.test.mjs"
   },
   "engines": {
     "node": ">=20"

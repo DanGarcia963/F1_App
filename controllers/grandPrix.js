@@ -43,6 +43,13 @@ obtenerGPTemporadaPorId = async (req, res) => {
             res.status(404).json({ message: 'Campeonato de constructores no encontrado' })
     }
 
+    obtenerLastWinnerGPPorId = async (req, res) => {
+      const id = Number(req.params.id);
+      if (!Number.isSafeInteger(id) || id < 1) return res.status(400).json({message:'ID de GP invalido'});
+      const winners = await this.gpModel.obtenerLastWinnerGPPorId(id);
+      return res.json(Array.isArray(winners) ? winners : []);
+    }
+
     obtenerLastWinnerGP = async (req, res) => {
         const { nombreOficial } = req.params
 

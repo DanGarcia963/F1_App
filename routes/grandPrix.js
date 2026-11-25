@@ -11,6 +11,7 @@ export const GPRouter = (Modelos) => {
   GPRouter.get('/obtenerGPTemporada/:Categoria/:Anio', cacheControl(120), gpController.obtenerGPTemporadaPorId)
   GPRouter.get('/obtenerWDCPorAnio/:Categoria/:Anio', cacheControl(120),gpController.obtenerCampeonatoPilotosPorAnio)
   GPRouter.get('/obtenerWCCPorAnio/:Categoria/:Anio', cacheControl(120), gpController.obtenerCampeonatoConstructoresPorAnio)
+  GPRouter.get('/obtenerLastWinnersPorGp/:id', cacheControl(120), gpController.obtenerLastWinnerGPPorId)
   GPRouter.get('/obtenerLastWinners/:nombreOficial', cacheControl(120), gpController.obtenerLastWinnerGP)
   GPRouter.post('/registrarGP', gpController.registrarGP)
   GPRouter.post('/editarGP', gpController.editarGP)

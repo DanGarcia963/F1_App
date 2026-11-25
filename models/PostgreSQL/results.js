@@ -14,10 +14,10 @@ export class ResultsModel {
 
   static async obtenerResultadoPorGPPorId(idGP) {
     const [rows] = await connectionPostgres.query(`
-      SELECT CONCAT(p.nombre, ' ',p.apellido) AS "nombre_piloto",
-         e.nombre AS equipo, r.posicion_final,r.posicion_inicio,
+      SELECT p.id_piloto AS "id_Piloto", CONCAT(p.nombre, ' ',p.apellido) AS "nombre_piloto",
+         p.codigo_fia, e.nombre AS equipo, r.posicion_final,r.posicion_inicio,
          r.puntos_obtenidos,r.vueltas_completadas,gp.tipo_carrera,
-         r.estado_resultado
+         gp.fecha, EXTRACT(YEAR FROM gp.fecha)::integer AS anio, r.estado_resultado
       FROM resultados r
       JOIN piloto p ON p.id_piloto = r.piloto_id
       JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id

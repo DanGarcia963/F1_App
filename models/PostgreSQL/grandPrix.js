@@ -111,6 +111,29 @@
         ORDER BY puntos_totales DESC,e.nombre ASC`, [anio, categoria]);
       return rows;
     }
+    // Los patrocinadores cambian; buscamos historia por circuito y categoria.
+    static async obtenerLastWinnerGPPorId(idGP) {
+      const [rows] = await connectionPostgres.query(`
+        SELECT hist.id_gp AS "id_GP", hist.nombre_oficial, t.anio,
+               p.id_piloto AS "id_Piloto",
+               CONCAT(p.nombre, ' ', p.apellido) AS "Winners",
+               c.nombre AS "Circuito"
+        FROM grandes_premios actual
+        JOIN grandes_premios hist
+          ON hist.circuito_id = actual.circuito_id
+         AND hist.id_categoria = actual.id_categoria
+         AND hist.tipo_carrera = 'GP'
+         AND hist.fecha < actual.fecha
+        JOIN resultados r ON r.grand_prix_id = hist.id_gp AND r.posicion_final = 1
+        JOIN piloto p ON p.id_piloto = r.piloto_id
+        JOIN temporada t ON t.id_temporada = hist.temporada_id
+        JOIN circuito c ON c.id_circuito = hist.circuito_id
+        WHERE actual.id_gp = ? AND actual.tipo_carrera = 'GP'
+        ORDER BY hist.fecha DESC, hist.id_gp DESC
+        LIMIT 8`, [idGP]);
+      return rows;
+    }
+
       static async obtenerLastWinnerGP (nombreOficial){
       const [LastWinners] = await connectionPostgres.query(`SELECT 
       gp.id_GP,
