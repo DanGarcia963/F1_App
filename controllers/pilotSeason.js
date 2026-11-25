@@ -18,7 +18,7 @@
     }
 
     obtenerDuplaPilotos = async (req, res) => {
-        const { idTemporada, idEquipo } = req.body;
+        const { idTemporada, idEquipo } = req.method === 'GET' ? req.params : req.body;
         const PilotosDuplaTemporada = await this.pilotSeasonModel.obtenerDuplaPilotos(idTemporada, idEquipo)
 
         if (PilotosDuplaTemporada) return res.json(PilotosDuplaTemporada)

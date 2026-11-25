@@ -12,6 +12,8 @@ export const TeamRouter = (Modelos) => {
     TeamRouter.get('/obtenerVictoriasEquipo/:id', cacheControl(120),teamController.obtenerVictoriasEquipoPorID)
     TeamRouter.get('/obtenerInfoEquipo/:id', cacheControl(120),teamController.obtenerInfoEquipoPorId)
     TeamRouter.get('/obtenerDuplasEquipo/:id', cacheControl(120),teamController.obtenerDuplasPilotos)
+    TeamRouter.get('/:id/monoplazas', cacheControl(120), teamController.obtenerMonoplazaActualEquipo)
+    TeamRouter.get('/:id/estadisticas-pilotos/:anio', cacheControl(120), teamController.obtenerPilotoseEquipoTemporada)
     TeamRouter.post('/obtenerMonoplazaActual', teamController.obtenerMonoplazaActualEquipo)
     TeamRouter.post('/obtenerStatsDuplaEquipoYear', teamController.obtenerPilotoseEquipoTemporada)
   TeamRouter.post('/crearEquipo', teamController.registrarEquipo)

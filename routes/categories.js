@@ -8,6 +8,7 @@ export const CategoriesRouter = (Modelos) => {
 
   CategoriesRouter.get('/', cacheControl(120), categoriesController.obtenerTodosLasCategorias)
 //  CategoriesRouter.get('/obtenerCircuito/:id', cacheControl(120), categoriesController.obtenerCircuitoPorId)
+  CategoriesRouter.get('/:id/temporada-actual', cacheControl(30), categoriesController.obtenerTemporadaActual)
   CategoriesRouter.post('/cambiarNombre', categoriesController.cambiarNombre)
   return CategoriesRouter
 }

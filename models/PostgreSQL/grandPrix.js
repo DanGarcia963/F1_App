@@ -40,8 +40,8 @@
             ON cat.id_Categoria = gp.id_Categoria
         JOIN circuito c
             ON c.id_Circuito = gp.circuito_id
-        WHERE t.anio = ? AND cat.id_Categoria = ?
-        ORDER BY gp.fecha ASC;`, [Anio, Categoria])
+        WHERE t.anio = ? AND cat.id_Categoria = ? AND gp.tipo_carrera = 'GP'
+        ORDER BY gp.fecha ASC, gp.id_gp ASC;`, [Anio, Categoria])
         if (GPsTemporada.length === 0) return false 
         return GPsTemporada
     }

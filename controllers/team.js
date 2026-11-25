@@ -29,7 +29,7 @@ export class TeamController {
 
     obtenerMonoplazaActualEquipo = async (req, res) => {
 
-        const monoplaza = await this.teamModel.obtenerMonoplazaActualEquipo({ entrada: req.body })
+        const monoplaza = await this.teamModel.obtenerMonoplazaActualEquipo({ entrada: req.method === 'GET' ? { idEquipo: req.params.id } : req.body })
 
         if (monoplaza) return res.json(monoplaza)
             res.status(404).json({ message: 'monoplaza no encontrado' })
@@ -37,7 +37,7 @@ export class TeamController {
     
     obtenerPilotoseEquipoTemporada = async (req, res) => {
 
-        const pilotos = await this.teamModel.obtenerPilotoseEquipoTemporada({ entrada: req.body })
+        const pilotos = await this.teamModel.obtenerPilotoseEquipoTemporada({ entrada: req.method === 'GET' ? { idEquipo: req.params.id, anio: req.params.anio } : req.body })
 
         if (pilotos) return res.json(pilotos)
             res.status(404).json({ message: 'pilotos de equipo en esa temporada no encontrado' })

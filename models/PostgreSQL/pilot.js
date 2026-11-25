@@ -8,10 +8,23 @@ export class PilotModel {
     }
 
     static async obtenerPilotoPorId (idPiloto) {
-        const [piloto] = await connectionPostgres.query(`SELECT CONCAT(nombre, ' ', apellido) AS "nombre_completo", CONCAT('#', numero, ' - ', codigo_fia) AS "identificador", nacionalidad, fecha_nacimiento, fecha_debut, id_Categoria FROM piloto where id_Piloto = ?;`, [idPiloto])
-        if (piloto.length === 0) return false
-    
-        return piloto[0]
+        const [piloto] = await connectionPostgres.query(`
+          SELECT p.id_piloto AS "id_Piloto",
+            CONCAT(p.nombre,' ',p.apellido) AS nombre_completo,
+            CONCAT('#',COALESCE(p.numero::text,'—'),' - ',COALESCE(p.codigo_fia,'')) AS identificador,
+            p.nacionalidad,p.fecha_nacimiento,p.fecha_debut,
+            p.id_categoria AS "id_Categoria",e.nombre AS equipo
+          FROM piloto p
+          LEFT JOIN LATERAL (
+             SELECT pt.equipo_id
+             FROM pilotos_temporada pt
+             JOIN temporada t ON t.id_temporada=pt.temporada_id
+             WHERE pt.piloto_id=p.id_piloto
+             ORDER BY t.anio DESC LIMIT 1
+          ) ultimo ON TRUE
+          LEFT JOIN equipo e ON e.id_equipo=ultimo.equipo_id
+          WHERE p.id_piloto = ?`, [idPiloto]);
+        return piloto[0] || false;
     }
 
     static async obtenerInfoPilotoPorId (idPiloto) {

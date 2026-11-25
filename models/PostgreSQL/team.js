@@ -69,38 +69,31 @@ export class TeamModel {
     }
 
     static async obtenerPilotoseEquipoTemporada ({ entrada }) {
-        const {
-            idEquipo, anio
-        }=entrada
-        const [pilotos] = await connectionPostgres.query(`SELECT
-            pt.piloto_id,
-            CONCAT(p.Nombre, ' ', p.Apellido) AS "nombre_completo",
-            COALESCE(SUM(
-                CASE 
-                WHEN rgp.posicion_final = 1 AND gp.temporada_id = t.id_Temporada AND gp.tipo_carrera='GP' THEN 1 
-                ELSE 0 
-                END
-            ),0) AS "victorias",
-            COALESCE(SUM(
-                CASE 
-                WHEN rgp.posicion_final BETWEEN 1 AND 3 AND gp.temporada_id = t.id_Temporada AND gp.tipo_carrera='GP' THEN 1 
-                ELSE 0 
-                END
-            ),0) AS "podios"
-            FROM pilotos_temporada pt
-            JOIN piloto p ON p.id_Piloto = pt.piloto_id
-            JOIN temporada t ON t.id_Temporada = pt.temporada_id
-            LEFT JOIN resultados rgp ON rgp.piloto_id = pt.piloto_id AND (rgp.equipo_id IS NULL OR rgp.equipo_id = pt.equipo_id)
-            LEFT JOIN grandes_premios gp ON gp.id_GP = rgp.grand_prix_id
-            WHERE pt.equipo_id = ?
-            AND t.anio = ?
-            GROUP BY pt.piloto_id, nombre_completo, pt.numero
-            ORDER BY (pt.numero IS NULL), pt.numero ASC, nombre_completo;
-            `, [idEquipo, anio])
-        if (pilotos.length === 0) return false 
-        return pilotos
+      const { idEquipo, anio } = entrada;
+      const [rows] = await connectionPostgres.query(`
+        SELECT pt.piloto_id AS "id_Piloto",
+          CONCAT(p.nombre, ' ', p.apellido) AS nombre_completo,
+          COALESCE(stats.victorias, 0)::integer AS victorias,
+          COALESCE(stats.podios, 0)::integer AS podios
+        FROM pilotos_temporada pt
+        JOIN piloto p ON p.id_piloto = pt.piloto_id
+        JOIN temporada t ON t.id_temporada = pt.temporada_id
+        LEFT JOIN LATERAL (
+          SELECT
+             COUNT(*) FILTER (WHERE r.posicion_final = 1)::integer AS victorias,
+             COUNT(*) FILTER (WHERE r.posicion_final BETWEEN 1 AND 3)::integer AS podios
+          FROM resultados r
+          JOIN grandes_premios gp ON gp.id_gp = r.grand_prix_id
+          WHERE r.piloto_id = pt.piloto_id
+            AND gp.temporada_id = t.id_temporada
+            AND gp.tipo_carrera = 'GP'
+            AND COALESCE(r.equipo_id, pt.equipo_id) = pt.equipo_id
+        ) stats ON TRUE
+        WHERE pt.equipo_id = ? AND t.anio = ?
+        ORDER BY pt.numero ASC NULLS LAST, nombre_completo ASC`, [idEquipo, anio]);
+      return rows;
     }
-    
+
         static async obtenerInfoEquipoPorId (idEquipo) {
         const [equipo] = await connectionPostgres.query(`SELECT 
       t.anio,
