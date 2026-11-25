@@ -135,6 +135,21 @@ REVOKE ALL ON public.pilotos_categorias,public.pilotos_temporada_categoria,publi
  public.v_pilotos_temporada_categoria FROM PUBLIC,anon,authenticated;
 CREATE INDEX IF NOT EXISTS idx_ptc_equipo_temporada ON public.pilotos_temporada_categoria(equipo_id,temporada_id);
 CREATE INDEX IF NOT EXISTS idx_gp_categoria_temporada_tipo ON public.grandes_premios(id_categoria,temporada_id,tipo_carrera);
+-- Exceptions to standard weekend format (Baku 2026 has two Feature Races).
+CREATE TABLE IF NOT EXISTS public.formato_ronda_categoria (
+ id_categoria integer NOT NULL REFERENCES public.categoria(id_categoria),
+ anio smallint NOT NULL,
+ ronda smallint NOT NULL,
+ feature_races smallint NOT NULL CHECK(feature_races>=0),
+ sprint_races smallint NOT NULL CHECK(sprint_races>=0),
+ fuente text NOT NULL,
+ PRIMARY KEY(id_categoria,anio,ronda)
+);
+INSERT INTO public.formato_ronda_categoria VALUES
+(2,2026,12,2,1,'https://www.fiaformula2.com/en/latest/article/fia-formula-2-announce-supersized-baku-round.5ixzvM3F663c6zjTWZHLDX')
+ON CONFLICT DO NOTHING;
+ALTER TABLE public.formato_ronda_categoria ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.formato_ronda_categoria FROM PUBLIC,anon,authenticated;
 COMMIT;
 
 SELECT id_categoria,count(*) AS pilotos FROM public.pilotos_categorias GROUP BY id_categoria ORDER BY id_categoria;
