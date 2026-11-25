@@ -111,7 +111,7 @@
         ORDER BY puntos_totales DESC,e.nombre ASC`, [anio, categoria]);
       return rows;
     }
-    // Los patrocinadores cambian; buscamos historia por circuito y categoria.
+    // Historial por circuito, categoría y formato; nunca por patrocinador.
     static async obtenerLastWinnerGPPorId(idGP) {
       const [rows] = await connectionPostgres.query(`
         SELECT hist.id_gp AS "id_GP", hist.nombre_oficial, t.anio,
@@ -122,25 +122,26 @@
         JOIN grandes_premios hist
           ON hist.circuito_id = actual.circuito_id
          AND hist.id_categoria = actual.id_categoria
-         AND hist.tipo_carrera = 'GP'
+         AND hist.tipo_carrera IS NOT DISTINCT FROM actual.tipo_carrera
+         AND hist.id_gp <> actual.id_gp
          AND hist.fecha < actual.fecha
         JOIN resultados r ON r.grand_prix_id = hist.id_gp AND r.posicion_final = 1
         JOIN piloto p ON p.id_piloto = r.piloto_id
         JOIN temporada t ON t.id_temporada = hist.temporada_id
         JOIN circuito c ON c.id_circuito = hist.circuito_id
-        WHERE actual.id_gp = ? AND actual.tipo_carrera = 'GP'
+        WHERE actual.id_gp = ?
         ORDER BY hist.fecha DESC, hist.id_gp DESC
-        LIMIT 8`, [idGP]);
+        LIMIT 30`, [idGP]);
       return rows;
     }
 
       static async obtenerLastWinnerGP (nombreOficial){
       const [LastWinners] = await connectionPostgres.query(`SELECT 
-      gp.id_GP,
+      gp.id_gp AS "id_GP",
       t.anio,
-      concat(p.Nombre, ' ',p.Apellido) Winners,
+      concat(p.nombre, ' ',p.apellido) AS "Winners",
       gp.nombre_oficial,
-      c.nombre
+      c.nombre AS "Circuito"
       FROM resultados rgp
       JOIN piloto p
       on p.id_Piloto = rgp.piloto_id
@@ -152,7 +153,6 @@
       on t.id_Temporada = gp.temporada_id
       where rgp.posicion_final = 1 AND gp.nombre_oficial = ?
       ORDER BY t.anio DESC `,[nombreOficial]);
-        if(LastWinners === 0) return false
         return LastWinners
     }
 

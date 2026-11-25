@@ -7,7 +7,7 @@ const read = path => readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
 function loadModel(fakeConnection){
   const script=read('models/PostgreSQL/grandPrix.js')
-    .replace(/^import .+$/gm,'').replaceAll('export ','');
+    .replace(/^[ \t]*import .+$/gm,'').replaceAll('export ','');
   return runInNewContext(script+'\nGPModel;', {connectionPostgres:fakeConnection});
 }
 function loadController(){
@@ -27,7 +27,9 @@ test('ganadores anteriores se consultan por id, circuito, categoria y fecha',asy
   assert.match(sql,/hist\.circuito_id\s*=\s*actual\.circuito_id/);
   assert.match(sql,/hist\.id_categoria\s*=\s*actual\.id_categoria/);
   assert.match(sql,/hist\.fecha\s*<\s*actual\.fecha/);
-  assert.match(sql,/hist\.tipo_carrera\s*=\s*'GP'/);
+  assert.match(sql,/hist\.tipo_carrera IS NOT DISTINCT FROM actual\.tipo_carrera/);
+  assert.match(sql,/hist\.id_gp <> actual\.id_gp/);
+  assert.match(sql,/LIMIT 30/);
   assert.match(sql,/r\.posicion_final\s*=\s*1/);
   assert.doesNotMatch(sql,/hist\.nombre_oficial\s*=\s*actual\.nombre_oficial/);
 });
@@ -55,4 +57,21 @@ test('resultados incluyen piloto y equipo para construir podio',()=>{
   assert.match(results,/AS "nombre_piloto"/);
   assert.match(results,/r\.puntos_obtenidos/);
   assert.match(results,/posicion_final ASC NULLS LAST/);
+});
+
+test('la ruta antigua mantiene los alias JSON de PostgreSQL',async()=>{
+  let sql,params;
+  const Model=loadModel({query:async(q,p)=>{sql=q;params=p;return [[{Winners:'Piloto',id_GP:1,Circuito:'Circuito'}]];}});
+  const rows=await Model.obtenerLastWinnerGP('GP de prueba');
+  assert.equal(rows[0].Winners,'Piloto');
+  assert.match(sql,/AS "Winners"/);
+  assert.match(sql,/AS "id_GP"/);
+  assert.deepEqual(Array.from(params),['GP de prueba']);
+});
+test('el controlador rechaza IDs invalidos sin consultar PostgreSQL',async()=>{
+  const Controller=loadController();
+  const controller=new Controller({GPModel:{obtenerLastWinnerGPPorId:async()=>{throw Error('No debe consultar');}}});
+  const res={statusCode:200,status(code){this.statusCode=code;return this},json(body){this.body=body;return this}};
+  await controller.obtenerLastWinnerGPPorId({params:{id:'abc'}},res);
+  assert.equal(res.statusCode,400);
 });

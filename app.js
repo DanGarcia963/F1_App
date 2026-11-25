@@ -22,7 +22,7 @@ export const crearApp = Modelos => {
     .split(',').map(value => value.trim()).filter(Boolean);
 
   // Metadatos publicos para confirmar que codigo esta atendiendo las peticiones.
-  const apiRevision = 'f1-routes-2026-11-25-v2';
+  const apiRevision = 'f1-routes-2026-11-25-v3';
   const commit = (process.env.RAILWAY_GIT_COMMIT_SHA || '').slice(0,12) || 'desconocido';
   const branch = process.env.RAILWAY_GIT_BRANCH || 'desconocida';
   app.use('/api',(_req,res,next)=>{res.set('X-F1-App-Revision',apiRevision);next();});
@@ -33,7 +33,9 @@ export const crearApp = Modelos => {
       categories:'/api/categoria/',seasons:'/api/temporada/',
       calendar:'/api/granPremio/obtenerGPTemporada/1/2026',
       drivers:'/api/granPremio/obtenerWDCPorAnio/1/2026',
-      constructors:'/api/granPremio/obtenerWCCPorAnio/1/2026'}});
+      constructors:'/api/granPremio/obtenerWCCPorAnio/1/2026',
+      winnerHistory:'/api/granPremio/obtenerLastWinnersPorGp/:id',
+      raceResults:'/api/resultados/obtenerResultadoGP/:id'}});
   });
 
   app.disable('x-powered-by');
