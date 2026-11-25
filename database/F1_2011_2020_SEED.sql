@@ -2,6 +2,7 @@
 -- Source: F1DB, CC BY 4.0, https://github.com/f1db/f1db
 -- CSV mirror: https://github.com/TracingInsights/RaceData ; tree 41ab91c48792bfd6e81ccb8c4458d881d3133ef1
 -- Historical master records are inserted only when missing; existing F1 records are preserved.
+-- v2: resolves VER/MSC/HAR collisions with internal aliases and retains original FIA abbreviations.
 -- Pilot-season team/number reflects last recorded participation; exact team is stored per result.
 -- Pole/fastest lap based on source; points taken from source, never inferred from rank.
 -- F2 not included: separate dataset and category model validation required.
@@ -4882,8 +4883,38 @@ END $$;
 INSERT INTO public.temporada(anio,finalizada)
 SELECT y,1 FROM generate_series(2011,2020) y
 ON CONFLICT(anio) DO UPDATE SET finalizada=excluded.finalizada;
-INSERT INTO public.piloto(codigo_fuente,nombre,apellido,nacionalidad,fecha_nacimiento,numero,codigo_fia,id_categoria)
-SELECT codigo,nombre,apellido,pais,nacimiento,numero,fia,1 FROM f1hist_p
+-- Keep the application's existing unique display code; preserve historical FIA codes separately.
+-- Do not remove uq_piloto_categoria_codigo: legacy API writes can use codigo_fia.
+ALTER TABLE public.piloto ADD COLUMN IF NOT EXISTS codigo_fia_original text;
+COMMENT ON COLUMN public.piloto.codigo_fia_original IS
+ 'Abreviatura FIA de la fuente historica; codigo_fia puede ser un alias interno para evitar colisiones entre epocas.';
+
+CREATE TEMP TABLE f1hist_p_codes ON COMMIT DROP AS
+SELECT s.*, CASE s.codigo
+ WHEN 'jean-eric-vergne' THEN 'JEV'
+ WHEN 'michael-schumacher' THEN 'MSH'
+ WHEN 'rio-haryanto' THEN 'RHY'
+ ELSE s.fia END AS codigo_interno
+FROM f1hist_p s;
+
+DO $ BEGIN
+ IF EXISTS (
+   SELECT 1 FROM f1hist_p_codes s
+   JOIN public.piloto p ON p.id_categoria=1 AND p.codigo_fia=s.codigo_interno
+   WHERE p.codigo_fuente IS DISTINCT FROM s.codigo
+     AND NOT EXISTS (SELECT 1 FROM public.piloto old WHERE old.codigo_fuente=s.codigo)
+ ) OR EXISTS (
+   SELECT codigo_interno FROM f1hist_p_codes
+   WHERE codigo_interno IS NOT NULL GROUP BY codigo_interno HAVING count(*)>1
+ ) THEN
+  RAISE EXCEPTION 'Colision adicional de codigo FIA: revisar los alias historicos antes de importar';
+ END IF;
+END $;
+
+INSERT INTO public.piloto(codigo_fuente,nombre,apellido,nacionalidad,fecha_nacimiento,numero,codigo_fia,codigo_fia_original,id_categoria)
+SELECT s.codigo,s.nombre,s.apellido,s.pais,s.nacimiento,s.numero,s.codigo_interno,s.fia,1
+FROM f1hist_p_codes s
+WHERE NOT EXISTS (SELECT 1 FROM public.piloto p WHERE p.codigo_fuente=s.codigo)
 ON CONFLICT(codigo_fuente) DO NOTHING;
 INSERT INTO public.equipo(codigo_fuente,nombre,motor,pais,id_categoria)
 SELECT codigo,nombre,motor,pais,1 FROM f1hist_e
