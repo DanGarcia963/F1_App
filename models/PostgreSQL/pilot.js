@@ -5,7 +5,7 @@ export class PilotModel {
       const [pilotos] = await connectionPostgres.query(`SELECT p.id_piloto AS "id_Piloto", CONCAT(p.nombre,' ',p.apellido) AS nombre_completo,
  CONCAT('#',p.numero,' - ',p.codigo_fia) AS identificador,p.nacionalidad,p.fecha_nacimiento,p.fecha_debut, ?::integer AS "id_Categoria"
  FROM piloto p WHERE p.id_categoria=? OR EXISTS(SELECT 1 FROM pilotos_categorias pc WHERE pc.piloto_id=p.id_piloto AND pc.id_categoria=?)
- OR EXISTS(SELECT 1 FROM v_pilotos_temporada_categoria pt WHERE pt.piloto_id=p.id_piloto AND pt.id_categoria=? AND pt.id_categoria=?)
+ OR EXISTS(SELECT 1 FROM v_pilotos_temporada_categoria pt WHERE pt.piloto_id=p.id_piloto AND pt.id_categoria=?)
  ORDER BY nombre_completo;`,[idCategoria,idCategoria,idCategoria,idCategoria])
   
       return pilotos
@@ -23,7 +23,7 @@ export class PilotModel {
              SELECT pt.equipo_id
              FROM v_pilotos_temporada_categoria pt
              JOIN temporada t ON t.id_temporada=pt.temporada_id
-             WHERE pt.piloto_id=p.id_piloto
+             WHERE pt.piloto_id=p.id_piloto AND pt.id_categoria=?
              ORDER BY t.anio DESC LIMIT 1
           ) ultimo ON TRUE
           LEFT JOIN equipo e ON e.id_equipo=ultimo.equipo_id
