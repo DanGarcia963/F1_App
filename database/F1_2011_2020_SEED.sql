@@ -2,7 +2,7 @@
 -- Source: F1DB, CC BY 4.0, https://github.com/f1db/f1db
 -- CSV mirror: https://github.com/TracingInsights/RaceData ; tree 41ab91c48792bfd6e81ccb8c4458d881d3133ef1
 -- Historical master records are inserted only when missing; existing F1 records are preserved.
--- v2: resolves VER/MSC/HAR collisions with internal aliases and retains original FIA abbreviations.
+-- v3: corrected PL/pgSQL delimiters; resolves VER/MSC/HAR collisions with internal aliases and retains original FIA abbreviations.
 -- Pilot-season team/number reflects last recorded participation; exact team is stored per result.
 -- Pole/fastest lap based on source; points taken from source, never inferred from rank.
 -- F2 not included: separate dataset and category model validation required.
@@ -4897,7 +4897,7 @@ SELECT s.*, CASE s.codigo
  ELSE s.fia END AS codigo_interno
 FROM f1hist_p s;
 
-DO $ BEGIN
+DO $$ BEGIN
  IF EXISTS (
    SELECT 1 FROM f1hist_p_codes s
    JOIN public.piloto p ON p.id_categoria=1 AND p.codigo_fia=s.codigo_interno
@@ -4909,7 +4909,7 @@ DO $ BEGIN
  ) THEN
   RAISE EXCEPTION 'Colision adicional de codigo FIA: revisar los alias historicos antes de importar';
  END IF;
-END $;
+END $$;
 
 INSERT INTO public.piloto(codigo_fuente,nombre,apellido,nacionalidad,fecha_nacimiento,numero,codigo_fia,codigo_fia_original,id_categoria)
 SELECT s.codigo,s.nombre,s.apellido,s.pais,s.nacimiento,s.numero,s.codigo_interno,s.fia,1
