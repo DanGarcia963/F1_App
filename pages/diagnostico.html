@@ -51,9 +51,13 @@
       ['Netlify → Railway · categorías','/api/categoria/'],
       ['Netlify → Railway · temporada','/api/categoria/1/temporada-actual'],
       ['Netlify → Railway · pilotos','/api/granPremio/obtenerWDCPorAnio/1/2026'],
-      ['Railway directo · health', backendOrigin+'/api/health/live'],
-      ['Railway directo · versión', backendOrigin+'/api/meta'],
-      ['Railway directo · temporada',backendOrigin+'/api/categoria/1/temporada-actual']
+      ['Netlify → Railway · calendario 2026','/api/granPremio/obtenerGPTemporada/1/2026'],
+      ['Netlify → Railway · constructores 2026','/api/granPremio/obtenerWCCPorAnio/1/2026'],
+      ['Netlify → Railway · temporadas','/api/temporada/'],
+      ['Netlify → Railway · circuitos','/api/circuito/'],
+      ['Railway directo · health (CORS puede bloquear lectura)', backendOrigin+'/api/health/live'],
+      ['Railway directo · versión (CORS puede bloquear lectura)', backendOrigin+'/api/meta'],
+      ['Railway directo · temporada (CORS puede bloquear lectura)',backendOrigin+'/api/categoria/1/temporada-actual']
     ];
     const $ = id => document.getElementById(id);
     const create = tag => document.createElement(tag);
