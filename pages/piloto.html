@@ -258,6 +258,8 @@
 
     // Obtiene el id del piloto desde la URL
     const params = new URLSearchParams(window.location.search);
+    const selectedCategory = params.get("categoria") || sessionStorage.getItem("f1_categoria") || "1";
+    const categoryQuery = "?categoria=" + encodeURIComponent(/^\d+$/.test(selectedCategory) ? selectedCategory : "1");
     const idPiloto = params.get("id");
     console.log(idPiloto)
 
@@ -286,7 +288,7 @@
 
     async function cargarVictoriasPiloto(){
       try{
-        const VictoriasPiloto = await fetch(`/api/piloto/obtenerVictoriasPiloto/${idPiloto}`).then(r=>r.json());
+        const VictoriasPiloto = await fetch(`/api/piloto/obtenerVictoriasPiloto/${idPiloto}` + categoryQuery).then(r=>r.json());
         const container =document.getElementById('gridVictories')
         container.innerHTML='';
         for(let i=0; i<VictoriasPiloto.length;i++){
@@ -315,7 +317,7 @@
 
     async function cargarPodiosPiloto(){
       try{
-        const PodiosPiloto = await fetch(`/api/piloto/obtenerPodiosPiloto/${idPiloto}`).then(r=>r.json());
+        const PodiosPiloto = await fetch(`/api/piloto/obtenerPodiosPiloto/${idPiloto}` + categoryQuery).then(r=>r.json());
         const container =document.getElementById('gridPodios')
         container.innerHTML='';
         for(let i=0; i<PodiosPiloto.length;i++){
@@ -344,7 +346,7 @@
 
     async function cargarTrayectoria(){
       try{
-        const TrayectoriaPiloto = await fetch(`/api/piloto/obtenerTrayectoriaPiloto/${idPiloto}`).then(r=>r.json());
+        const TrayectoriaPiloto = await fetch(`/api/piloto/obtenerTrayectoriaPiloto/${idPiloto}` + categoryQuery).then(r=>r.json());
         const container =document.getElementById('gridTrayectoria')
         container.innerHTML='';
         for(let i=0; i<TrayectoriaPiloto.length;i++){
@@ -380,8 +382,8 @@
       try {
         // Ejemplo de llamada a tu backend para obtener info
         
-        const infoPiloto = await fetch(`/api/piloto/obtenerPiloto/${idPiloto}`).then(r => r.json());
-        const statsPiloto = await fetch(`/api/piloto/obtenerInfoPiloto/${idPiloto}`).then(r=> r.json());
+        const infoPiloto = await fetch(`/api/piloto/obtenerPiloto/${idPiloto}` + categoryQuery).then(r => r.json());
+        const statsPiloto = await fetch(`/api/piloto/obtenerInfoPiloto/${idPiloto}` + categoryQuery).then(r=> r.json());
         console.log(statsPiloto)
         var acumPuntos=0
         var acumPodios=0

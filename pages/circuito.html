@@ -181,6 +181,8 @@
   <script>
     // Obtiene el id del piloto desde la URL
     const params = new URLSearchParams(window.location.search);
+    const selectedCategory = params.get("categoria") || sessionStorage.getItem("f1_categoria") || "1";
+    const categoryQuery = "?categoria=" + encodeURIComponent(/^\d+$/.test(selectedCategory) ? selectedCategory : "1");
     const IdCircuito = params.get("id");
     console.log(IdCircuito)
 
@@ -250,9 +252,9 @@
           if(results[1].status==='fulfilled')setImage('bandera',results[1].value,'Bandera '+info.pais);
         });
         const qs=await Promise.allSettled([
-          query('/api/circuito/obtenerRecordPole/'+encodeURIComponent(IdCircuito)),
-          query('/api/circuito/obtenerRecordVuelta/'+encodeURIComponent(IdCircuito)),
-          query('/api/circuito/obtenerMaxVencedor/'+encodeURIComponent(IdCircuito))
+          query('/api/circuito/obtenerRecordPole/'+encodeURIComponent(IdCircuito)+categoryQuery),
+          query('/api/circuito/obtenerRecordVuelta/'+encodeURIComponent(IdCircuito)+categoryQuery),
+          query('/api/circuito/obtenerMaxVencedor/'+encodeURIComponent(IdCircuito)+categoryQuery)
         ]);
         const [pole,vr,winner]=qs.map(x=>x.status==='fulfilled'?x.value:null);
         setText('nombrePiloto',pole?.nombre_completo || 'Sin récord registrado');
