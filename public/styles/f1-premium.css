@@ -1081,3 +1081,87 @@ body[data-f1-page="granpremio"] .gp-layout > section{
   .gp-info-table tbody tr{grid-template-columns:1fr!important;}
   .gp-info-table tbody td:first-child{grid-column:1;}
 }
+
+
+/* F1 APP · cierre de auditoría responsive (25-11-2026) */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+:where(main,section,article,.grid,.flex,.gp-layout,.gp-podium-stage){min-width:0;}
+:where(#gridGPs,#gridWDC,#gridWCC,#gridCircuitos,#gridPilotos,#gridEquipos,
+  #gridDriverSeason,#gridTeamSeason,#gridVictories,#gridPodios,#gridTrayectoria) > *{
+  min-width:0!important;max-width:100%!important;
+}
+:where(#gridGPs,#gridWDC,#gridWCC,#gridCircuitos,#gridPilotos,#gridEquipos,
+  #gridDriverSeason,#gridTeamSeason,#gridVictories,#gridPodios,#gridTrayectoria)
+  :is(h2,h3,h4,p,strong,span){
+  min-width:0;max-width:100%;overflow-wrap:anywhere;hyphens:auto;
+}
+#WDCSection #infoGridWDC,#WCCSection #infoGridWCC,
+#GPSection #infoGridGP,.gp-history-section #infoGridWCC{
+  min-width:0;padding:clamp(8px,1.5vw,18px)!important;
+}
+#WDCSection #gridWDC,#WCCSection #gridWCC{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  align-content:start;overflow-x:hidden!important;overflow-y:auto!important;
+  padding:clamp(8px,1.3vw,16px)!important;gap:11px!important;
+}
+#GPSection #gridGPs{
+  display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))!important;
+  align-content:start;overflow-x:hidden!important;overflow-y:auto!important;
+  padding:clamp(9px,1.4vw,17px)!important;gap:12px!important;
+}
+#gridGPs > *{width:100%!important;}
+#gridGPs > * :is(h3,strong){
+  font-size:clamp(16px,1.5vw,21px)!important;line-height:1.16!important;
+  overflow-wrap:anywhere;
+}
+#gridCircuitos,#gridPilotos,#gridEquipos{
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))!important;
+  padding:clamp(10px,2vw,22px)!important;
+}
+#gridDriverSeason,#gridTeamSeason{max-width:100%!important;min-width:0;}
+#gridDriverSeason > *,#gridTeamSeason > *{flex-shrink:0;max-width:100%;}
+body[data-f1-page="granpremio"] .gp-layout > .gp-history-section{
+  min-height:0;align-self:start;
+}
+body[data-f1-page="granpremio"] #gridResultados{overflow:hidden;min-width:0;}
+body[data-f1-page="granpremio"] .gp-podium-stage,
+body[data-f1-page="granpremio"] .gp-podium-card{min-width:0;max-width:100%;}
+body[data-f1-page="granpremio"] :is(.gp-podium-name,.gp-podium-team){
+  width:100%;overflow-wrap:anywhere;hyphens:auto;
+}
+.gp-results-driver{font-weight:800;}
+.gp-driver-link{color:#f4f7fc;text-decoration:none;overflow-wrap:anywhere;}
+.gp-driver-link:hover,.gp-driver-link:focus-visible{color:var(--f1-gold);text-decoration:underline;}
+.gp-winner-card{min-height:76px;}
+.gp-winner-arrow{flex:none;}
+#gridLastWinner.gp-last-winners{scrollbar-gutter:stable;}
+.gp-info-table td{min-width:0;}
+body #gpTitle.f1-gp-header-title{
+  font:700 clamp(10px,1vw,13px)/1.3 var(--f1-body)!important;
+  text-transform:none!important;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+@media(max-width:850px){
+  #WDCSection,#WCCSection,#GPSection{width:100%;max-width:100%;}
+  #GPSection #gridGPs{
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,205px),1fr))!important;
+    max-height:none!important;
+  }
+  #WDCSection #gridWDC,#WCCSection #gridWCC{max-height:440px!important;}
+}
+@media(max-width:480px){
+  body[data-f1-page="granpremio"] .gp-layout{gap:14px!important;}
+  #gridGrandPrixEdit,#gridResultados,#noResultados,.gp-history-section{padding:15px!important;}
+  .gp-summary-heading{align-items:flex-start;gap:9px;}
+  .gp-summary-edit{font-size:10px!important;padding:7px 9px!important;}
+  .gp-podium-card{
+    grid-template-columns:38px 58px minmax(0,1fr)!important;
+    gap:3px 8px!important;padding:11px!important;
+  }
+  .gp-podium-portrait,.gp-podium-card--1 .gp-podium-portrait{width:56px;height:64px;}
+  .gp-podium-name{font-size:clamp(15px,4.5vw,19px)!important;line-height:1.12!important;}
+  .gp-podium-rank{font-size:23px!important;}
+  .gp-results-table{margin:0 -4px;padding:0 4px;}
+  #gridGPs > * h3{font-size:17px!important;}
+  #gridLastWinner.gp-last-winners{scrollbar-gutter:auto;}
+}

@@ -76,3 +76,19 @@ test('fechas no muestran ISO largo ni alteran el dia UTC',()=>{
  assert.match(gp,/String\(data\.fecha \|\| ''\)\.slice\(0,10\)/);
  assert.match(pilot,/formatHistoricDate\(infoPiloto\.fecha_nacimiento\)/);
 });
+
+test('el historial no queda interrumpido por un error cargando pilotos',()=>{
+  assert.doesNotMatch(gp,/console\.error\('Error cargando pilotos', err\)/);
+  assert.match(gp,/cargarLastWinners\(\)/);
+});
+test('los guardados esperan las respuestas antes de notificar exito',()=>{
+  assert.match(gp,/for\(const resultado of payload\)await fetchGuardarResultadoGP\(resultado\)/);
+  assert.match(gp,/for\(const cambio of payload\)await fetchEditarGP\(cambio\)/);
+  assert.match(gp,/closeModalGP\(\)/);
+});
+test('el podio es accesible y la tabla enlaza perfiles sin inventar posiciones',()=>{
+  assert.match(gp,/entry\.id_Piloto/);
+  assert.match(gp,/if\(!driver\)continue/);
+  assert.match(css,/#GPSection #gridGPs/);
+  assert.match(css,/@media\(max-width:480px\)/);
+});
