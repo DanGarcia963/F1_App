@@ -21,6 +21,21 @@ export const crearApp = Modelos => {
   const allowedOrigins = (process.env.CORS_ORIGIN || '')
     .split(',').map(value => value.trim()).filter(Boolean);
 
+  // Metadatos publicos para confirmar que codigo esta atendiendo las peticiones.
+  const apiRevision = 'f1-routes-2026-11-25-v2';
+  const commit = (process.env.RAILWAY_GIT_COMMIT_SHA || '').slice(0,12) || 'desconocido';
+  const branch = process.env.RAILWAY_GIT_BRANCH || 'desconocida';
+  app.use('/api',(_req,res,next)=>{res.set('X-F1-App-Revision',apiRevision);next();});
+  app.get('/api/meta',(_req,res)=>{
+    res.set('Cache-Control','no-store');
+    res.json({service:'f1-app-api',apiRevision,commit,branch,
+      endpoints:{currentSeason:'/api/categoria/1/temporada-actual',
+      categories:'/api/categoria/',seasons:'/api/temporada/',
+      calendar:'/api/granPremio/obtenerGPTemporada/1/2026',
+      drivers:'/api/granPremio/obtenerWDCPorAnio/1/2026',
+      constructors:'/api/granPremio/obtenerWCCPorAnio/1/2026'}});
+  });
+
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
@@ -98,7 +113,12 @@ export const crearApp = Modelos => {
   app.use('/api/resultados', handleAsyncErrors(ResultsRouter(Modelos)));
   app.use('/api/categoria', handleAsyncErrors(CategoriesRouter(Modelos)));
 
-  app.use((_req, res) => res.status(404).json({ message: 'Ruta no encontrada' }));
+  app.use((req,res)=>{
+    if(req.path.startsWith('/api/')) console.warn('[F1_App] 404',req.method,req.path,'branch',branch,'commit',commit);
+    res.status(404).json({message:'Ruta no encontrada',
+      method:req.method,path:req.path,apiRevision,
+      suggestion:'Consulta /api/meta y comprueba que Railway usa el commit correcto.'});
+  });
   app.use((error, _req, res, _next) => {
     console.error('[F1_App] Error en API:', error?.code || 'ERROR', error?.message || '');
     const isDatabaseError = new Set([
