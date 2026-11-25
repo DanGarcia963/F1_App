@@ -109,14 +109,14 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
+    <div class="grid f1-championship-layout">
       <section id="WDCSection"class=" md:col-span-3 lg:col-span-2 lg:col-start-4 lg:row-start-2 xl:col-span-2 xl:col-start-6 xl:row-start-1 2xl:col-span-2 2xl:col-start-8 bg-gray-800 gap-4 p-4 rounded-lg overflow-hidden shadow-lg relative">
         <!-- Campeonato -->
         <div id="infoGridWDC" class="grid grid-cols-1 p-6 items-start">
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
             <div class="p-4 flex flex-row items-center gap-4">
               <div class="flex flex-col">
-                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Drivers Championship</p>
+                <p class="f1-championship-heading">Pilotos <span>WDC</span></p>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@
           <div class="group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer">
             <div class="p-4 flex flex-row items-center gap-4">
               <div class="flex flex-col">
-                <p class="text-2xl max-w-full text-neutral-200 font-semibold">World Constructors Championship</p>
+                <p class="f1-championship-heading">Constructores <span>WCC</span></p>
               </div>
             </div>
           </div>
@@ -165,10 +165,7 @@
             </div>
           </div>
         </div>
-        <div class="p-5">
-          <h2 class="text-2xl font-bold">Grandes Premios</h2>
-          <p class="mt-2 text-gray-300">Revive las mejores maniobras, el podio y los momentos clave.</p>
-        </div>
+        
       </section>
 
     </div>
@@ -939,8 +936,8 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
                 <p class="text-sm text-neutral-400 w-6 text-center">${i+1}</p>
                 ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 rounded-none mb-2">` : ''}
                 <div class="flex flex-col">
-                <p class="text-sm mx-8 text-neutral-200 font-semibold">${c.register}</p>
-                <p class="text-sm mx-8 text-neutral-400">${c.puntos_totales}</p>
+                <p class="text-sm text-neutral-200 font-semibold">${c.register}</p>
+                <p class="text-sm text-neutral-400">${c.puntos_totales}</p>
                 </div>
                 </div>
         `;
