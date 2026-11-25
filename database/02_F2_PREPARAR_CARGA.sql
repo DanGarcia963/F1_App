@@ -80,6 +80,20 @@ ALTER TABLE f2_import.resultados_verificados ENABLE ROW LEVEL SECURITY;
 ALTER TABLE f2_import.campeonato_pilotos_verificado ENABLE ROW LEVEL SECURITY;
 ALTER TABLE f2_import.campeonato_equipos_verificado ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON ALL TABLES IN SCHEMA f2_import FROM PUBLIC,anon,authenticated;
+-- Differences between race totals and official championship totals require explicit documented adjustment.
+CREATE TABLE IF NOT EXISTS f2_import.ajustes_campeonato_pilotos(
+ anio smallint NOT NULL, piloto text NOT NULL, puntos numeric(10,2) NOT NULL,
+ motivo text NOT NULL, fuente text NOT NULL CHECK(fuente LIKE 'https://%'),
+ PRIMARY KEY(anio,piloto), FOREIGN KEY(anio,piloto) REFERENCES f2_import.campeonato_pilotos_verificado(anio,piloto)
+);
+CREATE TABLE IF NOT EXISTS f2_import.ajustes_campeonato_equipos(
+ anio smallint NOT NULL, equipo text NOT NULL, puntos numeric(10,2) NOT NULL,
+ motivo text NOT NULL, fuente text NOT NULL CHECK(fuente LIKE 'https://%'),
+ PRIMARY KEY(anio,equipo), FOREIGN KEY(anio,equipo) REFERENCES f2_import.campeonato_equipos_verificado(anio,equipo)
+);
+ALTER TABLE f2_import.ajustes_campeonato_pilotos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE f2_import.ajustes_campeonato_equipos ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON f2_import.ajustes_campeonato_pilotos,f2_import.ajustes_campeonato_equipos FROM PUBLIC,anon,authenticated;
 COMMIT;
 -- No official records loaded by this script. Staging may be populated with verified source rows.
 SELECT anio,verificado,carreras_esperadas,resultados_esperados FROM f2_import.lotes_verificados ORDER BY anio;

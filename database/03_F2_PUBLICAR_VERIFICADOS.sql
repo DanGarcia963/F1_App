@@ -30,6 +30,19 @@ BEGIN
  IF EXISTS(SELECT 1 FROM f2_import.equipos_verificados s JOIN public.equipo e ON e.codigo_fuente=s.codigo WHERE e.id_categoria<>2)
  OR EXISTS(SELECT 1 FROM f2_import.carreras_verificadas s JOIN public.grandes_premios g ON g.codigo_fuente=s.codigo WHERE g.id_categoria<>2)
  THEN RAISE EXCEPTION 'Codigo de origen ocupado por otra categoria'; END IF;
+ IF EXISTS (SELECT 1 FROM f2_import.campeonato_pilotos_verificado p JOIN f2_lotes l USING(anio)
+ LEFT JOIN f2_import.ajustes_campeonato_pilotos a ON a.anio=p.anio AND a.piloto=p.piloto
+ WHERE p.puntos <> COALESCE((SELECT sum(r.puntos) FROM f2_import.resultados_verificados r JOIN f2_import.carreras_verificadas c ON c.codigo=r.carrera WHERE c.anio=p.anio AND r.piloto=p.piloto),0)+COALESCE(a.puntos,0))
+ OR EXISTS (SELECT 1 FROM f2_import.campeonato_equipos_verificado p JOIN f2_lotes l USING(anio)
+ LEFT JOIN f2_import.ajustes_campeonato_equipos a ON a.anio=p.anio AND a.equipo=p.equipo
+ WHERE p.puntos <> COALESCE((SELECT sum(r.puntos) FROM f2_import.resultados_verificados r JOIN f2_import.carreras_verificadas c ON c.codigo=r.carrera WHERE c.anio=p.anio AND r.equipo=p.equipo),0)+COALESCE(a.puntos,0))
+ THEN RAISE EXCEPTION 'Diferencias de puntos sin ajuste oficial documentado'; END IF;
+ IF EXISTS(SELECT 1 FROM f2_import.resultados_verificados r JOIN f2_import.carreras_verificadas c ON c.codigo=r.carrera JOIN f2_lotes l USING(anio)
+ WHERE NOT EXISTS(SELECT 1 FROM f2_import.campeonato_pilotos_verificado p WHERE p.anio=c.anio AND p.piloto=r.piloto)
+ OR NOT EXISTS(SELECT 1 FROM f2_import.campeonato_equipos_verificado e WHERE e.anio=c.anio AND e.equipo=r.equipo))
+ THEN RAISE EXCEPTION 'Participante sin clasificacion oficial'; END IF;
+ IF EXISTS(SELECT 1 FROM f2_import.pilotos_verificados s JOIN public.piloto p ON p.codigo_fuente=s.codigo WHERE p.fecha_nacimiento IS DISTINCT FROM s.nacimiento)
+ THEN RAISE EXCEPTION 'Codigo fuente de piloto con fecha de nacimiento incompatible'; END IF;
 END;
 $check$;
 -- Only entities belonging to selected seasons.
