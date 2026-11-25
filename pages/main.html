@@ -129,296 +129,204 @@
     </div>
   </main>
   <script>
+(() => {
+  'use strict';
+  const params = new URLSearchParams(window.location.search);
+  const selected = params.get('id') || params.get('categoria') || sessionStorage.getItem('f1_categoria') || '1';
+  const idCategoria = /^\d+$/.test(selected) && Number(selected) > 0 ? selected : '1';
+  sessionStorage.setItem('f1_categoria', idCategoria);
+  let currentYear = null;
 
-        // Obtiene el id del piloto desde la URL
-    const params = new URLSearchParams(window.location.search);
-    const idCategoria = params.get("id") || "1";
-    console.log(idCategoria)
-
-    async function obtenerImagenWikipedia(nombre) {
-      const query = encodeURIComponent(nombre);
-      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${query}&prop=pageimages&format=json&pithumbsize=1000&origin=*`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const pages = data.query.pages;
-        const page = Object.values(pages)[0];
-        return page.thumbnail ? page.thumbnail.source : null;
-      } catch (err) {
-        console.error('Error obteniendo imagen de', nombre, err);
-        return null;
-      }
+  for (const [id,path] of [
+    ['mainPage','/main'],['teamsPage','/teams'],
+    ['driversPage','/pilotos'],['seasonPage','/seasons']
+  ]) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.setAttribute('href',path+'?id='+idCategoria);
+      element.addEventListener('click', () => window.location.assign(path+'?id='+idCategoria));
     }
-
-    async function obtenerFotoPiloto(nombrePiloto, anio) {
-  // Normaliza el nombre para que coincida con la carpeta
-  const nombreCarpeta = nombrePiloto.trim();
-  const extensiones = ['png'];
-  for (let ext of extensiones) {
-    const urlLocal = `/Driver_photos/${encodeURIComponent(nombreCarpeta)}/${encodeURIComponent(anio)}.${ext}`;
-    try {
-      const res = await fetch(urlLocal, { method: 'HEAD' });
-      if (res.ok) return urlLocal;
-    } catch (e) { /* ignorar */ }
   }
-  // Si no hay foto local, busca en Wikipedia
-  return await obtenerImagenWikipedia(nombrePiloto);
-}
 
-    async function obtenerFotoEquipo(nombreEquipo) {
-  // Normaliza el nombre para que coincida con la carpeta
-  const nombreImagen = nombreEquipo.trim();
-  const extensiones = ['png'];
-  for (let ext of extensiones) {
-    const urlLocal = `/Team_photos/${encodeURIComponent(nombreImagen)}.${ext}`;
-    try {
-      const res = await fetch(urlLocal, { method: 'HEAD' });
-      if (res.ok) return urlLocal;
-    } catch (e) { /* ignorar */ }
+  const $ = id => document.getElementById(id);
+  const create = (tag,className,value) => {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (value !== undefined && value !== null) e.textContent = String(value);
+    return e;
+  };
+  async function getJSON(path) {
+    const response = await fetch(path, { headers: { Accept:'application/json' },cache:'no-store' });
+    if (!response.ok) {
+      throw new Error('HTTP '+response.status+' en '+path);
+    }
+    const data = await response.json();
+    if (data && !Array.isArray(data) && data.message && !data.anio) throw new Error(data.message);
+    return data;
   }
-  // Si no hay foto local, busca en Wikipedia
-  return await obtenerImagenWikipedia(nombreEquipo);
-}
-
-document.getElementById("mainPage").addEventListener("click",()=>{
-  window.location.href=`/main/?id=${idCategoria}`
-})
-
-document.getElementById("teamsPage").addEventListener("click",()=>{
-  window.location.href=`/teams/?id=${idCategoria}`
-})
-
-document.getElementById("driversPage").addEventListener("click",()=>{
-    window.location.href=`/pilotos/?id=${idCategoria}`
-})
-document.getElementById("seasonPage").addEventListener("click",()=>{
-    window.location.href=`/seasons/?id=${idCategoria}`
-})
-
-    var today = new Date()
-    var CurrentYear = today.getFullYear()
-    const season = document.getElementById('anio')
-    season.textContent = CurrentYear
-    console.log(CurrentYear)
-
-
-
-    async function cargarGPS(){
-      const cacheKey = `gps_${CurrentYear}`;
-      const cacheTimeKey = `gps_time_${CurrentYear}`;
-      const cacheDuration = 30 * 1000; // 120 segundos
-
-      const now = Date.now();
-      const cachedData = localStorage.getItem(cacheKey);
-      const cachedTime = localStorage.getItem(cacheTimeKey);
-
-      if (cachedData && cachedTime && (now - cachedTime < cacheDuration)) {
-        renderGPs(JSON.parse(cachedData));
-        console.log('Datos de GP cargados desde caché');
-        return;
-      }
-
-    try{
-      const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${idCategoria}/${CurrentYear}`).then(r => r.json());
-        localStorage.setItem(cacheKey, JSON.stringify(GPs));
-        localStorage.setItem(cacheTimeKey, now);
-        renderGPs(GPs);
-
+  const list = (value,name) => {
+    if (!Array.isArray(value)) throw new Error('Formato de datos inesperado para '+name);
+    return value;
+  };
+  function message(container,text,isError=false) {
+    if (!container) return;
+    container.replaceChildren();
+    const panel = create('div','f1-empty-message',text);
+    panel.setAttribute('role',isError?'alert':'status');
+    container.append(panel);
+  }
+  function errorIn(section,text) {
+    const target = $(section);
+    message(target,'No se pudieron cargar '+text+'. Comprueba la API de Railway y vuelve a intentarlo.',true);
+  }
+  const dateKey = raw => String(raw||'').slice(0,10);
+  const prettyDate = raw => {
+    const s = dateKey(raw);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return 'Fecha pendiente';
+    return new Intl.DateTimeFormat('es-MX',{timeZone:'UTC',day:'numeric',month:'short',year:'numeric'})
+      .format(new Date(s+'T12:00:00Z'));
+  };
+  function addImage(box,filename,kind) {
+    const img = create('img','f1-list-image');
+    img.alt = filename;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    const candidates = kind === 'driver'
+      ? [String(currentYear)+'.png','2025.png','driver.jpg','driver.webp']
+        .map(file => '/Driver_photos/'+encodeURIComponent(filename)+'/'+encodeURIComponent(file))
+        .concat(['/Driver_photos/default.png'])
+      : ['/Team_photos/'+encodeURIComponent(filename)+'.png'];
+    let index=0;
+    img.onerror = () => {
+      index++;
+      if (index >= candidates.length) { img.remove(); return; }
+      img.src = candidates[index];
+    };
+    img.src=candidates[index];
+    box.append(img);
+  }
+  function clickableCard(container,url,style) {
+    const card=create('a',style);
+    card.href=url;
+    container.append(card);
+    return card;
+  }
+  function renderGPs(gps) {
+    const root=$('gridGPs');
+    if (!gps.length) return message(root,'No hay Grandes Premios registrados para esta temporada.');
+    root.replaceChildren();
+    for (const gp of gps) {
+      const id=gp.id_GP ?? gp.id_gp;
+      const card=clickableCard(root,
+        '/granPremio?id='+encodeURIComponent(id)+'&categoria='+idCategoria,
+        'group bg-neutral-900 rounded-xl flex-none min-w-[100px] snap-center overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative');
+      const body=create('div','p-4 flex flex-col gap-2');
+      const label=create('span','f1-card-eyebrow',gp.Ganador==='Aún no se disputa'?'PRÓXIMAMENTE':'GRAN PREMIO');
+      const name=create('h3','text-lg font-bold',gp.Nombre_GP||gp.nombre_oficial||'Gran Premio');
+      const date=create('p','text-sm text-neutral-400',prettyDate(gp.fecha));
+      const track=create('p','text-sm text-neutral-500',gp.Nombre_Circuito||'Circuito por confirmar');
+      const result=create('p','f1-card-result',gp.Ganador&&gp.Ganador!=='Aún no se disputa'
+        ? 'Ganador: '+gp.Ganador : 'Por disputar');
+      body.append(label,name,date,track,result);
+      card.append(body);
     }
-      catch (err) {
-        console.error('Error cargando campeonatos', err);
-      }
+  }
+  function renderStandings(items,kind) {
+    const drivers=kind==='driver';
+    const root=$(drivers?'gridWDC':'gridWCC');
+    if (!items.length) return message(root,
+      drivers?'Aún no hay clasificación de pilotos.':'Aún no hay clasificación de constructores.');
+    root.replaceChildren();
+    for(let i=0;i<items.length;i++) {
+      const p=items[i];
+      const id=drivers?(p.id_Piloto??p.id_piloto):(p.id_Equipo??p.id_equipo);
+      const name=drivers?(p.nombre_completo||p.Piloto||'Piloto'):(p.equipo||p.Equipo||'Equipo');
+      const card=clickableCard(root,
+        (drivers?'/piloto?id=':'/team?id=')+encodeURIComponent(id)+'&categoria='+idCategoria,
+        'group bg-neutral-900 rounded-xl overflow-hidden border border-neutral-700 transition-all duration-500 cursor-pointer');
+      const row=create('div','p-4 flex flex-row items-center gap-3');
+      row.append(create('span','f1-rank',i+1));
+      const photo=create('span','f1-list-photo');
+      addImage(photo,name,drivers?'driver':'team');
+      row.append(photo);
+      const info=create('div','flex flex-col f1-rank-label');
+      info.append(create('strong','text-sm text-neutral-200',name));
+      const score=Number(p.puntos_totales||0);
+      info.append(create('span','text-sm text-neutral-400',
+        Number.isFinite(score)?score.toLocaleString('es-MX')+' pts':'—'));
+      row.append(info);
+      card.append(row);
     }
-
-    async function renderGPs(GPs){
-        const container = document.getElementById('gridGPs');
-        container.innerHTML = '';
-          for (let i = 0; i < GPs.length; i++) {
-          const gp = GPs[i];
-        const imgCUrl = await obtenerImagenWikipedia(gp.Nombre_Circuito);
-        const imgPUrl = await obtenerImagenWikipedia(gp.Pais);
-         const card = document.createElement('div');
-
-        const fecha = new Date(gp.fecha);
-        const day = String(fecha.getDate()).padStart(2, '0');
-        const month = fecha.toLocaleString('es-ES', { month: 'short' });
-        const year = fecha.getFullYear();
-
-        const newDate = `${day}/${month}/${year}`;
-
-        card.className = 'group bg-neutral-900 rounded-xl flex-none min-w-[100px] snap-center snap-always overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative';
-        card.innerHTML = `
-                <div class="p-4 flex flex-col items-center text-center">
-                ${imgPUrl ? `<img src="${imgPUrl}" alt="Bandera ${gp.Pais}" class="w-12 h-8 mb-2 border">` : ''}
-                <h3 class="text-lg font-bold text-white">${gp.Nombre_GP}</h3>
-                <p class="text-sm text-neutral-400">${newDate}</p>
-                <p class="text-sm text-neutral-500">${gp.Nombre_Circuito}</p>
-                </div>
-
-                <div class="max-h-0 overflow-hidden transition-[max-height] duration-500 px-4 text-center items-center text-sm text-neutral-300 group-hover:max-h-96">
-                <h3 class="text-xl font-bold text-red-500 mb-2">${gp.Nombre_GP}</h3>
-                <p class="mb-1">Fecha: ${newDate}</p>
-                <p class="mb-1">Circuito: ${gp.Nombre_Circuito}</p>
-                ${imgCUrl ? `<img src="${imgCUrl}" alt="${gp.Nombre_Circuito}" class="w-12 h-8 mb-2 bg-white border>` : ''}
-                <p class="mb-1">Vuelta Rapida: ${gp.Vuelta_Rapida}</p>
-                <p class="mb-1">Pole Position: ${gp.Pole_Position}</p>
-                <p>Ganador: ${gp.Ganador}</p>
-                </div>
-
-        
-        `;
-        card.dataset.IdGP = gp.id_GP
-        card.addEventListener('click', () => {
-        window.location.href = `/granPremio?id=${gp.id_GP}&categoria=${idCategoria}`; // ejemplo de redirección con query
-        });
-          container.appendChild(card);          
-        };
-      }
-    
-    async function renderWDCChampionship(WDCDATA){
-       const WDC = document.getElementById('gridWDC');
-        WDC.innerHTML = '';
-          for (let i = 0; i < WDCDATA.length; i++) {
-          const p = WDCDATA[i];
-        const imgUrl = await obtenerFotoPiloto(p.nombre_completo, CurrentYear);
-        const cardDriver = document.createElement('div');
-
-        cardDriver.className =`group bg-neutral-900 rounded-xl flex-none min-w-[100px] snap-center snap-always overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
-        cardDriver.innerHTML = `
-                <div id="idPiloto" class="p-4 flex flex-row items-center gap-4">
-                <p class="text-sm text-neutral-400 w-3 text-center">${i+1}</p>
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${p.nombre_completo}" class="w-14 h-14 bg-white rounded-full mb-2 border">` : ''}
-                <div class="flex flex-col">
-                <p class="text-sm mx-2 text-neutral-200 font-semibold">${p.Piloto}</p>
-                <p class="text-sm mx-2 text-neutral-400">Puntos: ${p.puntos_totales}</p>
-                </div>
-                </div>
-        `;
-        cardDriver.dataset.IdPiloto = p.id_Piloto
-        cardDriver.addEventListener('click', () => {
-        window.location.href = `/piloto?id=${p.id_Piloto}`; // ejemplo de redirección con query
-        });
-        WDC.appendChild(cardDriver)
-
-        };
+  }
+  function renderNextGP(gps) {
+    const container=$('nextGPContainer');
+    if (!container) return;
+    const today=new Date();
+    const todayKey=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),
+      String(today.getDate()).padStart(2,'0')].join('-');
+    const upcoming=gps.filter(gp=>dateKey(gp.fecha)>=todayKey)
+      .sort((a,b)=>dateKey(a.fecha).localeCompare(dateKey(b.fecha)))[0];
+    container.style.display='';
+    if(!upcoming) {
+      $('text-GP').textContent='CALENDARIO';
+      $('nextGPName').textContent='Fin de la temporada';
+      $('nextGPDate').textContent='';
+      return;
     }
+    $('text-GP').textContent='PRÓXIMA CARRERA';
+    $('nextGPName').textContent=upcoming.Nombre_GP||upcoming.nombre_oficial;
+    $('nextGPDate').textContent=prettyDate(upcoming.fecha);
+    const id=upcoming.id_GP??upcoming.id_gp;
+    container.tabIndex=0;
+    container.setAttribute('role','link');
+    container.style.cursor='pointer';
+    const open=()=>window.location.assign('/granPremio?id='+encodeURIComponent(id)+'&categoria='+idCategoria);
+    container.addEventListener('click',open,{once:true});
+    container.addEventListener('keydown',event=>{if(event.key==='Enter')open();},{once:true});
+  }
 
-    async function renderWCCChampionships(WCCDATA){
-      
-        const WCC = document.getElementById('gridWCC');
-        WCC.innerHTML = '';
-          for (let i = 0; i < WCCDATA.length; i++) {
-          const c = WCCDATA[i];
-        const imgUrl = await obtenerFotoEquipo(c.equipo);
-        const cardTeam = document.createElement('div');
-        
-        cardTeam.className =`group bg-neutral-900 rounded-xl flex-none min-w-[100px] snap-center snap-always overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
-        cardTeam.innerHTML = `
-                <div class="p-4 flex flex-row items-center gap-4">
-                <p class="text-sm text-neutral-400 w-6 text-center">${i+1}</p>
-                ${imgUrl ? `<img src="${imgUrl}" alt="Bandera ${c.equipo}" class="w-16 h-16 mb-2 ">` : ''}
-                <div class="flex flex-col">
-                <p class="text-sm mx-8 text-neutral-200 font-semibold">${c.equipo}</p>
-                <p class="text-sm mx-8 text-neutral-400">${c.puntos_totales}</p>
-                </div>
-                </div>
-        `;
-        cardTeam.dataset.IdEquipo = c.id_Equipo
-        cardTeam.addEventListener('click', () => {
-        window.location.href = `/team?id=${c.id_Equipo}`; // ejemplo de redirección con query
-        });
-        WCC.appendChild(cardTeam)
-        };
-        
-    }
-    
-    // Simulación: reemplazar fetch con tus endpoints reales
-    async function cargarCampeonatos() {
-      const cachekeyWDC = `wdc_${CurrentYear}`;
-      const cacheTimeKeyWDC = `wdc_time_${CurrentYear}`;
-
-      const cachekeyWCC = `wcc_${CurrentYear}`;
-      const cacheTimeKeyWCC = `wcc_time_${CurrentYear}`;
-
-      const cacheDuration = 30 * 1000; // 120 segundos
-
-      const now = Date.now();
-
-      const cachedDataWDC = localStorage.getItem(cachekeyWDC);
-      const cachedTimeWDC = localStorage.getItem(cacheTimeKeyWDC);  
-
-      const cachedDataWCC = localStorage.getItem(cachekeyWCC);
-      const cachedTimeWCC = localStorage.getItem(cacheTimeKeyWCC);
-
-      if (cachedDataWDC && cachedTimeWDC && (now - cachedTimeWDC < cacheDuration) && cachedDataWCC && cachedTimeWCC && (now - cachedTimeWCC < cacheDuration)) {
-        renderWDCChampionship(JSON.parse(cachedDataWDC));
-        renderWCCChampionships(JSON.parse(cachedDataWCC));
-        console.log('Datos de WDC y WCC cargados desde caché');
-        return;
+  async function start() {
+    message($('gridGPs'),'Cargando calendario...');
+    message($('gridWDC'),'Consultando clasificación...');
+    message($('gridWCC'),'Consultando clasificación...');
+    let actual;
+    try {
+      actual=await getJSON('/api/categoria/'+idCategoria+'/temporada-actual');
+      if (!actual || !Number.isInteger(Number(actual.anio))) throw new Error('Temporada no disponible');
+    } catch (error) {
+      console.error('[F1_APP] No se pudo determinar la temporada de la categoría',idCategoria,error);
+      for(const id of ['gridGPs','gridWDC','gridWCC']) {
+        message($(id),'No se pudo consultar la temporada de esta categoría. '+error.message,true);
       }
-      try {
-        const pilotos = await fetch(`/api/granPremio/obtenerWDCPorAnio/${idCategoria}/${CurrentYear}`).then(r => r.json());
-        const constructores = await fetch(`/api/granPremio/obtenerWCCPorAnio/${idCategoria}/${CurrentYear}`).then(r => r.json());
-        localStorage.setItem(cachekeyWDC, JSON.stringify(pilotos));
-        localStorage.setItem(cacheTimeKeyWDC, now);
-
-        localStorage.setItem(cachekeyWCC, JSON.stringify(constructores));
-        localStorage.setItem(cacheTimeKeyWCC, now);
-        renderWDCChampionship(pilotos);
-        renderWCCChampionships(constructores);
-      } catch (err) {
-        console.error('Error cargando campeonatos', err);
-      }
+      const badge=$('anio');if(badge)badge.textContent='—';
+      return;
     }
-    
-    // Mostrar el siguiente GP en el header
-    async function mostrarSiguienteGP() {
-      try {
-        const GPs = await fetch(`/api/granPremio/obtenerGPTemporada/${idCategoria}/${CurrentYear}`).then(r => r.json());
-        const hoy = new Date();
-        
-        // Buscar el GP más próximo en el futuro
-        let siguienteGP = null;
-        for (let i = 0; i < GPs.length; i++) {
-          const fechaGP = new Date(GPs[i].fecha);
-          
-          if(fechaGP == hoy) {
-            siguienteGP = GPs[i];
-            document.getElementById('text-GP').textContent = 'Current:';
-          }
-          if (fechaGP > hoy) {
-            if (!siguienteGP || fechaGP < new Date(siguienteGP.fecha)) {
-              siguienteGP = GPs[i];
-              document.getElementById('text-GP').textContent = 'Next Round:';
-            }
-          }
-
-        }
-        if (siguienteGP) {
-          const banderaUrl = await obtenerImagenWikipedia(siguienteGP.Pais);
-          
-          document.getElementById('nextGPFlag').innerHTML = banderaUrl ? `<img src="${banderaUrl}" alt="${siguienteGP.Pais}" class="w-6 h-4 rounded">` : '';
-          document.getElementById('nextGPName').textContent = siguienteGP.Nombre_GP;
-          const fecha = new Date(siguienteGP.fecha);
-          const day = String(fecha.getDate()).padStart(2, '0');
-          const month = fecha.toLocaleString('es-ES', { month: 'short' });
-          const year = fecha.getFullYear();
-          document.getElementById('nextGPDate').textContent = `${day}/${month}/${year}`;
-        } else {
-          document.getElementById('nextGPContainer').style.display = 'none';
-        }
-        document.getElementById('nextGPContainer').addEventListener('click', () => {
-          if (siguienteGP) {
-            window.location.href = `/granPremio?id=${siguienteGP.id_GP}`;
-          }
-        }); 
-      } catch (err) {
-        document.getElementById('nextGPContainer').style.display = 'none';
-      }
-    }
-    mostrarSiguienteGP();
-    cargarGPS();
-    cargarCampeonatos();
+    currentYear=Number(actual.anio);
+    $('anio').textContent=String(currentYear);
+    const live=document.querySelector('.f1-live-chip');
+    if(live)live.textContent=currentYear+' / F1';
+    const paths=[
+      '/api/granPremio/obtenerGPTemporada/'+idCategoria+'/'+currentYear,
+      '/api/granPremio/obtenerWDCPorAnio/'+idCategoria+'/'+currentYear,
+      '/api/granPremio/obtenerWCCPorAnio/'+idCategoria+'/'+currentYear
+    ];
+    const outcomes=await Promise.allSettled(paths.map(getJSON));
+    const [g,d,c]=outcomes;
+    if(g.status==='fulfilled'){
+      try{const gps=list(g.value,'grandes premios');renderGPs(gps);renderNextGP(gps);}
+      catch(e){console.error(e);errorIn('gridGPs','el calendario');}
+    }else {console.error(g.reason);errorIn('gridGPs','el calendario');}
+    if(d.status==='fulfilled'){
+      try{renderStandings(list(d.value,'pilotos'),'driver');}
+      catch(e){console.error(e);errorIn('gridWDC','los pilotos');}
+    }else {console.error(d.reason);errorIn('gridWDC','los pilotos');}
+    if(c.status==='fulfilled'){
+      try{renderStandings(list(c.value,'equipos'),'team');}
+      catch(e){console.error(e);errorIn('gridWCC','los constructores');}
+    }else {console.error(c.reason);errorIn('gridWCC','los constructores');}
+  }
+  window.addEventListener('DOMContentLoaded',start,{once:true});
+})();
   </script>
 </body>
 </html>

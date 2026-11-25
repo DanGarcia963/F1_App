@@ -216,52 +216,61 @@
 
 
     async function cargarDatosCircuito() {
+      const setText=(id,value)=>{ const node=document.getElementById(id);if(node)node.textContent=value??'—'; };
+      const setImage=(id,url,alt)=> {
+        const node=document.getElementById(id);
+        if(!node||!url)return;
+        const img=document.createElement('img');
+        img.src=url;img.alt=alt;
+        img.loading='lazy';
+        img.className='w-32 h-32 rounded-xl border border-neutral-700 object-cover';
+        node.replaceChildren(img);
+      };
+      const query=async (route)=>{
+        const response=await fetch(route);
+        if(response.status===404)return null;
+        if(!response.ok)throw new Error('HTTP '+response.status+' en '+route);
+        return response.json();
+      };
       try {
-        // Ejemplo de llamada a tu backend para obtener info
-        
-        const infoCircuito = await fetch(`/api/circuito/obtenerCircuito/${IdCircuito}`).then(r => r.json());
-        const recordPole = await fetch(`/api/circuito/obtenerRecordPole/${IdCircuito}`).then(r=> r.json());
-        const recordVuelta = await fetch(`/api/circuito/obtenerRecordVuelta/${IdCircuito}`).then(r=> r.json());
-        const maximoGanador = await fetch(`/api/circuito/obtenerMaxVencedor/${IdCircuito}`).then(r=> r.json());
-        console.log(infoCircuito);
-        console.log(recordPole);
-        console.log(recordVuelta);
-       
-        const imgPUrl = await obtenerImagenWikipedia(infoCircuito.nombre);
-        const imgCUrl = await obtenerImagenWikipedia(infoCircuito.pais);
-        const imgUrl = await obtenerFotoPiloto(recordPole.nombre_completo);
-        const imgVUrl = await obtenerFotoPiloto(recordVuelta.nombre_completo);
-        const imgMaxUrl = await obtenerFotoPiloto(maximoGanador.nombre_completo);
-        document.getElementById("bandera").innerHTML = `<img src="${imgCUrl}" alt="Piloto ${infoCircuito.pais}" class="w-40 h-30 rounded-none justify-self-start border border-neutral-700 bg-white object-cover">`
-        
-        document.getElementById("fotoCircuito").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoCircuito.nombre}" class="w-42 h-32 rounded-full justify-self-center border border-neutral-700 bg-white object-cover">`
-        
-        document.getElementById("nombre_Circuito").textContent = infoCircuito.nombre;
-        document.getElementById("pais").textContent = infoCircuito.pais;
-        document.getElementById("city").textContent = infoCircuito.ciudad;
-        document.getElementById("long").textContent = (infoCircuito.longitud_km + " km");
-        document.getElementById("curvas").textContent = infoCircuito.curvas;
-        document.title = `  ${infoCircuito.nombre} | F1 Stats`;
-
-        const year = new Date(recordPole.fecha).getFullYear();
-        console.log(year);
-        document.getElementById("nombrePiloto").textContent = recordPole.nombre_completo;
-        document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgUrl}" alt="Piloto ${recordPole.nombre_completo}" class="w-32 h-32 rounded-full justify-self-center border border-neutral-700 bg-white object-cover">`
-        document.getElementById("race").textContent = `${recordPole.nombre_oficial} ${year}`;
-        document.getElementById("time_record").textContent = recordPole.tiempo_pole;
-
-        const yearV = new Date(recordVuelta.fecha).getFullYear();
-        console.log(yearV);
-        document.getElementById("nombrePilotoV").textContent = recordVuelta.nombre_completo;
-        document.getElementById("fotoPilotoV").innerHTML =  `<img src="${imgVUrl}" alt="Piloto ${recordVuelta.nombre_completo}" class="w-32 h-32 rounded-full justify-self-center border border-neutral-700 bg-white object-cover">`
-        document.getElementById("raceV").textContent = `${recordVuelta.nombre_oficial} ${yearV}`;
-        document.getElementById("time_recordV").textContent = recordVuelta.tiempo_vuelta_rapida;
-   
-        document.getElementById("fotoMaximoGanador").innerHTML =  `<img src="${imgMaxUrl}" alt="Piloto ${maximoGanador.nombre_completo}" class="w-32 h-32 rounded-full justify-self-center border border-neutral-700 bg-white object-cover">`
-        document.getElementById("nombreMaximoGanador").textContent = maximoGanador.nombre_completo;
-        document.getElementById("numVictorias").textContent = maximoGanador.total_victorias
-      } catch (error) {
-        console.error("Error cargando datos del piloto:", error);
+        const info=await query('/api/circuito/obtenerCircuito/'+encodeURIComponent(IdCircuito));
+        if(!info){setText('nombre_Circuito','Circuito no encontrado');return;}
+        setText('nombre_Circuito',info.nombre);
+        setText('pais',info.pais);
+        setText('city',info.ciudad);
+        setText('long',info.longitud_km!=null ? info.longitud_km+' km' : '—');
+        setText('curvas',info.curvas);
+        document.title=info.nombre+' | F1 Stats';
+        // No bloquear la ficha mientras se consulta la miniatura externa.
+        Promise.allSettled([
+          obtenerImagenWikipedia(info.nombre),
+          obtenerImagenWikipedia(info.pais)
+        ]).then(results=>{
+          if(results[0].status==='fulfilled')setImage('fotoCircuito',results[0].value,'Circuito '+info.nombre);
+          if(results[1].status==='fulfilled')setImage('bandera',results[1].value,'Bandera '+info.pais);
+        });
+        const qs=await Promise.allSettled([
+          query('/api/circuito/obtenerRecordPole/'+encodeURIComponent(IdCircuito)),
+          query('/api/circuito/obtenerRecordVuelta/'+encodeURIComponent(IdCircuito)),
+          query('/api/circuito/obtenerMaxVencedor/'+encodeURIComponent(IdCircuito))
+        ]);
+        const [pole,vr,winner]=qs.map(x=>x.status==='fulfilled'?x.value:null);
+        setText('nombrePiloto',pole?.nombre_completo || 'Sin récord registrado');
+        setText('race',pole?.nombre_oficial || '—');
+        setText('time_record',pole?.tiempo_pole || '—');
+        setText('nombrePilotoV',vr?.nombre_completo || 'Sin récord registrado');
+        setText('raceV',vr?.nombre_oficial || '—');
+        setText('time_recordV',vr?.tiempo_vuelta_rapida || '—');
+        setText('nombreMaximoGanador',winner?.nombre_completo || 'Sin victorias registradas');
+        setText('numVictorias',winner?.total_victorias ?? 0);
+        for(const [detail,element] of [[pole,'fotoPiloto'],[vr,'fotoPilotoV'],[winner,'fotoMaximoGanador']]){
+          if(detail?.nombre_completo)obtenerFotoPiloto(detail.nombre_completo)
+            .then(url=>setImage(element,url,'Piloto '+detail.nombre_completo))
+            .catch(()=>{});
+        }
+      } catch(err) {
+        console.error('[F1_APP] Error en ficha de circuito',err);
+        setText('nombre_Circuito','No se pudieron cargar los datos del circuito');
       }
     }
     cargarDatosCircuito();

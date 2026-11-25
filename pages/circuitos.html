@@ -153,7 +153,7 @@
             }
         } 
         catch (err) {
-            console.error('Error cargando circuitos', err);
+            console.error('Error cargando circuitos', err); document.getElementById('gridCircuitos').textContent='No se pudieron cargar los circuitos. Revisa la API de Railway.';
             alert('No se pudieron cargar circuitos. Revisa la conexión.');
             return;
         }
@@ -350,13 +350,13 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
     // Simulación: reemplazar fetch con tus endpoints reales
     async function cargarCircuitos() {
       try {
-        const circuitos = await fetch(endpointAllCircuitos).then(r => r.json());
+        const response = await fetch(endpointAllCircuitos); if(!response.ok) throw new Error('HTTP '+response.status); const circuitos = await response.json(); if(!Array.isArray(circuitos)) throw new Error('Datos de circuitos inválidos');
 
         const gridCircuitos = document.getElementById('gridCircuitos');
         gridCircuitos.innerHTML = '';
           for (let i = 0; i < circuitos.length; i++) {
           const c = circuitos[i];
-        const imgUrl = await obtenerImagenWikipedia(c.nombre);
+        const imgUrl = null; // Miniatura externa opcional; no bloquear el listado.
         const cardTeam = document.createElement('div');
 
         cardTeam.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
@@ -371,9 +371,17 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
         `;
         cardTeam.dataset.IdCircuito = c.id_Circuito;
         cardTeam.addEventListener('click', () => {
-        window.location.href = `/circuito?id=${c.id_Circuito}`; // ejemplo de redirección con query
+        window.location.href = `/circuito?id=${c.id_Circuito}&categoria=${idCategoria}`; // ejemplo de redirección con query
         });
-        gridCircuitos.appendChild(cardTeam)
+        gridCircuitos.appendChild(cardTeam);
+        obtenerImagenWikipedia(c.nombre).then(url=>{
+          if(!url)return;
+          const image=document.createElement('img');
+          image.src=url;image.loading='lazy';image.alt='Circuito '+c.nombre;
+          image.className='w-40 h-30 rounded-lg bg-white mb-2';
+          image.onerror=()=>image.remove();
+          cardTeam.querySelector('div')?.prepend(image);
+        }).catch(()=>{});
 
         };
       } catch (err) {

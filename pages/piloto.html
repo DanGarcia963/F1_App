@@ -269,7 +269,7 @@
         const day = String(fecha.getDate()).padStart(2, '0');
         const month = fecha.toLocaleString('es-ES', { month: 'short' });
         const year = fecha.getFullYear();
-        const newDate = `${day}/${month}/${year}`;
+        const newDate = Number.isFinite(fecha.getTime()) ? `${day}/${month}/${year}` : 'No registrada';
 
         card.className = 'group bg-neutral-900 rounded-xl flex-none min-w-[100px] overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative flex items-center justify-between';
         card.innerHTML =`                
@@ -375,25 +375,25 @@
                     acumStarts += Number(piloto.Starts);
                     acumFastLaps += Number(piloto.FastestLaps);
           }
-        const fecha = new Date(infoPiloto.fecha_nacimiento);
+        const fecha = infoPiloto.fecha_nacimiento ? new Date(infoPiloto.fecha_nacimiento) : new Date(NaN);
         const day = String(fecha.getDate()).padStart(2, '0');
         const month = fecha.toLocaleString('es-ES', { month: 'short' });
         const year = fecha.getFullYear();
 
         const newDate = `${day}/${month}/${year}`;
         const imgPUrl = await obtenerFotoPiloto(infoPiloto.nombre_completo);
-        document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoPiloto.nombre_completo}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">`
-        document.getElementById("equipoPiloto").textContent = infoPiloto.equipo;
+        document.getElementById("fotoPiloto").innerHTML = imgPUrl ? `<img src="${imgPUrl}" alt="Piloto ${infoPiloto.nombre_completo}" class="w-40 h-40 rounded-full border border-neutral-700 object-cover">` : '';
+        document.getElementById("equipoPiloto").textContent = infoPiloto.equipo || "Sin equipo registrado";
         document.getElementById("nombrePiloto").textContent = infoPiloto.nombre_completo;
         document.getElementById("nacionalidadPiloto").textContent = infoPiloto.nacionalidad;
         document.getElementById("fechaNacimiento").textContent = newDate;
         document.getElementById("numeroPiloto").textContent = infoPiloto.identificador;
         document.getElementById("startsPiloto").textContent = ` ${acumStarts}`;
-        document.getElementById("victoriasPiloto").textContent = ` ${acumVictories} (${(parseFloat(Number(acumVictories)/Number(acumStarts))*100).toFixed(2)}%)`;
-        document.getElementById("podiosPiloto").textContent = ` ${acumPodios} (${(parseFloat(Number(acumPodios)/Number(acumStarts))*100).toFixed(2)}%)`;
-        document.getElementById("polesPiloto").textContent = ` ${acumPoles} (${(parseFloat(Number(acumPoles)/Number(acumStarts))*100).toFixed(2)}%)`;
-        document.getElementById("fastLapsPiloto").textContent = ` ${acumFastLaps} (${(parseFloat(Number(acumFastLaps)/Number(acumStarts))*100).toFixed(2)}%)`;
-        document.getElementById("puntosTotales").textContent =` ${acumPuntos} (${parseFloat(Number(acumPuntos)/Number(acumStarts)).toFixed(2)} pts/start)`;
+        document.getElementById("victoriasPiloto").textContent = ` ${acumVictories} (${(acumStarts>0 ? (acumVictories/acumStarts*100) : 0).toFixed(2)}%)`;
+        document.getElementById("podiosPiloto").textContent = ` ${acumPodios} (${(acumStarts>0 ? (acumPodios/acumStarts*100) : 0).toFixed(2)}%)`;
+        document.getElementById("polesPiloto").textContent = ` ${acumPoles} (${(acumStarts>0 ? (acumPoles/acumStarts*100) : 0).toFixed(2)}%)`;
+        document.getElementById("fastLapsPiloto").textContent = ` ${acumFastLaps} (${(acumStarts>0 ? (acumFastLaps/acumStarts*100) : 0).toFixed(2)}%)`;
+        document.getElementById("puntosTotales").textContent =` ${acumPuntos} (${(acumStarts>0 ? acumPuntos/acumStarts : 0).toFixed(2)} pts/start)`;
         document.title = `  ${infoPiloto.nombre_completo} | F1 Stats`;
         
         

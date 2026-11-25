@@ -156,7 +156,7 @@
             }
         } 
         catch (err) {
-            console.error('Error cargando equipos', err);
+            console.error('Error cargando equipos', err); document.getElementById('gridEquipos').textContent='No se pudieron cargar los equipos. Revisa la API de Railway.';
             alert('No se pudieron cargar equipos. Revisa la conexión.');
             return;
         }
@@ -339,13 +339,13 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
     // Simulación: reemplazar fetch con tus endpoints reales
     async function cargarEquipos() {
       try {
-        const equipos = await fetch(endpointAllEquipos).then(r => r.json());
+        const response = await fetch(endpointAllEquipos); if(!response.ok) throw new Error('HTTP '+response.status); const equipos = await response.json(); if(!Array.isArray(equipos)) throw new Error('Datos de equipos inválidos');
 
         const gridequipos = document.getElementById('gridEquipos');
         gridequipos.innerHTML = '';
           for (let i = 0; i < equipos.length; i++) {
           const e = equipos[i];
-        const imgUrl = await obtenerImagenWikipedia(e.pais);
+        const imgUrl = '/Team_photos/'+encodeURIComponent(e.nombre)+'.png';
         const cardTeam = document.createElement('div');
 
         cardTeam.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
@@ -361,8 +361,10 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
         `;
         cardTeam.dataset.IdEquipo = e.id_Equipo
         cardTeam.addEventListener('click', () => {
-        window.location.href = `/team?id=${e.id_Equipo}`; // ejemplo de redirección con query
+        window.location.href = `/team?id=${e.id_Equipo}&categoria=${idCategoria}`; // ejemplo de redirección con query
         });
+        const photo=cardTeam.querySelector('img');
+        if(photo)photo.onerror=()=>{photo.remove();};
         gridequipos.appendChild(cardTeam)
 
         };

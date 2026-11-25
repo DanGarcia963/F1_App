@@ -388,7 +388,13 @@
       async function inicializarCarrusel(){
         const monoplazasAll = await obtenerMonoplazasEquipo();
         const CurrentYear = new Date().getFullYear();
-        const monoplaza = monoplazasAll.filter(m => m.anio <= CurrentYear);
+        const monoplaza = (Array.isArray(monoplazasAll) ? monoplazasAll : [])
+          .filter(m => Number(m.anio) <= CurrentYear);
+        if (!monoplaza.length) {
+          document.getElementById('nombreMonoplaza').textContent = 'Sin monoplazas registrados para este equipo';
+          document.getElementById('gridMonoplaza').classList.remove('invisible');
+          return;
+        }
         console.log(monoplaza)
         mostrarMonoplaza(currentIndex, monoplaza)
 
@@ -412,6 +418,7 @@
         
         let imgMUrl=null;
         const mono = monoplaza[idx];
+        if (!mono) return;
         console.log(mono.anio, mono.F1_Car)
         if(verifiedIndy == 1)
       {    
@@ -456,49 +463,22 @@
         }
       }
 
-      async function obtenerStatsDuplaEquipo(anio){
-        try{
-          const res = await fetch(`http://localhost:1234/api/equipo/obtenerStatsDuplaEquipoYear`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                    "idEquipo": idEquipo,
-                    "anio": anio
-            })
-          });
-          if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
-          return data = await res.json();
-          //
-
-          // opcional: recargar la página para mostrar resultados recién guardados
-          //
-        } catch (err) {
-          console.error(err);
-          
-          throw err;
-        }
+      async function obtenerStatsDuplaEquipo(anio) {
+        const url = '/api/equipo/'+encodeURIComponent(idEquipo)+
+          '/estadisticas-pilotos/'+encodeURIComponent(anio);
+        const response = await fetch(url,{headers:{Accept:'application/json'}});
+        if (!response.ok) throw new Error('HTTP '+response.status+' consultando estadísticas por piloto');
+        const rows = await response.json();
+        return Array.isArray(rows) ? rows : [];
       }
 
-      async function obtenerMonoplazasEquipo(){
-        try{
-          const res = await fetch(`http://localhost:1234/api/equipo/obtenerMonoplazaActual`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                    "idEquipo": idEquipo
-            })
-          });
-          if (!res.ok) throw new Error('Error en la busqueda de monoplazass');
-          return data = await res.json();
-          //
-
-          // opcional: recargar la página para mostrar resultados recién guardados
-          //
-        } catch (err) {
-          console.error(err);
-          
-          throw err;
-        }
+      async function obtenerMonoplazasEquipo() {
+        const response = await fetch(
+          '/api/equipo/'+encodeURIComponent(idEquipo)+'/monoplazas',
+          {headers:{Accept:'application/json'}});
+        if (!response.ok) throw new Error('HTTP '+response.status+' consultando monoplazas');
+        const rows = await response.json();
+        return Array.isArray(rows) ? rows : [];
       }
 
       async function cargarDatosPiloto() {
@@ -521,7 +501,11 @@
             acumPoles += Number(equipo.poles);
           }
 
-          inicializarCarrusel()
+          inicializarCarrusel().catch(err => {
+            console.error('No se pudo cargar el carrusel del equipo:',err);
+            const label=document.getElementById('nombreMonoplaza');
+            if(label) label.textContent='No se pudo cargar el monoplaza';
+          });
           const imgPUrl = await obtenerFotoEquipo(infoEquipo.nombre);
           console.log(imgPUrl);
           document.getElementById("fotoPiloto").innerHTML =  `<img src="${imgPUrl}" alt="Piloto ${infoEquipo.nombre}" class="w-40 h-40 rounded-none object-cover">`

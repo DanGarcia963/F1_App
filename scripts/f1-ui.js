@@ -7,8 +7,13 @@
     'granpremio':'granpremio','gran_premio':'granpremio' };
   const page = map[slug] || slug;
   const params = new URLSearchParams(window.location.search);
-  const category = params.get('categoria') || params.get('id') || '1';
-  const safeCategory = /^\d+$/.test(category) ? category : '1';
+  // En una ficha, ?id representa el piloto, equipo, circuito o GP; no la categoría.
+  const isList = ['categories','main','seasons','pilotos','teams','circuitos'].includes(page);
+  const category = params.get('categoria')
+    || (isList ? params.get('id') : null)
+    || sessionStorage.getItem('f1_categoria') || '1';
+  const safeCategory = /^\d+$/.test(category) && Number(category) > 0 ? category : '1';
+  sessionStorage.setItem('f1_categoria',safeCategory);
   document.body.dataset.f1Page = page;
   const pages = {
     categories: {

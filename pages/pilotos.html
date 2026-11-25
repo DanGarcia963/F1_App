@@ -383,13 +383,13 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
     // Simulación: reemplazar fetch con tus endpoints reales
     async function cargarPilotos() {
       try {
-        const pilotos = await fetch(endpointAllPilotos).then(r => r.json());
+        const response = await fetch(endpointAllPilotos); if(!response.ok) throw new Error('HTTP '+response.status); const pilotos = await response.json(); if(!Array.isArray(pilotos)) throw new Error('Datos de pilotos inválidos');
         console.log(pilotos)
         const gridpilotos = document.getElementById('gridPilotos');
         gridpilotos.innerHTML = '';
           for (let i = 0; i < pilotos.length; i++) {
           const p = pilotos[i];
-        const imgUrl = await obtenerFotoPiloto(p.nombre_completo);
+        const imgUrl = '/Driver_photos/'+encodeURIComponent(p.nombre_completo)+'/driver.webp';
         const cardDriver = document.createElement('div');
 
         cardDriver.className =`group bg-neutral-900 rounded-xl overflow-hidden shadow-lg border border-neutral-700 transition-all duration-500 cursor-pointer relative`
@@ -405,13 +405,24 @@ document.getElementById("seasonPage").addEventListener("click",()=>{
         `;
         cardDriver.dataset.IdPiloto = p.id_Piloto
         cardDriver.addEventListener('click', () => {
-        window.location.href = `/piloto?id=${p.id_Piloto}`; // ejemplo de redirección con query
+        window.location.href = `/piloto?id=${p.id_Piloto}&categoria=${idCategoria}`; // ejemplo de redirección con query
         });
+        const photo = cardDriver.querySelector('img');
+        if(photo){
+          const variants=['driver.webp','driver.jpg','2025.png'];
+          let imageIndex=0;
+          photo.addEventListener('error',()=>{
+            imageIndex++;
+            photo.src=imageIndex<variants.length
+              ? '/Driver_photos/'+encodeURIComponent(p.nombre_completo)+'/'+variants[imageIndex]
+              : '/Driver_photos/default.png';
+          },{once:false});
+        }
         gridpilotos.appendChild(cardDriver)
 
         };
       } catch (err) {
-        console.error('Error cargando campeonatos', err);
+        console.error('Error cargando pilotos', err); document.getElementById('gridPilotos').textContent='No se pudieron cargar los pilotos. Revisa la API de Railway.';
       }
     }
     cargarPilotos();

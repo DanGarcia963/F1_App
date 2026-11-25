@@ -208,7 +208,7 @@
   // Obtener id_GP desde URL
   const params = new URLSearchParams(window.location.search);
   const idGP = params.get('id');
-  const idCategoria = params.get("categoria");
+  const idCategoria = params.get("categoria") || sessionStorage.getItem("f1_categoria") || "1";
   const gpTitle = document.getElementById('gpTitle');
   console.log(gpTitle)
   console.log(idCategoria)
