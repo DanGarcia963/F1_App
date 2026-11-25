@@ -223,8 +223,24 @@
   
 
   // Endpoints que puedes ajustar
-  const GPPoint = await fetch(`/api/granPremio/obtenerGP/${idGP}`).then(r => r.json());
-  console.log(GPPoint[0])
+  let GPPoint;
+  try {
+    const response = await fetch(`/api/granPremio/obtenerGP/${encodeURIComponent(idGP || '')}`);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    GPPoint = await response.json();
+    if (!Array.isArray(GPPoint) || GPPoint.length === 0) {
+      throw new Error('No se encontró información para este Gran Premio');
+    }
+  } catch (error) {
+    console.error('[F1_APP] No se pudo cargar el GP', error);
+    gpTitle.textContent = 'No se pudo cargar este Gran Premio';
+    const aviso = document.getElementById('noResultados');
+    if (aviso) {
+      aviso.classList.remove('hidden');
+      aviso.textContent = 'No se pudo consultar la carrera. Revisa Railway o regresa al calendario.';
+    }
+    return;
+  }
   const idSeason = GPPoint[0].id_Temporada
   
   const anio = GPPoint[0].anio
