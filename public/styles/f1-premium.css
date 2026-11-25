@@ -1,0 +1,1167 @@
+/* F1_App / PADDOCK UI — unified visual system 2026 */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  color-scheme: dark;
+  --f1-bg: #080b11;
+  --f1-bg-2: #0e131d;
+  --f1-surface: #131a25;
+  --f1-surface-raised: #1a222f;
+  --f1-line: rgba(192,204,225,.12);
+  --f1-line-bright: rgba(236,245,255,.22);
+  --f1-ink: #f4f7fc;
+  --f1-muted: #a7b3c5;
+  --f1-red: #f63743;
+  --f1-red-deep: #aa1428;
+  --f1-gold: #ffca66;
+  --f1-radius: 18px;
+  --f1-radius-lg: 26px;
+  --f1-shadow: 0 18px 55px rgba(0,0,0,.24);
+  --f1-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f1-body: "DM Sans", "Segoe UI", sans-serif;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+body {
+  min-width: 0 !important;
+  background: var(--f1-bg) !important;
+  color: var(--f1-ink);
+  font-family: var(--f1-body);
+  letter-spacing: -.011em;
+  line-height: 1.55;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+body::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 750px 480px at 4% 0%, rgba(246,55,67,.10), transparent 65%),
+    radial-gradient(ellipse 920px 610px at 105% 32%, rgba(49,78,130,.13), transparent 68%),
+    linear-gradient(180deg, #0b1019 0%, #080b11 45%, #090d15 100%);
+}
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  opacity: .08;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(229,239,255,.14) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(229,239,255,.14) 1px, transparent 1px);
+  background-size: 84px 84px;
+  mask-image: linear-gradient(180deg, black, transparent 58%);
+}
+::selection { background: rgba(246,55,67,.56); color: white; }
+:where(a,button,input,textarea,select,summary):focus-visible { outline: 2px solid var(--f1-red) !important; outline-offset: 3px; }
+a, button { -webkit-tap-highlight-color: transparent; }
+a { transition: color .2s ease; }
+a:hover { color: #fff; }
+button { cursor: pointer; }
+img { max-width: 100%; }
+main, .min-w-md { min-width: 0 !important; }
+main { margin-inline: auto; padding: clamp(22px,3vw,44px) clamp(16px,3vw,48px) 88px !important; max-width: 1540px !important; }
+body[data-f1-page="piloto"] > .grid,
+body[data-f1-page="team"] > .grid,
+body[data-f1-page="circuito"] > .grid {
+  width: 100% !important;
+  max-width: 1540px !important;
+  margin: 0 auto 70px !important;
+  gap: clamp(16px,2vw,26px) !important;
+  padding: 0 clamp(16px,3vw,48px);
+}
+body[data-f1-page="piloto"],
+body[data-f1-page="team"],
+body[data-f1-page="circuito"] { padding: 0 !important; }
+body > main > .grid { gap: 18px !important; }
+footer, body footer { border-top: 1px solid var(--f1-line); color: var(--f1-muted) !important; margin-top: 42px; padding-block: 30px !important; }
+
+/* Header and universal navigation */
+body > header,
+body header.sticky {
+  background: rgba(8,12,19,.91) !important;
+  border-bottom: 1px solid rgba(255,255,255,.1) !important;
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow: 0 9px 30px rgba(0,0,0,.24);
+  min-height: 70px;
+  z-index: 100 !important;
+}
+body > header::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  bottom: -1px;
+  left: 0;
+  width: 19%;
+  background: linear-gradient(90deg, var(--f1-red), transparent);
+}
+body > header .rounded:has(img[src*="Logos/"]),
+body > header img[src*="Logos/"] {
+  border-radius: 7px !important;
+}
+body > header nav a {
+  color: #b9c3d2 !important;
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  transition: background .2s ease,color .2s ease;
+}
+body > header nav a:hover { background: rgba(255,255,255,.07); color: #fff !important; }
+.f1-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 63px;
+  justify-content: space-between;
+  padding: 0 clamp(16px,3vw,44px);
+  margin: 0 auto;
+  max-width: 1540px;
+}
+.f1-desktop-nav .f1-brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 12px;
+  min-width: 0;
+  color: white;
+}
+.f1-brand-mark {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  height: 42px;
+  min-width: 63px;
+  background: var(--f1-red);
+  border-radius: 7px 14px 7px 7px;
+  clip-path: polygon(0 0,100% 0,91% 100%,0 100%);
+  font: 900 26px/1 var(--f1-display);
+  font-style: italic;
+  letter-spacing: -.055em;
+  box-shadow: 0 8px 28px rgba(246,55,67,.22);
+}
+.f1-brand-name { display: flex; flex-direction: column; gap: 1px; }
+.f1-brand-name strong { font: 800 19px/.95 var(--f1-display); text-transform: uppercase; letter-spacing: .09em; }
+.f1-brand-name span { font: 700 9px/1.2 var(--f1-body); letter-spacing: .2em; color: var(--f1-muted); }
+.f1-links { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.f1-links a {
+  color: #aab7ca;
+  padding: 9px 15px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  transition: color .18s ease, background .18s ease;
+}
+.f1-links a:hover { background: rgba(255,255,255,.06); color: #fff; }
+.f1-links a[aria-current="page"] {
+  background: rgba(246,55,67,.14);
+  color: white;
+  box-shadow: inset 0 -2px 0 var(--f1-red);
+}
+.f1-live-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  color: #f7ccd1;
+  background: rgba(246,55,67,.09);
+  border: 1px solid rgba(246,55,67,.23);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font: 800 10px/1 var(--f1-body);
+  letter-spacing: .13em;
+}
+.f1-live-chip::before { content:"";width:7px;height:7px;background:var(--f1-red);border-radius:50%;box-shadow:0 0 0 4px rgba(246,55,67,.12); }
+.f1-topbar-fallback { background: #0c1019; border-bottom: 1px solid var(--f1-line); position: relative; z-index: 10; }
+
+/* Editorial page hero: race-grid texture and overlaid title */
+.f1-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  max-width: 1540px;
+  margin: clamp(24px,3vw,42px) auto 0;
+  border-radius: var(--f1-radius-lg);
+  min-height: 205px;
+  border: 1px solid rgba(255,255,255,.1);
+  background:
+     linear-gradient(110deg, #1a232f 0%, #101722 42%, #0a111b 100%);
+  box-shadow: 0 20px 55px rgba(0,0,0,.22);
+}
+.f1-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+   radial-gradient(ellipse 500px 280px at 91% 54%, rgba(246,55,67,.21), transparent 68%),
+   linear-gradient(120deg, transparent 32%, rgba(255,255,255,.045) 32.1%, rgba(255,255,255,.045) 32.5%, transparent 32.7%),
+   repeating-linear-gradient(132deg, transparent 0 52px, rgba(255,255,255,.018) 53px 54px);
+}
+.f1-hero::after {
+  content: "F1";
+  pointer-events: none;
+  position: absolute;
+  right: clamp(-12px,3vw,48px);
+  top: 50%;
+  transform: translateY(-53%) skew(-9deg);
+  font: 900 clamp(145px,21vw,315px)/.8 var(--f1-display);
+  letter-spacing: -.12em;
+  color: rgba(255,255,255,.045);
+  z-index: -1;
+}
+.f1-hero-content {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: inherit;
+  max-width: 730px;
+  padding: clamp(26px,4.5vw,56px);
+  align-items: flex-start;
+  justify-content: center;
+}
+.f1-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--f1-gold);
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: .24em;
+}
+.f1-kicker::before { content:""; width:22px;height:2px; background:var(--f1-red); }
+.f1-title {
+  margin: 10px 0 9px;
+  font: 900 clamp(42px,5.8vw,86px)/.88 var(--f1-display);
+  letter-spacing: -.025em;
+  text-transform: uppercase;
+  color: #fff;
+  text-wrap: balance;
+}
+.f1-title em { font-style: normal; color:var(--f1-red); }
+.f1-desc { font-size:clamp(12px,1.24vw,14px); max-width: 560px; line-height:1.65; color:#bdc7d8; }
+.f1-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:17px; }
+.f1-meta span {
+  display:inline-flex;align-items:center;gap:6px;
+  border:1px solid rgba(225,235,255,.14); color:#c1cbd8;
+  background:rgba(255,255,255,.035);border-radius:999px;
+  padding:6px 11px; font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+}
+
+/* Panels, scoreboards and cards */
+main section[class*="bg-neutral-900"],
+main section[class*="bg-gray-800"],
+main section[class*="bg-neutral-800"],
+body > .grid section[class*="bg-neutral-900"],
+body > .grid section[class*="border-neutral-700"],
+main section[class*="border-neutral-700"] {
+  background: linear-gradient(150deg, rgba(25,33,46,.93), rgba(14,19,29,.98)) !important;
+  border: 1px solid var(--f1-line) !important;
+  border-radius: var(--f1-radius-lg) !important;
+  box-shadow: var(--f1-shadow) !important;
+  min-width: 0;
+}
+main section:has(> h2),
+body > .grid section:has(> h2) { position: relative; }
+main section[class*="bg-neutral-900"] h2,
+main section[class*="bg-gray-800"] h2,
+body > .grid section h2,
+main section h2 {
+  font-family: var(--f1-display);
+  font-size: clamp(22px,2.5vw,33px) !important;
+  font-weight: 800 !important;
+  letter-spacing: .025em;
+  text-transform: uppercase;
+  color: white;
+}
+h1,h2,h3,h4 { color: #f7f9ff; }
+main h1,main h2,main h3,.f1-section-title {
+  text-wrap: balance;
+}
+.f1-section-title { font:800 27px/.98 var(--f1-display) !important;text-transform:uppercase;letter-spacing:.045em; }
+#WDCSection, #WCCSection, #GPSection {
+  padding: clamp(18px,2vw,28px) !important;
+  background: linear-gradient(150deg,rgba(25,34,47,.96),rgba(12,18,28,.98)) !important;
+}
+#WDCSection::before,#WCCSection::before,#GPSection::before {
+  content:"";display:block; height:3px; position:absolute;left:25px;right:25px;top:0;
+  background:linear-gradient(90deg,var(--f1-red),transparent 62%);border-radius:3px;
+}
+#WDCSection h2,#WCCSection h2,#GPSection h2 { font-size: clamp(21px,2vw,30px) !important;line-height:1 !important; }
+#gridPilotos,#gridEquipos,#gridCircuitos,#gridSeasons,
+#gridDriverSeason,#gridTeamSeason,#gridGPs,#gridVictories,#gridPodios,#gridTrayectoria,#gridDuplas,
+#gridWDC,#gridWCC,#gridLastWinner {
+  gap: clamp(10px,1.5vw,18px) !important;
+  min-width:0;
+}
+:is(#gridPilotos,#gridEquipos,#gridCircuitos,#gridSeasons,#gridDriverSeason,#gridTeamSeason,#gridGPs,
+#gridVictories,#gridPodios,#gridTrayectoria,#gridDuplas,#gridWDC,#gridWCC,#gridLastWinner) > *:not(.hidden) {
+  border-radius: 16px !important;
+  border: 1px solid rgba(194,210,232,.12) !important;
+  background: linear-gradient(142deg, #222c3b 0%, #151d2a 100%) !important;
+  box-shadow: 0 8px 23px rgba(0,0,0,.17);
+  overflow:hidden;
+  position:relative;
+  min-width: 0;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+}
+:is(#gridPilotos,#gridEquipos,#gridCircuitos,#gridSeasons,#gridDriverSeason,#gridTeamSeason,#gridGPs,
+#gridVictories,#gridPodios,#gridTrayectoria,#gridDuplas,#gridWDC,#gridWCC,#gridLastWinner) > *:not(.hidden):hover {
+  transform: translateY(-3px);
+  border-color: rgba(246,55,67,.55) !important;
+  box-shadow: 0 19px 34px rgba(0,0,0,.29), 0 0 0 1px rgba(246,55,67,.1);
+}
+:is(#gridPilotos,#gridEquipos,#gridCircuitos,#gridSeasons,#gridDriverSeason,#gridTeamSeason,#gridGPs,
+#gridVictories,#gridPodios,#gridTrayectoria,#gridDuplas,#gridWDC,#gridWCC,#gridLastWinner) > *::after {
+  content: "";position:absolute;pointer-events:none;top:0;right:0;width:50px;height:50px;
+  background:linear-gradient(45deg, transparent 48%, rgba(246,55,67,.12) 49%, rgba(246,55,67,.12) 55%, transparent 56%);
+  opacity:.9;
+}
+#gridSeasons > * { min-height:124px;display:flex;align-items:center;justify-content:center; }
+#gridSeasons h3 {
+  font: 900 clamp(27px,3.3vw,45px)/1 var(--f1-display) !important;
+  letter-spacing:.03em;
+}
+#gridSeasons p { margin-top:10px;font-size:12px!important; }
+#gridGPs > * h3 { font: 800 21px/1.08 var(--f1-display) !important; }
+#gridWDC > *,#gridWCC > * { border-radius: 13px !important; }
+#gridWDC > * p:first-child,#gridWCC > * p:first-child { font-variant-numeric:tabular-nums; }
+
+/* Main category posters */
+#categoriaGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));
+  align-items:stretch;
+  gap:24px!important;
+}
+#categoriaGrid > a {
+  display:flex;flex-direction:column;min-height:310px;
+  background:linear-gradient(155deg,#202a38,#0d131e) !important;
+  border:1px solid rgba(240,246,255,.13) !important;
+  border-radius:24px!important;
+  box-shadow:var(--f1-shadow);
+  text-decoration:none;
+  overflow:hidden; position:relative;
+  transition:transform .26s ease,box-shadow .26s ease,border-color .26s ease;
+}
+#categoriaGrid > a:hover {
+  transform: translateY(-6px);
+  border-color: rgba(246,55,67,.58) !important;
+  box-shadow:0 26px 58px rgba(0,0,0,.38),0 0 0 1px rgba(246,55,67,.11);
+}
+#categoriaGrid > a > div:first-child {
+  height:230px!important;
+  flex:none;
+  position:relative;
+  background-color:#181f2b;
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:min(64%,260px) auto;
+  font-size:26px;
+  font-family:var(--f1-display);
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+#categoriaGrid > a > div:first-child::after {
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent 25%,rgba(5,8,15,.3) 100%);
+}
+#categoriaGrid > a > div:last-child {
+  padding:23px!important;display:flex;align-items:center;justify-content:space-between;
+  font:800 26px/1 var(--f1-display);text-transform:uppercase;letter-spacing:.02em;
+}
+#categoriaGrid > a > div:last-child::after {content:"↗";font:700 23px/1 var(--f1-body);color:var(--f1-red);}
+
+/* Image shapes: portraits, team badges, car renders, circuit profiles */
+img[src*="Driver_photos/"]:not([src*="default.png"]) {
+  object-fit: cover;
+  object-position: center 22%;
+  background: linear-gradient(145deg,#253041,#161f2c);
+  border-radius: 13px 13px 6px 13px !important;
+  border: 1px solid rgba(250,255,255,.13);
+  transition: transform .25s ease,filter .25s ease;
+}
+img[src*="Team_photos/"] {
+  object-fit: contain;
+  object-position:center;
+  background: linear-gradient(150deg,#293240,#131b27);
+  border-radius:14px!important;
+  padding: 6px;
+  transition:transform .25s ease;
+}
+img[src*="Team_photos/Monoplazas/"] {
+  background: radial-gradient(ellipse at center,rgba(240,248,255,.10),transparent 65%),#101721;
+  object-fit:contain;
+  border: 1px solid var(--f1-line);
+  border-radius:19px !important;
+  padding: 16px;
+}
+img[src*="Logos/"][src*="trophy"],
+img[src*="Logos/"][src*="podium"],
+img[src*="Logos/"][src*="races"],
+img[src*="Logos/"][src*="victories"],
+img[src*="Logos/"][src*="clock"],
+img[src*="Logos/"][src*="grid"] {
+  object-fit: contain;
+  border-radius:12px;
+  background:rgba(255,255,255,.035);
+  padding:6px;
+}
+body[data-f1-page="piloto"] #fotoPiloto img,
+body[data-f1-page="team"] #fotoPiloto img {
+  display:block;min-width:0;
+  width:min(100%,290px) !important;height:300px !important;
+  margin-inline:auto;
+  border-radius:25px 25px 6px 25px!important;
+  clip-path:polygon(0 0,93% 0,100% 7%,100% 100%,0 100%);
+  object-position:center 18%;
+  background:linear-gradient(145deg,#263146 5%,#0e1420 100%);
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.18));
+}
+body[data-f1-page="team"] #fotoPiloto img { object-fit:contain; padding:24px; }
+body[data-f1-page="circuito"] #fotoCircuito img {
+  width:min(100%,410px) !important;height:230px!important;
+  border-radius:18px!important;
+  object-fit:contain;
+  background:#e8eaf0;
+  padding:12px;
+}
+body[data-f1-page="team"] #monoplazaImg {
+  display:block;
+  width:min(100%,680px) !important;
+  min-height:195px;
+  max-height:360px;
+  height:auto;
+  margin:0 auto;
+  object-fit:contain;
+  background: radial-gradient(ellipse at center,rgba(253,253,255,.1),transparent 65%) !important;
+  border:0 !important;
+  border-radius:20px !important;
+}
+#fotoMaximoGanador img,#fotoPilotoV img,
+#gridDuplas img,#gridPilotos img {
+  border-radius:13px!important;
+}
+:is(#gridPilotos,#gridEquipos,#gridCircuitos,#gridSeasons,#gridGPs) img {
+  box-shadow:0 6px 15px rgba(0,0,0,.15);
+}
+img.f1-image-fallback { opacity:0; }
+.f1-image-empty { background:linear-gradient(135deg,#1e2938,#111923)!important; position:relative; }
+.f1-image-empty::before {
+  content:"F1"; position:absolute;inset:0;display:grid;place-items:center;
+  font:900 28px/1 var(--f1-display);color:rgba(255,255,255,.18);
+}
+
+/* Lists and stats */
+#puntosTotales,#victoriasPiloto,#podiosPiloto,#polesPiloto,#fastLapsPiloto,
+#startsPiloto,#numVictorias {
+  font-family:var(--f1-display)!important;
+  font-size:clamp(25px,3vw,45px)!important;
+  font-weight:900!important;
+  color:#fff!important;
+  font-variant-numeric: tabular-nums;
+}
+#nombrePiloto,#NameTeam,#nombreCircuito,#gpTitle {
+  font:900 clamp(32px,4vw,60px)/.95 var(--f1-display)!important;
+  letter-spacing:.015em;text-transform:uppercase;
+}
+#infoGridDetalles > *,#gridLineUp > * { min-width:0; }
+table {
+  border-collapse:separate;border-spacing:0;
+  width:100%;
+  color:#e7edf6;
+}
+thead {background:rgba(255,255,255,.055);}
+th {font:800 11px/1.4 var(--f1-body);letter-spacing:.11em;text-transform:uppercase!important;color:#adb9c9!important;}
+td,th {padding:12px 14px!important;border-bottom:1px solid rgba(200,215,234,.085)!important;}
+tbody tr {transition:background .15s ease;}
+tbody tr:hover {background:rgba(246,55,67,.055);}
+td {font-size:13px;}
+tbody tr:first-child td:first-child {color:var(--f1-gold);font-weight:800;}
+.overflow-x-auto {max-width:100%;border-radius:12px;}
+/* Controls */
+button:not(:disabled),a[role="button"] {transition:transform .2s ease, background .2s ease,box-shadow .2s ease;}
+button:not(:disabled):active,a[role="button"]:active {transform:translateY(1px);}
+button[class*="bg-red"],input[type="submit"],.f1-primary {
+  background:linear-gradient(145deg,#fc4b54,#d42135)!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+  border-radius:10px!important;
+  color:white!important;
+  font-weight:800;
+  box-shadow:0 9px 24px rgba(239,46,58,.20);
+}
+button[class*="bg-red"]:hover,.f1-primary:hover {box-shadow:0 13px 31px rgba(239,46,58,.29);filter:brightness(1.05);}
+button[class*="bg-gray-800"],button[class*="bg-neutral-800"] {
+  background:#252e3c!important;border:1px solid var(--f1-line)!important;border-radius:10px!important;
+}
+input:not([type="checkbox"]):not([type="radio"]),select,textarea {
+  background:#111925!important;color:#f5f7fb!important;
+  border:1px solid rgba(207,221,243,.19)!important;
+  border-radius:11px!important;
+  min-height:42px;
+}
+input:focus,select:focus,textarea:focus {border-color:var(--f1-red)!important;box-shadow:0 0 0 3px rgba(246,55,67,.13)!important;}
+input::placeholder,textarea::placeholder {color:#8897ac!important;}
+select option {background:#151d29;color:white;}
+[role="dialog"],[id^="modal"],[id^="formAgregar"] {
+  backdrop-filter:blur(12px);
+}
+[class*="bg-neutral-900"][class*="rounded"],[class*="bg-gray-800"][class*="rounded"] { background-color:var(--f1-surface); }
+#apiNotice {border-radius:14px!important;padding:18px!important;}
+
+/* Supplemental mobile navigation */
+.f1-mobile-dock {
+  display:none;
+  position:fixed;
+  left:max(14px,env(safe-area-inset-left));
+  right:max(14px,env(safe-area-inset-right));
+  bottom:max(13px,env(safe-area-inset-bottom));
+  z-index:150;
+  padding:8px;
+  border:1px solid rgba(223,234,249,.17);
+  border-radius:18px;
+  background:rgba(13,18,28,.94);
+  backdrop-filter:blur(24px);
+  box-shadow:0 18px 56px rgba(0,0,0,.6);
+  justify-content:space-around;
+  gap:3px;
+}
+.f1-mobile-dock a {
+  color:#99aabc;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:5px;
+  flex:1;min-width:0;padding:8px 2px;border-radius:11px;
+  font:800 9px/1.1 var(--f1-body);text-transform:uppercase;text-decoration:none;letter-spacing:.055em;
+}
+.f1-mobile-dock a span:first-child{font:800 19px/1 var(--f1-display);letter-spacing:-.03em;}
+.f1-mobile-dock a[aria-current="page"]{background:rgba(246,55,67,.15);color:#fff;}
+.f1-mobile-dock a[aria-current="page"] span:first-child{color:#ff4e5a;}
+.f1-empty-message{padding:28px;border:1px dashed var(--f1-line-bright);border-radius:16px;color:var(--f1-muted);font-size:13px;}
+
+/* Motion & responsive */
+@media (min-width: 1440px) {
+  .f1-hero {margin-inline:auto;}
+}
+@media (max-width: 1100px) {
+  .f1-desktop-nav {gap:14px;}
+  .f1-links a {padding:9px 10px;font-size:11px;}
+  .f1-brand-name span{display:none;}
+}
+@media (max-width: 850px) {
+  .f1-desktop-nav .f1-links,.f1-desktop-nav .f1-live-chip{display:none;}
+  .f1-mobile-dock {display:flex;}
+  body > header nav {display:none!important;}
+  body > header {min-height:62px;}
+  .f1-hero {margin:16px 14px 0;min-height:184px;border-radius:19px;}
+  .f1-hero-content {padding:26px;}
+  .f1-title {font-size:clamp(38px,8vw,61px);}
+  main {padding:24px 15px 112px!important;}
+  body > .grid {padding:0 15px 95px!important;}
+  #WDCSection,#WCCSection,#GPSection {padding:18px!important;}
+  body > main > .grid {grid-template-columns:minmax(0,1fr)!important;}
+  body > main > .grid > section {grid-column:auto!important;grid-row:auto!important;min-width:0!important;}
+}
+@media (max-width: 560px) {
+  .f1-hero::after {font-size:180px;right:-15px;opacity:.68;}
+  .f1-hero-content {padding:25px 22px;}
+  .f1-desc{line-height:1.5;}
+  .f1-brand-name strong{font-size:17px;}
+  #categoriaGrid {gap:14px!important;}
+  #categoriaGrid > a {min-height:246px;}
+  #categoriaGrid > a > div:first-child {height:170px!important;}
+  #gridSeasons {grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  #gridSeasons > * {min-height:110px;}
+  .f1-mobile-dock {border-radius:15px;}
+  table {font-size:12px;}
+  td,th {padding:9px 11px!important;}
+}
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after {scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;}
+}
+
+
+/* Keep legacy DOM for event listeners while showing the unified Paddock header. */
+body > header > .f1-legacy-header { display:none!important; }
+body > header .f1-refresh {
+  background: rgba(255,255,255,.065)!important;
+  border: 1px solid rgba(240,245,255,.17)!important;
+  border-radius: 10px!important;
+  padding:10px 13px!important;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+body > header .f1-refresh:hover{background:rgba(246,55,67,.16)!important;}
+body #gpTitle.f1-gp-header-title {
+  flex: 1;max-width:200px;min-width:0;
+  font:700 12px/1.35 var(--f1-body)!important;
+  text-align:right;color:var(--f1-muted)!important;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  text-transform:none;
+}
+.f1-next-gp {
+  position:absolute;right:32px;bottom:34px;
+  display:flex!important;align-items:flex-start!important;flex-direction:column;
+  gap:7px!important;width:260px;max-width:calc(100% - 64px);
+  padding:18px 19px!important;background:rgba(5,10,18,.73)!important;
+  border:1px solid rgba(250,254,255,.16)!important;
+  border-radius:16px!important;box-shadow:0 16px 28px rgba(0,0,0,.23);
+  backdrop-filter:blur(12px);
+  font-size:12px!important;
+}
+.f1-next-gp #text-GP {font:800 10px/1.2 var(--f1-body);color:var(--f1-gold);letter-spacing:.15em;text-transform:uppercase;}
+.f1-next-gp #nextGPName {font:800 21px/1 var(--f1-display);color:#fff;}
+.f1-next-gp #nextGPDate{font-size:11px;color:#becbd9;}
+.f1-next-gp img {max-width:40px;max-height:25px;border-radius:5px;}
+body[data-f1-page="main"] .f1-hero-content {padding-right:280px;max-width:1040px;}
+@media(max-width:1100px){
+ .f1-hero:has(.f1-next-gp) {display:flex;flex-direction:column;}
+ .f1-next-gp {position:relative;right:auto;bottom:auto;margin:0 25px 24px;width:auto;}
+ body[data-f1-page="main"] .f1-hero-content {padding-right:26px;}
+}
+@media(max-width:560px){
+ body > header .f1-refresh{padding:7px 10px!important;}
+ .f1-next-gp{margin:0 22px 22px;}
+ body #gpTitle.f1-gp-header-title{max-width:110px;font-size:10px!important;}
+}
+
+/* Team detail uses a flex body in the legacy markup: keep shell full-width. */
+body[data-f1-page="team"] > header,
+body[data-f1-page="team"] > .f1-hero { width: 100%; }
+body[data-f1-page="team"] > .f1-hero { width: min(1540px,calc(100% - 32px)); }
+body[data-f1-page="team"] > footer {width:100%;}
+@media (max-width:850px) {
+  body[data-f1-page="team"] > .f1-hero {width:calc(100% - 28px);}
+}
+
+
+/* === 2026 visual QA: prevent overflow, consistent cards, responsive components === */
+*,*::before,*::after { box-sizing:border-box; }
+:is(.gp-layout,.driver-page-grid,.season-cards,.gp-podium-stage) * { min-width:0; }
+:is(.gp-layout,.driver-page-grid,.season-cards) :is(h2,h3,p,strong,span,td) {
+  overflow-wrap:break-word;
+}
+.f1-title,.f1-desc{max-width:100%;}
+/* Full-size season tiles. "TEMPORADA" is now a small eyebrow, year a distinct metric. */
+#gridSeasons.season-cards {
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,206px),1fr))!important;
+  gap:16px!important;
+  overflow:visible!important;
+  max-height:none!important;
+  align-items:stretch!important;
+  padding:18px 0!important;
+  width:100%;
+}
+#gridSeasons .season-card {
+  position:relative;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:space-between!important;
+  flex-direction:column;
+  gap:15px;
+  width:100%;
+  min-height:205px!important;
+  padding:23px 20px!important;
+  text-align:left;
+  text-decoration:none;
+  border:1px solid rgba(235,244,255,.12)!important;
+  border-radius:19px!important;
+  background:linear-gradient(145deg,#202b3b,#121a27)!important;
+}
+#gridSeasons .season-card::after {opacity:0;}
+#gridSeasons .season-card .season-card-label{
+  font:800 10px/1.3 var(--f1-body)!important;
+  letter-spacing:.19em;color:var(--f1-gold);text-transform:uppercase;
+}
+#gridSeasons .season-card .season-card-year {
+  font:900 clamp(37px,4vw,57px)/.9 var(--f1-display)!important;
+  letter-spacing:.015em;color:#fff!important;
+  width:100%;display:block;
+}
+#gridSeasons .season-card .season-card-champion{
+  font:600 12px/1.45 var(--f1-body)!important;
+  color:#c5cfdb!important;
+  overflow-wrap:anywhere;
+  max-width:95%;
+  text-wrap:pretty;
+}
+#gridSeasons .season-card .season-card-arrow{
+  position:absolute;right:17px;top:17px;
+  font:700 20px/1 var(--f1-body);color:var(--f1-red);
+}
+
+/* Driver profile: six metrics within their own fluid cards, never inline with a percentage. */
+body[data-f1-page="piloto"] > .driver-page-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;
+  grid-auto-rows:min-content;
+  gap:20px!important;
+  width:min(100%,1540px)!important;
+  max-width:1540px!important;
+  margin:0 auto 80px!important;
+  padding:0 clamp(16px,3vw,48px)!important;
+  overflow:visible!important;
+}
+.driver-page-grid > .driver-panel{
+  min-width:0;
+  max-width:none!important;
+  width:100%;
+  margin:0!important;
+  padding:clamp(18px,2.3vw,30px)!important;
+  background:linear-gradient(150deg,#182130,#0e1520)!important;
+  border:1px solid var(--f1-line)!important;
+  border-radius:22px!important;
+  box-shadow:0 15px 35px rgba(0,0,0,.22)!important;
+  overflow:hidden;
+}
+.driver-profile-panel{grid-column:1;grid-row:1;}
+.driver-victories-panel{grid-column:2;grid-row:1;}
+.driver-career-panel{grid-column:1;grid-row:2;}
+.driver-podiums-panel{grid-column:2;grid-row:2;}
+.driver-profile-panel #nombrePiloto{
+  display:block;max-width:100%;padding:0 8px;
+  font:900 clamp(31px,3.5vw,48px)/.96 var(--f1-display)!important;
+  letter-spacing:.01em;text-align:center;overflow-wrap:anywhere;
+}
+.driver-profile-panel #equipoPiloto{
+  font-size:13px;color:#c5cedd;text-align:center;margin-top:8px;
+}
+.driver-profile-panel #fotoPiloto{display:block;max-width:100%;}
+.driver-profile-panel #fotoPiloto img{max-width:100%!important;height:230px!important;object-fit:contain!important;}
+.driver-overview{margin-top:23px;}
+.driver-section-heading{padding:0!important;margin-bottom:15px;border-bottom:1px solid var(--f1-line);}
+.driver-section-heading h2{
+  margin:0 0 13px;font:800 25px/1 var(--f1-display);
+  text-transform:uppercase;
+}
+.driver-meta-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;margin:0 0 26px;
+}
+.driver-meta-grid >div{
+  display:flex;flex-direction:column;gap:7px;min-width:0;
+  padding:14px 12px;border-radius:12px;
+  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);
+}
+.driver-meta-grid dt{
+  font:800 10px/1.4 var(--f1-body);letter-spacing:.08em;
+  color:#a6b6ca;text-transform:uppercase;
+}
+.driver-meta-grid dd{
+  margin:0;font:700 13px/1.45 var(--f1-body);color:#f3f6fb;
+  overflow-wrap:anywhere;
+}
+.driver-stats-heading{
+  font:800 24px/1 var(--f1-display);margin:0 0 14px;
+  text-transform:uppercase;
+}
+.driver-stats-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+}
+.driver-stat-card{
+  display:flex;flex-direction:column;align-items:flex-start;
+  justify-content:center;gap:9px;
+  min-height:127px;padding:15px 16px;
+  border:1px solid rgba(207,221,238,.12);
+  border-radius:13px;background:linear-gradient(145deg,#242e3d,#171f2c);
+}
+.driver-stat-card--primary{
+  background:linear-gradient(135deg,rgba(159,27,46,.35),rgba(27,34,47,.95))!important;
+  border-color:rgba(246,55,67,.27)!important;
+}
+.driver-stat-label{
+  font:800 11px/1.35 var(--f1-body);letter-spacing:.07em;
+  text-transform:uppercase;color:#b7c3d3;
+}
+.driver-stat-card .driver-stat-value,
+body[data-f1-page="piloto"] #puntosTotales,
+body[data-f1-page="piloto"] #startsPiloto,
+body[data-f1-page="piloto"] #victoriasPiloto,
+body[data-f1-page="piloto"] #podiosPiloto,
+body[data-f1-page="piloto"] #polesPiloto,
+body[data-f1-page="piloto"] #fastLapsPiloto {
+  display:block;
+  width:100%;
+  font:900 clamp(31px,3vw,43px)/.95 var(--f1-display)!important;
+  letter-spacing:.005em;color:#fff!important;
+  font-variant-numeric:tabular-nums;
+  white-space:normal!important;
+  overflow-wrap:anywhere;
+  min-width:0;
+}
+.driver-stat-card .driver-stat-note{
+  color:#a8b7ca;font:600 11px/1.3 var(--f1-body);text-wrap:balance;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) {
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,185px),1fr))!important;
+  align-content:start;align-items:stretch!important;
+  gap:12px!important;padding:10px 0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  max-height:650px;min-width:0;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) > *{
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:auto!important;align-self:start;overflow:hidden!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) > * > div{
+  width:100%;max-width:100%;padding:15px!important;
+  min-width:0!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) h3{
+  font:800 clamp(17px,1.9vw,22px)/1.16 var(--f1-display)!important;
+  max-width:100%;overflow-wrap:anywhere;hyphens:auto;
+  margin:0 0 12px!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) img{
+  width:100%;max-width:100%;height:112px!important;
+  object-fit:cover;border-radius:11px!important;
+}
+body[data-f1-page="piloto"] :is(#gridVictories,#gridPodios,#gridTrayectoria) p{
+  color:#b3c0d1;font-size:11px!important;line-height:1.45;
+  max-width:100%;
+}
+
+/* Grand Prix: no fixed four-by-four grid, no empty stretched quadrants. */
+body[data-f1-page="granpremio"] main{
+  width:100%;max-width:1540px!important;
+}
+body[data-f1-page="granpremio"] .gp-layout{
+  display:grid!important;
+  grid-template-columns:minmax(0,.84fr) minmax(0,1.42fr)!important;
+  grid-template-areas:"summary results" "history results";
+  grid-template-rows:auto 1fr;
+  align-items:start;
+  gap:20px!important;
+  width:100%;min-width:0;
+}
+body[data-f1-page="granpremio"] .gp-layout > section{
+  max-width:100%;min-width:0!important;margin:0!important;
+  border-radius:20px!important;
+  background:linear-gradient(155deg,#172131,#0f1723)!important;
+  border:1px solid var(--f1-line)!important;
+}
+#gridGrandPrixEdit{grid-area:summary;padding:25px!important;}
+#gridResultados,#noResultados{grid-area:results;padding:clamp(16px,2vw,26px)!important;}
+.gp-history-section{
+  grid-area:history;
+  padding:14px 18px 20px!important;
+  overflow:hidden!important;
+}
+.gp-history-section #infoGridWCC{padding:0!important;display:block!important;}
+.gp-history-section #infoGridWCC > div{border:0!important;background:transparent!important;box-shadow:none!important;}
+.gp-history-section #infoGridWCC p{
+  font:800 clamp(23px,2.6vw,31px)/1.07 var(--f1-display)!important;
+  text-transform:uppercase;
+}
+.gp-summary-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px;}
+.gp-summary-heading h2{
+  font:800 clamp(22px,2.4vw,30px)/1 var(--f1-display)!important;
+  margin:6px 0 0!important;text-transform:uppercase;
+}
+.gp-summary-kicker{
+  margin:0;font:800 10px/1.35 var(--f1-body)!important;
+  color:var(--f1-gold);letter-spacing:.15em;
+}
+.gp-summary-edit{
+  flex:none;display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;padding:8px 11px!important;border:1px solid rgba(218,232,249,.17)!important;
+  border-radius:9px!important;background:#273242!important;color:#f0f5ff;
+  font:700 11px/1 var(--f1-body);
+}
+.gp-summary-fields{min-width:0;width:100%;}
+.gp-info-table,.gp-info-table tbody,.gp-info-table tr{display:block!important;width:100%;}
+.gp-info-table thead.sr-only{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden;}
+.gp-info-table tbody tr{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px!important;padding:0!important;
+}
+.gp-info-table tbody td{
+  display:flex;flex-direction:column;gap:7px;
+  padding:12px!important;border:1px solid rgba(213,225,242,.11)!important;
+  border-radius:11px!important;background:#1b2534;
+  font:700 12px/1.5 var(--f1-body);
+  word-break:normal;overflow-wrap:anywhere;
+}
+.gp-info-table tbody td:first-child{
+  grid-column:1/-1;color:#fff!important;
+  font:800 clamp(16px,1.7vw,21px)/1.22 var(--f1-display)!important;
+}
+.gp-info-table tbody td::before{
+  font:800 10px/1.2 var(--f1-body);color:#aebed1;
+  letter-spacing:.1em;
+}
+.gp-info-table td:nth-child(1)::before{content:"GRAN PREMIO";}
+.gp-info-table td:nth-child(2)::before{content:"CIRCUITO";}
+.gp-info-table td:nth-child(3)::before{content:"FECHA";}
+.gp-info-table td:nth-child(4)::before{content:"POLE POSITION";}
+.gp-info-table td:nth-child(5)::before{content:"VUELTA RÁPIDA";}
+#gridResultados > h2{
+  font:800 clamp(23px,2.7vw,34px)/1 var(--f1-display)!important;
+  text-transform:uppercase;letter-spacing:.03em;
+  margin:0 0 22px;
+}
+#gridResultados .gp-podium{margin:0 0 28px;}
+.gp-podium-eyebrow,.gp-results-kicker{
+  color:var(--f1-gold);font:800 10px/1.3 var(--f1-body);
+  letter-spacing:.16em;margin:0 0 15px;text-transform:uppercase;
+}
+.gp-results-kicker{margin-top:12px;color:#b9c9db;}
+.gp-podium-stage{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);
+  align-items:end;gap:12px;
+}
+.gp-podium-card{
+  display:flex;flex-direction:column;align-items:center;
+  min-width:0;padding:15px 12px 0;
+  border-radius:16px 16px 10px 10px;
+  background:linear-gradient(180deg,#232e3f,#141b29);
+  border:1px solid rgba(225,236,250,.14);
+  text-align:center;position:relative;overflow:hidden;
+  box-shadow:0 9px 25px rgba(0,0,0,.18);
+  transition:transform .2s ease,border-color .2s ease;
+}
+.gp-podium-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.32);}
+.gp-podium-card--1{
+  background:linear-gradient(180deg,rgba(154,106,31,.29),#1c2532 64%,#111823);
+  border-color:rgba(255,205,109,.38);
+}
+.gp-podium-card--2{background:linear-gradient(180deg,rgba(144,161,187,.14),#192333);}
+.gp-podium-card--3{background:linear-gradient(180deg,rgba(165,99,64,.2),#192230);}
+.gp-podium-rank{
+  align-self:center;font:900 22px/1 var(--f1-display);
+  letter-spacing:.05em;color:#cbd9e9;
+}
+.gp-podium-card--1 .gp-podium-rank{color:#ffd27a;}
+.gp-podium-card--3 .gp-podium-rank{color:#dfaa86;}
+.gp-podium-portrait{
+  position:relative;display:grid;place-items:center;overflow:hidden;
+  margin:11px auto 13px;width:min(100%,118px);aspect-ratio:1;
+  border-radius:15px 15px 7px 15px;
+  border:1px solid rgba(255,255,255,.13);
+  background:radial-gradient(circle at 50% 0%,#3a4c63,#1a2534 85%);
+}
+.gp-podium-card--1 .gp-podium-portrait{width:min(100%,145px);}
+.gp-podium-initials{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font:900 39px/1 var(--f1-display);color:rgba(255,255,255,.3);
+}
+.gp-podium-photo{
+  position:relative;object-fit:cover;object-position:center 20%;
+  width:100%;height:100%;border:0!important;border-radius:0!important;
+  background:transparent;z-index:1;
+}
+.gp-podium-name{
+  color:white;font:900 clamp(17px,1.8vw,24px)/1.07 var(--f1-display);
+  min-height:42px;max-width:100%;text-wrap:balance;overflow-wrap:anywhere;
+}
+.gp-podium-team{
+  color:#bfcbd9;font:700 11px/1.35 var(--f1-body);margin-top:6px;
+  overflow-wrap:anywhere;
+}
+.gp-podium-points{
+  color:#fff;font:900 17px/1 var(--f1-display);margin:13px 0 15px;
+}
+.gp-podium-step{
+  display:grid;place-items:center;
+  width:calc(100% + 24px);
+  margin:auto -12px 0;
+  font:900 clamp(28px,3vw,43px)/1 var(--f1-display);
+  color:rgba(255,255,255,.6);
+  background:#75859c;height:43px;
+}
+.gp-podium-card--1 .gp-podium-step{
+  background:linear-gradient(100deg,#a67221,#f0c875);
+  color:#3c2d13;height:68px;
+}
+.gp-podium-card--3 .gp-podium-step{
+  background:linear-gradient(100deg,#815039,#c48668);height:33px;
+}
+.gp-results-table[hidden],.gp-podium[hidden]{display:none!important;}
+.gp-results-table{max-width:100%;overflow-x:auto;}
+.gp-results-table table{min-width:565px;}
+.gp-results-table th{white-space:nowrap;vertical-align:middle;}
+.gp-results-table tbody td:first-child{
+  font:900 19px/1 var(--f1-display);color:#f0f4f9!important;
+}
+.gp-results-table tbody td:last-child{
+  font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+#gridLastWinner.gp-last-winners{
+  display:flex!important;flex-direction:column!important;
+  gap:10px!important;padding:8px 0 0!important;
+  max-height:650px!important;overflow-x:hidden!important;overflow-y:auto!important;
+}
+.gp-winner-card{
+  display:flex;align-items:center;gap:12px;min-width:0;
+  width:100%;padding:10px 12px;
+  border-radius:12px;background:rgba(255,255,255,.036);
+  border:1px solid rgba(232,241,255,.09);
+  text-decoration:none;
+}
+.gp-winner-card:hover{background:rgba(246,55,67,.075);border-color:rgba(246,55,67,.34);}
+.gp-winner-portrait{
+  position:relative;display:grid;place-items:center;flex:none;
+  width:54px;height:58px;overflow:hidden;
+  background:#202b3a;border-radius:10px;
+}
+.gp-winner-photo{position:relative;width:100%;height:100%;object-fit:cover;object-position:center 20%;z-index:1;}
+.gp-winner-initials{position:absolute;color:#657a94;font:900 21px/1 var(--f1-display);}
+.gp-winner-info{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;}
+.gp-winner-year{color:var(--f1-gold);font:800 9px/1.1 var(--f1-body);letter-spacing:.1em;}
+.gp-winner-name{font:800 19px/1.03 var(--f1-display);color:#fff;overflow-wrap:anywhere;}
+.gp-winner-event{font:600 10px/1.3 var(--f1-body);color:#aebcd0;overflow-wrap:anywhere;}
+.gp-winner-arrow{font-size:19px;color:var(--f1-red);}
+.gp-list-message{margin:0;padding:18px;color:#aebdd0;font-size:12px;line-height:1.5;}
+/* Compact GP and season archive tiles: prevent massive overlong race names. */
+#gridGPs > *{min-width:0!important;max-width:100%;overflow:hidden;}
+#gridGPs h3,#gridVictories h3,#gridPodios h3{
+  max-width:100%;
+  font:800 clamp(17px,1.6vw,21px)/1.16 var(--f1-display)!important;
+  text-wrap:pretty;overflow-wrap:anywhere;
+}
+#gridGPs > * img{max-width:100%;object-fit:cover;border-radius:10px;}
+/* Tablet and phone: retain podio order and readable metrics. */
+@media(max-width:1100px){
+  body[data-f1-page="granpremio"] .gp-layout{
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-areas:"summary" "results" "history";
+    grid-template-rows:auto;
+  }
+  body[data-f1-page="piloto"] > .driver-page-grid{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .driver-profile-panel,.driver-victories-panel,.driver-career-panel,.driver-podiums-panel{
+    grid-column:1!important;grid-row:auto!important;
+  }
+}
+@media(max-width:650px){
+  #gridSeasons.season-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
+  #gridSeasons .season-card{min-height:175px!important;padding:16px 13px!important;gap:10px;}
+  #gridSeasons .season-card .season-card-year{font-size:40px!important;}
+  #gridSeasons .season-card .season-card-champion{font-size:11px!important;}
+  .driver-meta-grid{grid-template-columns:1fr 1fr;}
+  .driver-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .driver-stat-card{padding:12px 11px;min-height:112px;}
+  .gp-podium-stage{
+    display:flex;flex-direction:column;align-items:stretch;gap:11px;
+  }
+  .gp-podium-card{display:grid;grid-template-columns:48px 68px minmax(0,1fr);grid-template-rows:auto auto auto;
+    gap:2px 10px;min-height:100px;padding:13px!important;text-align:left;align-items:center;}
+  .gp-podium-card--1{order:1}.gp-podium-card--2{order:2}.gp-podium-card--3{order:3}
+  .gp-podium-rank{grid-column:1;grid-row:1/4;justify-self:center;align-self:center;font-size:27px;}
+  .gp-podium-portrait,.gp-podium-card--1 .gp-podium-portrait{
+    grid-column:2;grid-row:1/4;width:65px;height:72px;margin:0;
+    border-radius:10px;align-self:center;
+  }
+  .gp-podium-name{grid-column:3;grid-row:1;min-height:0!important;font-size:20px;}
+  .gp-podium-team{grid-column:3;grid-row:2;margin:0;}
+  .gp-podium-points{grid-column:3;grid-row:3;margin:0;font-size:16px;}
+  .gp-podium-step{display:none;}
+  .gp-info-table tbody tr{grid-template-columns:1fr 1fr!important;}
+  #gridLastWinner.gp-last-winners{max-height:none!important;}
+}
+@media(max-width:390px){
+  #gridSeasons.season-cards{grid-template-columns:1fr!important;}
+  .driver-meta-grid{grid-template-columns:1fr;}
+  .driver-stats-grid{grid-template-columns:1fr 1fr;}
+  .gp-info-table tbody tr{grid-template-columns:1fr!important;}
+  .gp-info-table tbody td:first-child{grid-column:1;}
+}
+
+
+/* F1 APP · cierre de auditoría responsive (25-11-2026) */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+:where(main,section,article,.grid,.flex,.gp-layout,.gp-podium-stage){min-width:0;}
+:where(#gridGPs,#gridWDC,#gridWCC,#gridCircuitos,#gridPilotos,#gridEquipos,
+  #gridDriverSeason,#gridTeamSeason,#gridVictories,#gridPodios,#gridTrayectoria) > *{
+  min-width:0!important;max-width:100%!important;
+}
+:where(#gridGPs,#gridWDC,#gridWCC,#gridCircuitos,#gridPilotos,#gridEquipos,
+  #gridDriverSeason,#gridTeamSeason,#gridVictories,#gridPodios,#gridTrayectoria)
+  :is(h2,h3,h4,p,strong,span){
+  min-width:0;max-width:100%;overflow-wrap:anywhere;hyphens:auto;
+}
+#WDCSection #infoGridWDC,#WCCSection #infoGridWCC,
+#GPSection #infoGridGP,.gp-history-section #infoGridWCC{
+  min-width:0;padding:clamp(8px,1.5vw,18px)!important;
+}
+#WDCSection #gridWDC,#WCCSection #gridWCC{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  align-content:start;overflow-x:hidden!important;overflow-y:auto!important;
+  padding:clamp(8px,1.3vw,16px)!important;gap:11px!important;
+}
+#GPSection #gridGPs{
+  display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))!important;
+  align-content:start;overflow-x:hidden!important;overflow-y:auto!important;
+  padding:clamp(9px,1.4vw,17px)!important;gap:12px!important;
+}
+#gridGPs > *{width:100%!important;}
+#gridGPs > * :is(h3,strong){
+  font-size:clamp(16px,1.5vw,21px)!important;line-height:1.16!important;
+  overflow-wrap:anywhere;
+}
+#gridCircuitos,#gridPilotos,#gridEquipos{
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))!important;
+  padding:clamp(10px,2vw,22px)!important;
+}
+#gridDriverSeason,#gridTeamSeason{max-width:100%!important;min-width:0;}
+#gridDriverSeason > *,#gridTeamSeason > *{flex-shrink:0;max-width:100%;}
+body[data-f1-page="granpremio"] .gp-layout > .gp-history-section{
+  min-height:0;align-self:start;
+}
+body[data-f1-page="granpremio"] #gridResultados{overflow:hidden;min-width:0;}
+body[data-f1-page="granpremio"] .gp-podium-stage,
+body[data-f1-page="granpremio"] .gp-podium-card{min-width:0;max-width:100%;}
+body[data-f1-page="granpremio"] :is(.gp-podium-name,.gp-podium-team){
+  width:100%;overflow-wrap:anywhere;hyphens:auto;
+}
+.gp-results-driver{font-weight:800;}
+.gp-driver-link{color:#f4f7fc;text-decoration:none;overflow-wrap:anywhere;}
+.gp-driver-link:hover,.gp-driver-link:focus-visible{color:var(--f1-gold);text-decoration:underline;}
+.gp-winner-card{min-height:76px;}
+.gp-winner-arrow{flex:none;}
+#gridLastWinner.gp-last-winners{scrollbar-gutter:stable;}
+.gp-info-table td{min-width:0;}
+body #gpTitle.f1-gp-header-title{
+  font:700 clamp(10px,1vw,13px)/1.3 var(--f1-body)!important;
+  text-transform:none!important;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+@media(max-width:850px){
+  #WDCSection,#WCCSection,#GPSection{width:100%;max-width:100%;}
+  #GPSection #gridGPs{
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,205px),1fr))!important;
+    max-height:none!important;
+  }
+  #WDCSection #gridWDC,#WCCSection #gridWCC{max-height:440px!important;}
+}
+@media(max-width:480px){
+  body[data-f1-page="granpremio"] .gp-layout{gap:14px!important;}
+  #gridGrandPrixEdit,#gridResultados,#noResultados,.gp-history-section{padding:15px!important;}
+  .gp-summary-heading{align-items:flex-start;gap:9px;}
+  .gp-summary-edit{font-size:10px!important;padding:7px 9px!important;}
+  .gp-podium-card{
+    grid-template-columns:38px 58px minmax(0,1fr)!important;
+    gap:3px 8px!important;padding:11px!important;
+  }
+  .gp-podium-portrait,.gp-podium-card--1 .gp-podium-portrait{width:56px;height:64px;}
+  .gp-podium-name{font-size:clamp(15px,4.5vw,19px)!important;line-height:1.12!important;}
+  .gp-podium-rank{font-size:23px!important;}
+  .gp-results-table{margin:0 -4px;padding:0 4px;}
+  #gridGPs > * h3{font-size:17px!important;}
+  #gridLastWinner.gp-last-winners{scrollbar-gutter:auto;}
+}

@@ -5,6 +5,7 @@
         const [GPsTemporada] = await connectionMySQL.query(`
         SELECT
             CONCAT(p.Nombre, ' ', p.Apellido) AS nombre_piloto,
+            p.id_Piloto AS id_Piloto,
             e.nombre AS equipo,
             rgp.posicion_final,
             rgp.posicion_inicio,

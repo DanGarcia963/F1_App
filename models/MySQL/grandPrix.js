@@ -153,6 +153,44 @@
         return LastWinners
     }
 
+
+    // Consulta histórica por identidad del circuito, categoría y formato de carrera.
+    // No compara nombre_oficial: los patrocinadores cambian entre temporadas.
+    static async obtenerLastWinnersPorGp(idGP) {
+      const [winners] = await connectionMySQL.query(`
+        SELECT
+          gp.id_GP,
+          temporada.anio,
+          CONCAT(p.Nombre, ' ', p.Apellido) AS Winners,
+          gp.nombre_oficial,
+          circuito.nombre AS Circuito
+        FROM grandes_premios actual
+        JOIN temporada temporadaActual
+          ON temporadaActual.id_Temporada = actual.temporada_id
+        JOIN grandes_premios gp
+          ON gp.circuito_id = actual.circuito_id
+         AND gp.id_Categoria = actual.id_Categoria
+         AND COALESCE(gp.tipo_carrera, 'GP') = COALESCE(actual.tipo_carrera, 'GP')
+        JOIN temporada
+          ON temporada.id_Temporada = gp.temporada_id
+        JOIN circuito
+          ON circuito.id_Circuito = gp.circuito_id
+        JOIN resultados r
+          ON r.grand_prix_id = gp.id_GP AND r.posicion_final = 1
+        JOIN piloto p
+          ON p.id_Piloto = r.piloto_id
+        WHERE actual.id_GP = ?
+          AND gp.id_GP <> actual.id_GP
+          AND (
+            temporada.anio < temporadaActual.anio
+            OR (temporada.anio = temporadaActual.anio AND gp.fecha < actual.fecha)
+          )
+        ORDER BY temporada.anio DESC, gp.fecha DESC, gp.id_GP DESC
+        LIMIT 30
+      `, [idGP]);
+      return winners;
+    }
+
 static async registrarGP({ entrada }) {
   const {
     nombre_oficial:nombreGP, fecha, circuito_id:circuito,temporada_id:temporada, vueltas_totales:vueltas, pole_position_piloto_id:polePosition, tiempo_pole:tiempoPole, vuelta_rapida_piloto_id:vueltaRapida, tiempo_vuelta_rapida:tiempoVR, tipo_carrera: formatoCarrera, id_Categoria: idCategoria
