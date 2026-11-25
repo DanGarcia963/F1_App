@@ -23,8 +23,7 @@ export class PilotoController {
 
         const piloto = await this.pilotModel.obtenerInfoPilotoPorId(id)
 
-        if (piloto) return res.json(piloto)
-            res.status(404).json({ message: 'piloto no encontrado' })
+        return res.json((Array.isArray(piloto) ? piloto : []));
     }
 
     obtenerVictoriasPilotoPorID = async (req, res) => {
@@ -32,8 +31,7 @@ export class PilotoController {
 
         const piloto = await this.pilotModel.obtenerVictoriasPilotoPorID(id)
 
-        if (piloto) return res.json(piloto)
-            res.status(404).json({ message: 'victorias del piloto no encontradas' })
+        return res.json((Array.isArray(piloto) ? piloto : []));
     }
 
     obtenerPodiosPilotoPorID = async (req, res) => {
@@ -41,8 +39,7 @@ export class PilotoController {
 
         const piloto = await this.pilotModel.obtenerPodiosPilotoPorID(id)
 
-        if (piloto) return res.json(piloto)
-            res.status(404).json({ message: 'Podios del piloto no encontrados' })
+        return res.json((Array.isArray(piloto) ? piloto : []));
     }
 
     obtenerTrayectoriaPilotoPorID = async (req, res) => {
@@ -50,8 +47,7 @@ export class PilotoController {
 
         const piloto = await this.pilotModel.obtenerTrayectoriaPilotoPorID(id)
 
-        if (piloto) return res.json(piloto)
-            res.status(404).json({ message: 'Trayectoria del piloto no encontrada' })
+        return res.json((Array.isArray(piloto) ? piloto : []));
     }
 
     registrarPiloto = async (req, res) => {

@@ -13,8 +13,7 @@
 
         const resultados = await this.resultsModel.obtenerResultadoPorGPPorId(id)
 
-        if (resultados) return res.json(resultados)
-            res.status(404).json({ message: 'resultados de GP no encontrados' })
+        return res.json((Array.isArray(resultados) ? resultados : []));
     }
 
     registrarResultado = async (req, res) => {

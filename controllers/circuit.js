@@ -35,22 +35,19 @@
         const { id } = req.params
         const recordPole = await this.circuitModel.obtenerRecordPolePorId(id)
 
-        if (recordPole) return res.json(recordPole)
-            res.status(404).json({ message: 'Record Pole no encontrado' })
+        return res.json((recordPole || null));
     }
 
     obtenerRecordVueltaPorId = async (req, res) => {
         const { id } = req.params
         const recordVuelta = await this.circuitModel.obtenerRecordVueltaPorId(id)
-        if (recordVuelta) return res.json(recordVuelta)
-            res.status(404).json({ message: 'Record Vuelta no encontrado' })
+        return res.json((recordVuelta || null));
     }
 
     obtenerMaxVencedorPorId = async (req, res) => {
         const { id } = req.params
         const maxVencedor = await this.circuitModel.obtenerMaxVencedorPorId(id)
-        if (maxVencedor) return res.json(maxVencedor)
-            res.status(404).json({ message: 'Max Vencedor no encontrado' })
+        return res.json((maxVencedor || null));
     }
 
     cambiarNombre = async (req, res) => {

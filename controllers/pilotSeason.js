@@ -13,24 +13,21 @@
 
         const PilotosTemporada = await this.pilotSeasonModel.obtenerPilotosPorTemporadaPorId(categoria, id)
 
-        if (PilotosTemporada) return res.json(PilotosTemporada)
-            res.status(404).json({ message: 'Pilotos por temporada no encontrados' })
+        return res.json((Array.isArray(PilotosTemporada) ? PilotosTemporada : []));
     }
 
     obtenerDuplaPilotos = async (req, res) => {
         const { idTemporada, idEquipo } = req.method === 'GET' ? req.params : req.body;
         const PilotosDuplaTemporada = await this.pilotSeasonModel.obtenerDuplaPilotos(idTemporada, idEquipo)
 
-        if (PilotosDuplaTemporada) return res.json(PilotosDuplaTemporada)
-            res.status(404).json({ message: 'Dupla de Pilotos por temporada no encontrados' })
+        return res.json((Array.isArray(PilotosDuplaTemporada) ? PilotosDuplaTemporada : []));
     }
 
     obtenerPilotosPorTemporadaYEquipoPorId = async (req, res) => {
         const { idTemporada, idPiloto } = req.body;
         const PilotosTemporada = await this.pilotSeasonModel.obtenerPilotosPorTemporadaYEquipoPorId(idTemporada, idPiloto)
 
-        if (PilotosTemporada) return res.json(PilotosTemporada)
-            res.status(404).json({ message: 'Piloto por temporada no encontrados' })
+        return res.json((Array.isArray(PilotosTemporada) ? PilotosTemporada : []));
     }
 
     crearPilotoTemporada = async (req, res) => {

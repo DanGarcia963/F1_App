@@ -21,8 +21,7 @@ obtenerGPTemporadaPorId = async (req, res) => {
     const { Categoria, Anio } = req.params;
     const GPsSeason = await this.gpModel.obtenerGPTemporadaPorId(Categoria, Anio);
 
-    if (GPsSeason) return res.json(GPsSeason);
-    res.status(404).json({ message: 'gran premio de esta temporada no encontrado' });
+    return res.json((Array.isArray(GPsSeason) ? GPsSeason : []));
 }
 
 
@@ -49,8 +48,7 @@ obtenerGPTemporadaPorId = async (req, res) => {
 
         const LastWinners = await this.gpModel.obtenerLastWinnerGP(nombreOficial)
 
-        if (LastWinners) return res.json(LastWinners)
-            res.status(404).json({ message: 'last Winners no encontrados' })
+        return res.json((Array.isArray(LastWinners) ? LastWinners : []));
     }
 
     registrarGP = async (req, res) => {

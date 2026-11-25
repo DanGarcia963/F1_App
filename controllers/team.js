@@ -31,16 +31,14 @@ export class TeamController {
 
         const monoplaza = await this.teamModel.obtenerMonoplazaActualEquipo({ entrada: req.method === 'GET' ? { idEquipo: req.params.id } : req.body })
 
-        if (monoplaza) return res.json(monoplaza)
-            res.status(404).json({ message: 'monoplaza no encontrado' })
+        return res.json((Array.isArray(monoplaza) ? monoplaza : []));
     }
     
     obtenerPilotoseEquipoTemporada = async (req, res) => {
 
         const pilotos = await this.teamModel.obtenerPilotoseEquipoTemporada({ entrada: req.method === 'GET' ? { idEquipo: req.params.id, anio: req.params.anio } : req.body })
 
-        if (pilotos) return res.json(pilotos)
-            res.status(404).json({ message: 'pilotos de equipo en esa temporada no encontrado' })
+        return res.json((Array.isArray(pilotos) ? pilotos : []));
     }
 
     obtenerInfoEquipoPorId = async (req, res) => {
@@ -48,8 +46,7 @@ export class TeamController {
 
         const equipo = await this.teamModel.obtenerInfoEquipoPorId(id)
 
-        if (equipo) return res.json(equipo)
-            res.status(404).json({ message: 'equipo no encontrado' })
+        return res.json((Array.isArray(equipo) ? equipo : []));
     }
 
     obtenerDuplasPilotos = async (req, res) => {
@@ -57,8 +54,7 @@ export class TeamController {
 
         const dupla = await this.teamModel.obtenerDuplasPilotos(id)
 
-        if (dupla) return res.json(dupla)
-            res.status(404).json({ message: 'duplas no encontradas' })
+        return res.json((Array.isArray(dupla) ? dupla : []));
     }
 
     obtenerVictoriasEquipoPorID = async (req, res) => {
@@ -66,8 +62,7 @@ export class TeamController {
 
         const equipo = await this.teamModel.obtenerVictoriasEquipoPorID(id)
 
-        if (equipo) return res.json(equipo)
-            res.status(404).json({ message: 'victorias del equipo no encontradas' })
+        return res.json((Array.isArray(equipo) ? equipo : []));
     }
 
     registrarEquipo = async (req, res) => {

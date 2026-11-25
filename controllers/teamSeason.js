@@ -13,15 +13,13 @@ export class TeamSeasonController {
 
         const equiposTemporada = await this.teamSeasonModel.obtenerEquiposPorTemporadaPorId(categoria, id)
 
-        if (equiposTemporada) return res.json(equiposTemporada)
-            res.status(404).json({ message: 'equipos por temporada no encontrados' })
+        return res.json((Array.isArray(equiposTemporada) ? equiposTemporada : []));
     }
 
     obtenerEquiposPorIDYPorTemporadaPorId = async (req, res) => {
         const equiposTemporada = await this.teamSeasonModel.obtenerEquiposPorIDYPorTemporadaPorId({entrada: req.body})
 
-        if (equiposTemporada) return res.json(equiposTemporada)
-            res.status(404).json({ message: 'equipos por temporada no encontrados' })
+        return res.json((Array.isArray(equiposTemporada) ? equiposTemporada : []));
     }
 
     crearEquipoTemporada = async (req, res) => {
