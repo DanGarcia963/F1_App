@@ -1,0 +1,5 @@
+# F2 — datos de fuente, no verificados
+Ejecutar primero database/01_F2_MULTICATEGORIA.sql y database/02_F2_PREPARAR_CARGA.sql. Los archivos de este directorio solo agregan registros en el esquema privado f2_import; se pueden ejecutar uno por uno. No establecen verificado=true ni insertan resultados operativos.
+2017–2023: 4397 filas del pipeline de Alarchemn (MIT del repositorio); fecha, abreviatura y clasificaciones originales. No contienen puntos oficiales, parrillas completas ni identidades consolidadas.
+2025–2026: fuente secundaria MatthewDelong/F1-Telemetry (uso no comercial, atribución y compartir bajo misma licencia); se conservan datos con discrepancias, por ejemplo dos rondas etiquetadas Hungary en 2026, y faltan puntos de 2025 y algunos de 2026. No usar para publicar sin conciliación. 2024 no incluido.
+Consultar F2_00_REVISAR_COBERTURA.sql al final. El SQL 03 solo puede ejecutarse con lotes verificados, después de normalizar y conciliar contra fuentes oficiales. No marcar verificado para evitar errores.
