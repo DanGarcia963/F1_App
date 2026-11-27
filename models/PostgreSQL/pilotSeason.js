@@ -123,11 +123,22 @@ export class PilotSeasonModel {
         const {
           id_Piloto_Temporada:idPilotoTemporada, piloto_id: idPiloto, equipo_id: idEquipo, temporada_id: idTemporada, numero
         } = entrada
+        const [teams] = await connectionPostgres.query('SELECT id_categoria FROM equipo WHERE id_equipo = ?', [idEquipo]);
+        if (!teams.length) throw new Error('Equipo no encontrado');
+        if (Number(teams[0].id_categoria) !== 1) {
+          // F2 uses a composite key. Never interpret a legacy F1 row ID as F2.
+          return 'La edición histórica F2 requiere identificar categoría, piloto y temporada; usar el importador verificado';
+        }
+        const [legacy] = await connectionPostgres.query(`
+          SELECT pt.piloto_id FROM pilotos_temporada pt JOIN equipo e ON e.id_equipo=pt.equipo_id
+          WHERE pt.id_piloto_temporada=? AND e.id_categoria=1 AND pt.temporada_id=?`,
+          [idPilotoTemporada,idTemporada]);
+        if (!legacy.length) return 'Inscripción F1 no encontrada';
         const existeDuplaPilotos = await this.obtenerDuplaPilotos(idTemporada, idEquipo)
         console.log(idTemporada, idEquipo, idPiloto, idPilotoTemporada)
-        if (existeDuplaPilotos.length > 2) {return 'Esta temporada la escuderia ya tiene su dupla de pilotos'}
+        if (Array.isArray(existeDuplaPilotos) && existeDuplaPilotos.length > 2) {return 'Esta temporada la escuderia ya tiene su dupla de pilotos'}
         
-        const existePilotoTemporada = await this.obtenerPilotosPorTemporadaPorId(idTemporada, idPiloto)
+        const existePilotoTemporada = await this.obtenerPilotosPorTemporadaYEquipoPorId(idTemporada, idPiloto, 1)
         
         if (existePilotoTemporada === false) {return 'Ya existe este piloto en esta temporada'}
 
