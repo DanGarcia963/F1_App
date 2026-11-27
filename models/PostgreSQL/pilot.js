@@ -3,10 +3,15 @@ import { connectionPostgres } from '../../helpers/connectionPostgres.js'
 export class PilotModel {
     static async obtenerTodosLosPilotos (idCategoria) {
       const [pilotos] = await connectionPostgres.query(`SELECT p.id_piloto AS "id_Piloto", CONCAT(p.nombre,' ',p.apellido) AS nombre_completo,
- CONCAT('#',p.numero,' - ',p.codigo_fia) AS identificador,p.nacionalidad,p.fecha_nacimiento,p.fecha_debut, ?::integer AS "id_Categoria"
- FROM piloto p WHERE p.id_categoria=? OR EXISTS(SELECT 1 FROM pilotos_categorias pc WHERE pc.piloto_id=p.id_piloto AND pc.id_categoria=?)
+ CONCAT(CASE WHEN n.numero IS NOT NULL THEN CONCAT('#',n.numero,' - ') ELSE '' END,p.codigo_fia) AS identificador,p.nacionalidad,p.fecha_nacimiento,p.fecha_debut, ?::integer AS "id_Categoria"
+ FROM piloto p
+ LEFT JOIN LATERAL (
+   SELECT pt.numero FROM v_pilotos_temporada_categoria pt JOIN temporada t ON t.id_temporada=pt.temporada_id
+   WHERE pt.piloto_id=p.id_piloto AND pt.id_categoria=? ORDER BY t.anio DESC LIMIT 1
+ ) n ON TRUE
+ WHERE p.id_categoria=? OR EXISTS(SELECT 1 FROM pilotos_categorias pc WHERE pc.piloto_id=p.id_piloto AND pc.id_categoria=?)
  OR EXISTS(SELECT 1 FROM v_pilotos_temporada_categoria pt WHERE pt.piloto_id=p.id_piloto AND pt.id_categoria=?)
- ORDER BY nombre_completo;`,[idCategoria,idCategoria,idCategoria,idCategoria])
+ ORDER BY nombre_completo;`,[idCategoria,idCategoria,idCategoria,idCategoria,idCategoria])
   
       return pilotos
     }
@@ -15,12 +20,12 @@ export class PilotModel {
         const [piloto] = await connectionPostgres.query(`
           SELECT p.id_piloto AS "id_Piloto",
             CONCAT(p.nombre,' ',p.apellido) AS nombre_completo,
-            CONCAT('#',COALESCE(p.numero::text,'—'),' - ',COALESCE(p.codigo_fia,'')) AS identificador,
+            CONCAT(CASE WHEN ultimo.numero IS NOT NULL THEN CONCAT('#',ultimo.numero,' - ') ELSE '' END,COALESCE(p.codigo_fia,'')) AS identificador,
             p.nacionalidad,p.fecha_nacimiento,p.fecha_debut,
             ?::integer AS "id_Categoria",e.nombre AS equipo
           FROM piloto p
           LEFT JOIN LATERAL (
-             SELECT pt.equipo_id
+             SELECT pt.equipo_id,pt.numero
              FROM v_pilotos_temporada_categoria pt
              JOIN temporada t ON t.id_temporada=pt.temporada_id
              WHERE pt.piloto_id=p.id_piloto AND pt.id_categoria=?
