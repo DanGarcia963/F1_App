@@ -42,7 +42,7 @@ export class PilotSeasonModel {
         return pilotosTemporada
     }
 
-        static async obtenerPilotosPorTemporadaYEquipoPorId (idTemporada, idPiloto) {
+        static async obtenerPilotosPorTemporadaYEquipoPorId (idTemporada, idPiloto, categoria=1) {
         const [pilotosTemporadaEquipo] = await connectionPostgres.query(`SELECT 
             e.nombre, 
             CONCAT(p.nombre, ' ', p.apellido) AS "nombre_completo", 
@@ -54,7 +54,7 @@ export class PilotSeasonModel {
             ON p.id_Piloto = pt.piloto_id
             JOIN temporada t
             ON t.id_Temporada = pt.temporada_id
-            WHERE pt.temporada_id = ? AND pt.piloto_id = ?;`, [idTemporada, idPiloto])
+            WHERE pt.temporada_id = ? AND pt.piloto_id = ? AND pt.id_categoria = ?;`, [idTemporada, idPiloto,categoria])
         if (pilotosTemporadaEquipo.length === 0) return false 
         return pilotosTemporadaEquipo
     }
@@ -77,11 +77,33 @@ export class PilotSeasonModel {
     }
 
     static async crearPilotoTemporada ({ entrada }) {
+        const { piloto_id, equipo_id, temporada_id, numero } = entrada;
+        const [rows] = await connectionPostgres.query(
+          'SELECT id_categoria FROM equipo WHERE id_equipo = ?', [equipo_id]);
+        if (!rows.length) throw new Error('Equipo no encontrado');
+        const categoria = Number(rows[0].id_categoria);
+        if (categoria === 1) return this.crearPilotoTemporadaLegado({ entrada });
+        // One membership per driver/category; one enrollment per category-season.
+        // Both changes are atomic within this PostgreSQL statement.
+        const [created] = await connectionPostgres.query(`
+          WITH afiliacion AS (
+            INSERT INTO pilotos_categorias(piloto_id,id_categoria)
+            VALUES (?,?) ON CONFLICT DO NOTHING
+          )
+          INSERT INTO pilotos_temporada_categoria(piloto_id,id_categoria,temporada_id,equipo_id,numero)
+          VALUES (?,?,?,?,?)
+          ON CONFLICT (piloto_id,id_categoria,temporada_id) DO NOTHING
+          RETURNING *`, [piloto_id,categoria,piloto_id,categoria,temporada_id,equipo_id,numero]);
+        if (!created.length) return 'Ya existe una inscripción en esta categoría y temporada';
+        return created;
+    }
+
+    static async crearPilotoTemporadaLegado ({ entrada }) {
         const {
             piloto_id:idPiloto, equipo_id:idEquipo, temporada_id:idTemporada, numero
         } = entrada
 
-        const pilotoTemporadaExiste = await this.obtenerPilotosPorTemporadaYEquipoPorId(idTemporada, idPiloto)
+        const pilotoTemporadaExiste = await this.obtenerPilotosPorTemporadaYEquipoPorId(idTemporada, idPiloto, 1)
         if (pilotoTemporadaExiste !== false) {
             return 'Ya existe un piloto esta temporada en ese equipo'
         }
